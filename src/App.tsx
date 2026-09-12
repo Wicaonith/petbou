@@ -21,6 +21,8 @@ import { Feuilles } from './ui/Feuilles'
 import { enregistrer, ouvrir } from './ui/fichier'
 import { Matchs } from './ui/Matchs'
 import { Tirage } from './ui/Tirage'
+import { Affichage } from './ui/Affichage'
+import { Bilan } from './ui/Bilan'
 import { Classement } from './ui/Classement'
 
 const CLE = 'petanque.tournoi.v1'
@@ -54,6 +56,7 @@ export default function App() {
   const [tournoi, setTournoi] = useState<Tournoi>(() => charger() ?? nouveau())
   const [noms, setNoms] = useState<string[]>(() => chargerNoms())
   const [onglet, setOnglet] = useState<Onglet>('reglages')
+  const [projection, setProjection] = useState(false)
 
   const lance = tournoi.matchs.length > 0
 
@@ -77,8 +80,8 @@ export default function App() {
     setOnglet('matchs')
   }
 
-  /** `feuilles` n'imprime que les feuilles de match ; sinon, l'écran courant. */
-  const imprimer = (mode?: 'feuilles') => {
+  /** `feuilles` ou `bilan` n'impriment que ce document ; sinon, l'écran courant. */
+  const imprimer = (mode?: 'feuilles' | 'bilan') => {
     if (mode) document.body.dataset.impression = mode
     window.print()
     delete document.body.dataset.impression
@@ -111,6 +114,13 @@ export default function App() {
           {tournoi.nbTerrains !== null && ` · ${tournoi.nbTerrains} terrains`}
         </span>
         <div className="droite">
+          <button
+            className="secondaire"
+            onClick={() => setProjection(true)}
+            disabled={tournoi.equipes.length === 0}
+          >
+            Projeter
+          </button>
           <button className="secondaire" onClick={ouvrirFichier}>
             Ouvrir
           </button>
@@ -153,7 +163,14 @@ export default function App() {
         ))}
       </nav>
 
-      {fini && <div className="bandeau">Concours terminé. Le classement final est définitif.</div>}
+      {fini && (
+        <div className="bandeau">
+          Concours terminé. Le classement final est définitif.{' '}
+          <button className="action" style={{ marginLeft: 8 }} onClick={() => imprimer('bilan')}>
+            Imprimer le bilan
+          </button>
+        </div>
+      )}
       {!fini && lance && attente === 0 && onglet !== 'tirage' && (
         <div className="bandeau">
           Tous les scores du tour sont saisis.{' '}
@@ -224,9 +241,25 @@ export default function App() {
         />
       )}
 
-      {onglet === 'classement' && <Classement tournoi={tournoi} />}
+      {onglet === 'classement' && (
+        <>
+          <Classement tournoi={tournoi} />
+          {lance && (
+            <div className="carte">
+              <button className="secondaire" onClick={() => imprimer('bilan')}>
+                Imprimer le bilan du concours
+              </button>
+              <p className="aide" style={{ margin: '12px 0 0' }}>
+                Une page A4 : podium, classement complet et méthode de départage.
+              </p>
+            </div>
+          )}
+        </>
+      )}
 
       <Feuilles tournoi={tournoi} />
+      <Bilan tournoi={tournoi} />
+      {projection && <Affichage tournoi={tournoi} onFermer={() => setProjection(false)} />}
     </div>
   )
 }
