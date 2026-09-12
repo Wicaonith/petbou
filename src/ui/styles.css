@@ -132,3 +132,30 @@ td .equipe-joueurs { color: var(--discret); font-size: 13px; }
   body { background: #fff; }
   .carte, .match { box-shadow: none; break-inside: avoid; }
 }
+
+/* ---------- Feuilles de match (papier uniquement) ---------- */
+.feuilles { display: none; }
+
+@media print {
+  /* Deux modes d'impression : l'écran courant, ou les feuilles de match. */
+  body[data-impression='feuilles'] .app > *:not(.feuilles) { display: none !important; }
+  body[data-impression='feuilles'] .feuilles {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 0;
+  }
+  .feuille {
+    border: 1px dashed #999; padding: 14px 16px; break-inside: avoid;
+    min-height: 46mm; display: flex; flex-direction: column;
+  }
+  .feuille-tete {
+    display: flex; justify-content: space-between; align-items: baseline;
+    font-size: 11px; color: #444; border-bottom: 1px solid #ccc; padding-bottom: 5px;
+  }
+  .feuille-tete strong { font-size: 15px; color: #000; }
+  .feuille-titre { font-size: 11px; color: #444; margin: 7px 0 10px; }
+  .feuille-camps { width: 100%; border-collapse: collapse; }
+  .feuille-camps td { border: none; padding: 7px 0; font-size: 14px; font-weight: 600; text-align: left; }
+  /* Sans quoi une doublette au nom long vient buter contre la case de score. */
+  .feuille-camps td:first-child { padding-right: 7mm; }
+  .feuille-camps td.case { width: 26mm; border: 1.5px solid #000; height: 13mm; }
+  .feuille-pied { margin-top: auto; padding-top: 12px; font-size: 10px; color: #777; border-top: 1px dotted #bbb; }
+}

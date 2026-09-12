@@ -15,6 +15,8 @@ import {
   type Tournoi,
 } from './engine'
 import { SaisieEquipes, equipesDepuisNoms } from './ui/SaisieEquipes'
+import { Feuilles } from './ui/Feuilles'
+import { enregistrer, ouvrir } from './ui/fichier'
 import { Matchs } from './ui/Matchs'
 import { Classement } from './ui/Classement'
 
@@ -72,6 +74,25 @@ export default function App() {
     setOnglet('matchs')
   }
 
+  /** `feuilles` n'imprime que les feuilles de match ; sinon, l'écran courant. */
+  const imprimer = (mode?: 'feuilles') => {
+    if (mode) document.body.dataset.impression = mode
+    window.print()
+    delete document.body.dataset.impression
+  }
+
+  const ouvrirFichier = async () => {
+    try {
+      const donnees = await ouvrir()
+      if (!donnees) return
+      setTournoi(donnees.tournoi)
+      setNoms(donnees.noms ?? [])
+      setOnglet(donnees.tournoi.matchs.length > 0 ? 'matchs' : 'equipes')
+    } catch (e) {
+      alert(e instanceof Error ? e.message : 'Fichier illisible.')
+    }
+  }
+
   const attente = enCours(tournoi).length
   const fini = termine(tournoi)
   const prets = tournoi.equipes.length
@@ -85,7 +106,16 @@ export default function App() {
           {prets > 1 ? 's' : ''} · {tournoi.nbTerrains} terrains
         </span>
         <div className="droite">
-          <button className="secondaire" onClick={() => window.print()}>
+          <button className="secondaire" onClick={ouvrirFichier}>
+            Ouvrir
+          </button>
+          <button
+            className="secondaire"
+            onClick={() => enregistrer({ version: 1, tournoi, noms }, tournoi.nom)}
+          >
+            Enregistrer
+          </button>
+          <button className="secondaire" onClick={() => imprimer()}>
             Imprimer
           </button>
           <button
@@ -164,6 +194,14 @@ export default function App() {
         </>
       )}
 
+      {onglet === 'matchs' && attente > 0 && (
+        <div style={{ marginBottom: 16 }}>
+          <button className="secondaire" onClick={() => imprimer('feuilles')}>
+            Imprimer les {attente} feuilles de match
+          </button>
+        </div>
+      )}
+
       {onglet === 'matchs' && (
         <Matchs
           tournoi={tournoi}
@@ -173,6 +211,8 @@ export default function App() {
       )}
 
       {onglet === 'classement' && <Classement tournoi={tournoi} />}
+
+      <Feuilles tournoi={tournoi} />
     </div>
   )
 }
