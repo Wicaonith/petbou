@@ -34,99 +34,104 @@
 <body>
 
 <div class="tete">
-  <h1>Installer « Concours de pétanque »</h1>
+  <h1>Mettre « Concours de pétanque » sur l'ordinateur du club</h1>
   <div class="destinataire">
-    Cette page s'adresse à <strong>la personne qui installe le logiciel</strong>, une seule fois, sur
-    l'ordinateur du club. Comptez cinq minutes. Ensuite, tenir la table de marque ne demande plus
-    rien de particulier&nbsp;: il y a un mode d'emploi séparé pour ça.
+    Cette page s'adresse à <strong>la personne qui prépare l'ordinateur</strong>, une seule fois.
+    Comptez cinq minutes. Il n'y a rien à installer. Ensuite, tenir la table de marque ne demande
+    plus rien de particulier&nbsp;: il y a un mode d'emploi séparé pour ça.
   </div>
-</div>
-
-<div class="encadre">
-  <div class="t">Le plus simple&nbsp;: apportez le fichier sur une clé USB</div>
-  <p>
-    Téléchargez l'installeur sur votre propre ordinateur, copiez-le sur une clé USB ordinaire, puis
-    branchez la clé sur le PC du club. Windows n'affichera alors <strong>aucun avertissement</strong>,
-    parce qu'un fichier qui arrive par une clé n'est plus marqué comme venant d'Internet. Vous
-    pouvez sauter l'étape&nbsp;2.
-  </p>
 </div>
 
 <ol>
   <li>
-    <strong>Récupérer le fichier</strong>
+    <strong>Récupérer le fichier, sur VOTRE ordinateur</strong>
     <p>
-      Sur GitLab, ouvrez le projet, puis le menu <em>Build</em> → <em>Pipelines</em>, et téléchargez
-      l'artefact du dernier pipeline vert. Le fichier s'appelle quelque chose comme
-      <em>Concours de pétanque_0.1.0_x64-setup.exe</em>.
+      Sur GitLab, ouvrez le projet, puis <em>Build</em> → <em>Pipelines</em>, et téléchargez
+      l'artefact du dernier pipeline vert. Le fichier s'appelle
+      <em>concours-petanque-portable.zip</em>.
     </p>
   </li>
 
   <li>
-    <strong>Si Windows affiche un avertissement bleu</strong>
+    <strong>Le copier sur une clé USB</strong>
     <p>
-      Cela arrive quand le fichier a été téléchargé directement sur ce PC. Ce n'est pas un virus&nbsp;:
-      Windows signale simplement que l'éditeur du logiciel n'a pas payé de certificat de signature.
-      Voici l'écran, et ce qu'il faut cliquer&nbsp;:
+      N'importe quelle clé fait l'affaire. Ne la branchez pas encore sur le PC du club.
     </p>
-    <div class="ecran">
-      <div class="faux-titre">Windows a protégé votre ordinateur</div>
-      Microsoft Defender SmartScreen a empêché le démarrage d'une application non reconnue.<br><br>
-      → Cliquez sur <em>Informations complémentaires</em> (le petit lien, facile à rater)<br>
-      → Puis sur le bouton <em>Exécuter quand même</em> qui apparaît en bas
+    <div class="encadre" style="margin-top:7px">
+      <div class="t">Ce détour n'est pas une perte de temps</div>
+      <p>
+        Windows marque les fichiers venus d'Internet et affiche un écran bleu inquiétant au premier
+        lancement. Une clé USB efface cette marque&nbsp;: le logiciel démarrera
+        <strong>sans aucun avertissement</strong>.
+      </p>
     </div>
   </li>
 
   <li>
-    <strong>Dérouler l'installation</strong>
+    <strong>Sortir le dossier du zip</strong>
     <p>
-      Cliquez <em>Suivant</em> jusqu'au bout. Aucun mot de passe administrateur n'est demandé&nbsp;:
-      le logiciel s'installe pour l'utilisateur courant. Sur le dernier écran,
-      <strong>cochez « Créer un raccourci sur le Bureau »</strong> — c'est par là que la personne
-      qui tient la table lancera le logiciel.
+      Branchez la clé sur le PC du club. Clic droit sur le zip → <em>Extraire tout</em>. Vous
+      obtenez un dossier <em>Concours de pétanque</em> contenant l'exécutable, un dossier
+      <em>donnees</em> et un LISEZ-MOI. Posez ce dossier où vous voulez&nbsp;: sur le disque du PC,
+      ou laissez-le sur la clé si le logiciel doit voyager.
     </p>
   </li>
 
   <li>
-    <strong>Vérifier que ça marche</strong>
+    <strong>Créer l'icône sur le Bureau</strong>
     <p>
-      Fermez tout, puis double-cliquez sur l'icône verte du Bureau. La fenêtre doit s'ouvrir sur
-      l'écran <em>1. Réglages</em>, avec un bandeau vert en haut. C'est bon.
+      C'est le geste qui compte, c'est par là que la personne lancera le logiciel.
     </p>
+    <div class="ecran">
+      Clic <strong>droit</strong> sur <em>Concours de petanque.exe</em><br>
+      → <em>Envoyer vers</em> → <em>Bureau (créer un raccourci)</em><br><br>
+      Sous Windows 11, cliquez d'abord sur <em>Afficher plus d'options</em> pour voir
+      <em>Envoyer vers</em>.
+    </div>
   </li>
 
   <li>
-    <strong>Laisser le mode d'emploi à côté du clavier</strong>
+    <strong>Vérifier, puis imprimer le mode d'emploi</strong>
     <p>
-      Dans le logiciel, onglet <em>1. Réglages</em>, bouton <em>Imprimer le mode d'emploi</em>.
-      Une page, à poser près de l'ordinateur.
+      Double-cliquez sur l'icône verte du Bureau&nbsp;: la fenêtre doit s'ouvrir sur l'écran
+      <em>1. Réglages</em>, avec un bandeau vert en haut. Puis, dans le logiciel&nbsp;:
+      <em>Imprimer le mode d'emploi</em>. Une page, à poser près du clavier.
     </p>
   </li>
 </ol>
 
 <div class="encadre attention">
-  <div class="t">Si la fenêtre ne s'ouvre pas du tout</div>
+  <div class="t">Deux choses à ne pas faire</div>
   <p>
-    Le logiciel a besoin de <strong>Microsoft Edge WebView2</strong>, présent d'office sur Windows 11
-    et sur la quasi-totalité des Windows 10. S'il manque sur un poste ancien, l'installeur sait le
-    récupérer si l'ordinateur a Internet. Sinon, téléchargez « WebView2 Runtime » sur le site de
-    Microsoft, sur votre ordinateur, et apportez-le sur la même clé USB.
+    Ne sortez pas l'exécutable de son dossier, et ne supprimez pas le dossier <em>donnees</em>&nbsp;:
+    c'est lui qui garde le concours en cours. Si le logiciel est resté sur la clé USB, le raccourci
+    du Bureau ne fonctionnera que quand la clé est branchée.
   </p>
 </div>
 
 <div class="encadre">
-  <div class="t">Vous préférez ne rien installer&nbsp;?</div>
+  <div class="t">Si un écran bleu « Windows a protégé votre ordinateur » apparaît</div>
   <p>
-    Le pipeline produit aussi <em>concours-petanque-portable.zip</em>. Décompressez-le sur une clé
-    USB et lancez l'exécutable&nbsp;: rien ne s'installe, et le concours en cours reste sur la clé.
-    Gardez le dossier <em>donnees</em> à côté de l'exécutable. Cette solution est pratique pour vous,
-    mais un raccourci sur le Bureau reste plus simple pour la personne qui tient la table.
+    C'est que le fichier n'est pas passé par une clé USB. Ce n'est pas un virus&nbsp;: Windows
+    signale que l'éditeur n'a pas payé de certificat. Cliquez sur
+    <em>Informations complémentaires</em> — un petit lien facile à rater — puis sur
+    <em>Exécuter quand même</em>.
+  </p>
+</div>
+
+<div class="encadre attention">
+  <div class="t">Si la fenêtre ne s'ouvre pas du tout</div>
+  <p>
+    Le logiciel a besoin de <strong>Microsoft Edge WebView2</strong>, présent d'office sur
+    Windows 11 et sur la quasi-totalité des Windows 10. S'il manque sur un poste ancien, la version
+    portable ne peut pas l'ajouter&nbsp;: prenez alors le fichier <em>…-setup.exe</em> du même
+    pipeline, qui sait le récupérer tout seul.
   </p>
 </div>
 
 <div class="pied">
-  Ce que verra ensuite la personne qui tient la table&nbsp;: un bandeau vert, en haut de l'écran, qui
-  lui indique à chaque instant la seule chose à faire. Elle n'a rien d'autre à retenir.
+  Ensuite, la personne qui tient la table double-clique sur l'icône verte et se laisse guider par le
+  bandeau vert. Elle n'a rien d'autre à retenir.
 </div>
 
 </body>

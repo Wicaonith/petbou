@@ -28,9 +28,9 @@ Le pipeline GitLab produit trois choses sur un runner Windows :
 
 | Fichier | Pour quoi |
 |---|---|
-| `...-setup.exe` (NSIS) | Installation classique, pour l'utilisateur courant — pas de droits administrateur |
+| `concours-petanque-portable.zip` | **La voie principale.** Un dossier à décompresser, rien à installer : l'exécutable, son dossier `donnees` et un LISEZ-MOI. Le raccourci du Bureau se crée par un clic droit → Envoyer vers |
+| `...-setup.exe` (NSIS) | Filet de secours : lui seul sait récupérer WebView2 s'il manque sur un poste ancien. Installe pour l'utilisateur courant, sans droits administrateur |
 | `...msi` | Déploiement en poste géré |
-| `concours-petanque-portable.zip` | **Version portable** : à décompresser sur une clé USB, rien à installer |
 
 La version portable contient un dossier `donnees` à côté de l'exécutable. Sa
 seule présence fait écrire WebView2 dans ce dossier plutôt que dans
@@ -45,10 +45,10 @@ L'installeur sait l'installer au besoin ; la version portable, non.
 ## Mettre le logiciel sur le PC du club
 
 `docs/installation.html` est une page à imprimer, destinée à la personne qui
-installe le logiciel une seule fois. Elle couvre le point qui bloque vraiment :
-l'installeur n'étant pas signé, Windows affiche un avertissement au premier
+prépare l'ordinateur une seule fois. Elle couvre le point qui bloque vraiment :
+l'exécutable n'étant pas signé, Windows affiche un avertissement au premier
 lancement — sauf si le fichier arrive par une clé USB, qui lui fait perdre sa
-marque « téléchargé depuis Internet ».
+marque « téléchargé depuis Internet ». D'où l'insistance sur ce détour.
 
 ```sh
 node outils/pdf.mjs docs/installation.html installation.pdf

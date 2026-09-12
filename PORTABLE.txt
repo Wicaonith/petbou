@@ -1,23 +1,44 @@
-Concours de pétanque — version portable
-=======================================
+Concours de pétanque
+====================
 
-Copiez ce dossier entier sur une clé USB ou où vous voulez, et lancez
-« Concours de petanque.exe ». Il n'y a rien à installer.
+Il n'y a rien à installer. Ce dossier se suffit à lui-même : posez-le sur une
+clé USB, sur le Bureau, ou où vous voulez.
 
-IMPORTANT
----------
-Gardez le dossier « donnees » à côté de l'exécutable. C'est lui qui fait que
-le concours en cours est enregistré sur la clé et non sur le PC : sans lui,
-l'application fonctionne toujours, mais vous ne retrouverez pas votre concours
-en changeant d'ordinateur.
 
-Pensez malgré tout à « Enregistrer » votre concours dans un fichier .petanque
-en fin de journée : c'est ce fichier qui vous permet d'archiver une saison et
-de rouvrir un concours n'importe où.
+POUR LANCER LE LOGICIEL
+-----------------------
+Double-cliquez sur « Concours de petanque.exe » (l'icône verte avec une boule).
 
-SI L'APPLICATION NE S'OUVRE PAS
--------------------------------
-Elle a besoin de « Microsoft Edge WebView2 », présent d'office sur Windows 11
-et sur la quasi-totalité des Windows 10. S'il manque sur un vieux poste,
-installez-le gratuitement depuis le site de Microsoft (cherchez « WebView2
-Runtime »), ou utilisez la version avec installeur, qui s'en charge.
+
+POUR AVOIR L'ICÔNE SUR LE BUREAU
+--------------------------------
+À faire une seule fois, par la personne qui prépare l'ordinateur :
+
+   1. Clic DROIT sur « Concours de petanque.exe »
+   2. « Envoyer vers »  ->  « Bureau (créer un raccourci) »
+
+Sous Windows 11, il faut d'abord cliquer sur « Afficher plus d'options »
+pour voir « Envoyer vers ».
+
+Ensuite, l'icône verte est sur le Bureau : un double-clic et c'est parti.
+Attention : si le logiciel est sur une clé USB, le raccourci ne marchera que
+lorsque la clé est branchée.
+
+
+NE DÉPLACEZ PAS LE DOSSIER « donnees »
+--------------------------------------
+Il doit rester à côté de l'exécutable. C'est lui qui garde le concours en
+cours. Sans lui le logiciel fonctionne toujours, mais votre concours reste sur
+l'ordinateur au lieu de suivre la clé.
+
+Pensez malgré tout à cliquer sur « Enregistrer » en fin de journée : cela crée
+un fichier que vous pouvez archiver et rouvrir n'importe où.
+
+
+SI LA FENÊTRE NE S'OUVRE PAS
+----------------------------
+Le logiciel a besoin de « Microsoft Edge WebView2 », présent d'office sur
+Windows 11 et sur la quasi-totalité des Windows 10. S'il manque sur un poste
+ancien, installez-le gratuitement depuis le site de Microsoft (cherchez
+« WebView2 Runtime »), ou utilisez la version avec installeur, qui sait le
+récupérer toute seule.
