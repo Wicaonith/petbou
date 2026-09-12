@@ -296,3 +296,61 @@ td .equipe-joueurs { color: var(--discret); font-size: 13px; }
     font-size: 11px; color: #555; line-height: 1.5;
   }
 }
+
+/* ---------- Prochaine étape ----------
+   Toujours au même endroit, toujours une seule action : c'est le fil que suit
+   quelqu'un qui n'a jamais organisé de concours sur un ordinateur. */
+.etape {
+  display: flex; align-items: center; gap: 20px; flex-wrap: wrap;
+  background: var(--accent-clair); border: 1px solid #b6d9c3;
+  border-radius: 12px; padding: 18px 20px; margin-bottom: 24px;
+}
+.etape-texte { display: flex; flex-direction: column; gap: 4px; flex: 1 1 320px; }
+.etape-texte strong { font-size: 18px; color: var(--accent); }
+.etape-texte span { font-size: 15px; color: var(--accent); line-height: 1.5; }
+.etape .action { flex-shrink: 0; }
+
+.conseille {
+  display: inline-block; margin-left: 8px; vertical-align: middle;
+  background: var(--accent); color: #fff; border-radius: 5px;
+  padding: 2px 8px; font-size: 11px; font-weight: 700;
+  text-transform: uppercase; letter-spacing: 0.05em;
+}
+
+@media print { .etape { display: none !important; } }
+
+/* ---------- Mode d'emploi (papier uniquement) ---------- */
+.guide { display: none; }
+
+@media print {
+  body[data-impression='guide'] .app > *:not(.guide) { display: none !important; }
+  body[data-impression='guide'] .guide { display: block; }
+
+  .guide-tete { border-bottom: 2px solid #14532d; padding-bottom: 10px; margin-bottom: 16px; }
+  .guide-titre { font-size: 21px; font-weight: 700; letter-spacing: -0.01em; }
+  .guide-sous { font-size: 12px; color: #444; margin-top: 5px; line-height: 1.5; }
+
+  .guide-etapes { margin: 0 0 18px; padding-left: 22px; }
+  .guide-etapes li { margin-bottom: 11px; break-inside: avoid; }
+  .guide-etapes li::marker { font-weight: 700; color: #14532d; }
+  .guide-etapes strong { font-size: 14px; }
+  .guide-etapes p { margin: 3px 0 0; font-size: 12px; line-height: 1.5; color: #222; }
+  .guide-etapes em { font-style: normal; font-weight: 700; }
+
+  .guide-titre-section {
+    font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.07em;
+    color: #555; margin-bottom: 7px;
+  }
+  .guide-pannes { width: 100%; border-collapse: collapse; }
+  .guide-pannes td {
+    font-size: 12px; padding: 8px 6px; border-bottom: 1px solid #ddd;
+    text-align: left; vertical-align: top; line-height: 1.45;
+  }
+  .guide-pannes td:first-child { font-weight: 700; width: 34%; }
+  .guide-pannes em { font-style: normal; font-weight: 700; }
+
+  .guide-pied {
+    margin-top: 16px; border: 1px solid #b6d9c3; background: #eef7f1; border-radius: 8px;
+    padding: 10px 12px; font-size: 12px; color: #14532d; line-height: 1.5;
+  }
+}

@@ -23,30 +23,37 @@ import { Matchs } from './ui/Matchs'
 import { Tirage } from './ui/Tirage'
 import { Affichage } from './ui/Affichage'
 import { Bilan } from './ui/Bilan'
+import { Guide } from './ui/Guide'
 import { ouvrirSecondEcran } from './ui/secondEcran'
 import { ecrire, lire } from './stockage'
 import { Classement } from './ui/Classement'
 
-const FORMATS: { id: FormatId; titre: string; quand: string }[] = [
+/**
+ * Les formats présentés par ce que le club en obtient, pas par leur nom de
+ * règlement : « système suisse » ne dit rien à quelqu'un qui organise son
+ * premier concours, « tout le monde joue toute la journée » si.
+ */
+const FORMATS: { id: FormatId; titre: string; quand: string; conseille?: boolean }[] = [
   {
     id: 'poules',
     titre: 'Poules',
-    quand: 'Poules de 4 (ou de 3), 2 équipes qualifiées par poule. Le format de concours classique.',
+    quand: 'Des groupes de 4 équipes, les 2 meilleures de chaque groupe continuent. Chacun joue au moins 2 parties. C’est ce que font la plupart des clubs.',
+    conseille: true,
   },
   {
     id: 'suisse',
-    titre: 'Système suisse',
-    quand: 'Chacun joue tous les tours contre une équipe au même nombre de victoires. Personne n’est éliminé.',
+    titre: 'Tout le monde joue tous les tours',
+    quand: 'Personne n’est éliminé. Chaque équipe joue le même nombre de parties, contre des équipes qui ont gagné autant qu’elle. À choisir si vous voulez que tout le monde joue toute la journée.',
+  },
+  {
+    id: 'multichances',
+    titre: 'Deuxième chance',
+    quand: 'Battu dès la première partie, on repart dans un second tableau au lieu de rentrer chez soi. Chacun joue au moins 2 parties.',
   },
   {
     id: 'seeding',
     titre: 'Élimination directe',
-    quand: 'Tableau avec têtes de série. Rapide, mais la moitié des équipes sort après un match.',
-  },
-  {
-    id: 'multichances',
-    titre: 'Multi-chances A / B / C',
-    quand: 'Battu d’entrée, on repart dans le tableau suivant. Personne ne rentre après un seul match.',
+    quand: 'On perd, on sort. La moitié des équipes rentre après une seule partie. Réservez-le aux concours courts.',
   },
 ]
 
@@ -81,7 +88,7 @@ export default function App() {
   }
 
   /** `feuilles` ou `bilan` n'impriment que ce document ; sinon, l'écran courant. */
-  const imprimer = (mode?: 'feuilles' | 'bilan') => {
+  const imprimer = (mode?: 'feuilles' | 'bilan' | 'guide') => {
     if (mode) document.body.dataset.impression = mode
     window.print()
     delete document.body.dataset.impression
@@ -163,11 +170,11 @@ export default function App() {
       <nav className="onglets" role="tablist">
         {(
           [
-            ['reglages', 'Réglages'],
-            ['equipes', `Équipes (${prets})`],
-            ['tirage', aTirer > 0 ? `Tirage · ${aTirer} à lancer` : 'Tirage'],
-            ['matchs', attente > 0 ? `Matchs · ${attente} en cours` : 'Matchs'],
-            ['classement', 'Classement'],
+            ['reglages', '1. Réglages'],
+            ['equipes', `2. Équipes (${prets})`],
+            ['tirage', aTirer > 0 ? `3. Tirage · ${aTirer} à lancer` : '3. Tirage'],
+            ['matchs', attente > 0 ? `4. Matchs · ${attente} en cours` : '4. Matchs'],
+            ['classement', '5. Classement'],
           ] as const
         ).map(([id, libelle]) => (
           <button key={id} role="tab" aria-selected={onglet === id} onClick={() => setOnglet(id)}>
@@ -176,25 +183,26 @@ export default function App() {
         ))}
       </nav>
 
-      {fini && (
-        <div className="bandeau">
-          Concours terminé. Le classement final est définitif.{' '}
-          <button className="action" style={{ marginLeft: 8 }} onClick={() => imprimer('bilan')}>
-            Imprimer le bilan
-          </button>
-        </div>
-      )}
-      {!fini && lance && attente === 0 && onglet !== 'tirage' && (
-        <div className="bandeau">
-          Tous les scores du tour sont saisis.{' '}
-          <button className="action" style={{ marginLeft: 8 }} onClick={() => setOnglet('tirage')}>
-            Voir le tirage du tour suivant
-          </button>
-        </div>
-      )}
+      <ProchaineEtape
+        etape={prochaineEtape({ tournoi, prets, aTirer, attente, fini })}
+        onglet={onglet}
+        aller={setOnglet}
+        imprimerBilan={() => imprimer('bilan')}
+      />
 
       {onglet === 'reglages' && (
-        <Reglages tournoi={tournoi} lance={lance} regler={regler} setTournoi={setTournoi} />
+        <>
+          <Reglages tournoi={tournoi} lance={lance} regler={regler} setTournoi={setTournoi} />
+          <div className="carte">
+            <button className="secondaire" onClick={() => imprimer('guide')}>
+              Imprimer le mode d’emploi
+            </button>
+            <p className="aide" style={{ margin: '12px 0 0' }}>
+              Une page à garder près de l’ordinateur : les cinq étapes et quoi faire en cas de
+              problème. Utile si ce n’est pas toujours la même personne qui tient la table.
+            </p>
+          </div>
+        </>
       )}
 
       {onglet === 'equipes' && (
@@ -272,7 +280,105 @@ export default function App() {
 
       <Feuilles tournoi={tournoi} />
       <Bilan tournoi={tournoi} />
+      <Guide nomConcours={tournoi.nom} />
       {projection && <Affichage tournoi={tournoi} onFermer={() => setProjection(false)} />}
+    </div>
+  )
+}
+
+interface Etape {
+  titre: string
+  detail: string
+  onglet: Onglet
+  bouton: string
+  /** Vrai quand l'étape se termine en imprimant le bilan plutôt qu'en changeant d'onglet. */
+  bilan?: boolean
+}
+
+/**
+ * La seule chose à faire maintenant.
+ *
+ * Une personne qui organise son premier concours ne sait pas dans quel ordre
+ * remplir cinq onglets. Plutôt que de tout ouvrir et d'espérer, l'application
+ * nomme à chaque instant l'unique action suivante — et se tait dès qu'on est
+ * déjà au bon endroit.
+ */
+function prochaineEtape(e: {
+  tournoi: Tournoi
+  prets: number
+  aTirer: number
+  attente: number
+  fini: boolean
+}): Etape {
+  if (e.fini) {
+    return {
+      titre: 'Le concours est terminé',
+      detail: 'Le classement final est définitif. Il ne reste qu’à l’imprimer et à l’afficher.',
+      onglet: 'classement',
+      bouton: 'Imprimer le bilan',
+      bilan: true,
+    }
+  }
+  if (e.attente > 0) {
+    return {
+      titre: `${e.attente} partie${e.attente > 1 ? 's' : ''} en cours`,
+      detail:
+        'Quand une équipe rentre, tapez le score du perdant : le 13 du gagnant se met tout seul, puis appuyez sur Entrée.',
+      onglet: 'matchs',
+      bouton: 'Saisir les scores',
+    }
+  }
+  if (e.aTirer > 0) {
+    return {
+      titre: 'Le tirage au sort est prêt',
+      detail:
+        'Regardez-le, annoncez-le aux joueurs, et relancez-le si besoin. Rien ne part sur les terrains tant que vous ne l’avez pas validé.',
+      onglet: 'tirage',
+      bouton: 'Voir le tirage',
+    }
+  }
+  if (e.prets < 2) {
+    return {
+      titre: 'Saisissez les joueurs',
+      detail:
+        'Tapez les noms les uns après les autres : la touche Entrée passe au champ suivant et les équipes se forment toutes seules.',
+      onglet: 'equipes',
+      bouton: 'Saisir les joueurs',
+    }
+  }
+  return {
+    titre: 'Vérifiez le nom et le format',
+    detail:
+      'Donnez un nom à votre concours et choisissez la formule. Vous n’avez rien d’autre à calculer : le logiciel déduit les poules et les tours du nombre d’équipes.',
+    onglet: 'reglages',
+    bouton: 'Aller aux réglages',
+  }
+}
+
+function ProchaineEtape({
+  etape,
+  onglet,
+  aller,
+  imprimerBilan,
+}: {
+  etape: Etape
+  onglet: Onglet
+  aller: (o: Onglet) => void
+  imprimerBilan: () => void
+}) {
+  const ici = onglet === etape.onglet
+  return (
+    <div className="etape">
+      <div className="etape-texte">
+        <strong>{etape.titre}</strong>
+        <span>{etape.detail}</span>
+      </div>
+      {/* Déjà au bon endroit : un bouton qui n'emmène nulle part ne ferait qu'ajouter du bruit. */}
+      {(!ici || etape.bilan) && (
+        <button className="action" onClick={() => (etape.bilan ? imprimerBilan() : aller(etape.onglet))}>
+          {etape.bouton}
+        </button>
+      )}
     </div>
   )
 }
@@ -372,7 +478,10 @@ function Reglages({
                 background: tournoi.config.format === f.id ? 'var(--accent-clair)' : undefined,
               }}
             >
-              <strong style={{ display: 'block', fontSize: 15, marginBottom: 4 }}>{f.titre}</strong>
+              <strong style={{ display: 'block', fontSize: 15, marginBottom: 4 }}>
+                {f.titre}
+                {f.conseille && <span className="conseille">conseillé</span>}
+              </strong>
               <span style={{ color: 'var(--discret)', fontSize: 13, fontWeight: 400 }}>{f.quand}</span>
             </button>
           ))}
