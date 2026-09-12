@@ -22,6 +22,26 @@ Les quatre formats partagent un même noyau (équipes, tours, matchs, terrains,
 classement) : `src/engine/formats/` ne contient que la règle d'appariement propre
 à chaque format.
 
+## Distribution
+
+Le pipeline GitLab produit trois choses sur un runner Windows :
+
+| Fichier | Pour quoi |
+|---|---|
+| `...-setup.exe` (NSIS) | Installation classique, pour l'utilisateur courant — pas de droits administrateur |
+| `...msi` | Déploiement en poste géré |
+| `concours-petanque-portable.zip` | **Version portable** : à décompresser sur une clé USB, rien à installer |
+
+La version portable contient un dossier `donnees` à côté de l'exécutable. Sa
+seule présence fait écrire WebView2 dans ce dossier plutôt que dans
+`%LOCALAPPDATA%` : l'application et le concours en cours voyagent alors
+ensemble. La version installée n'a pas ce dossier et garde le comportement
+normal — écrire à côté de l'exécutable échouerait sous `Program Files`.
+
+Dans les deux cas Windows doit disposer de **Microsoft Edge WebView2**,
+présent d'office sur Windows 11 et sur la quasi-totalité des Windows 10.
+L'installeur sait l'installer au besoin ; la version portable, non.
+
 ## Développement
 
 ```sh

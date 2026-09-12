@@ -51,9 +51,17 @@ installeur-windows:
   script:
     - npm ci
     - npm run app:build
+    # Version portable : le même exécutable, plus un dossier `donnees` qui le
+    # fait écrire à côté de lui. Posé sur une clé USB, le concours suit.
+    - New-Item -ItemType Directory -Force -Path portable/donnees | Out-Null
+    - $exe = Get-ChildItem src-tauri/target/release/*.exe | Select-Object -First 1
+    - Copy-Item $exe.FullName "portable/Concours de petanque.exe"
+    - Copy-Item PORTABLE.txt portable/LISEZ-MOI.txt
+    - Compress-Archive -Path portable/* -DestinationPath concours-petanque-portable.zip -Force
   artifacts:
     name: "concours-petanque-$CI_COMMIT_SHORT_SHA"
     paths:
       - src-tauri/target/release/bundle/nsis/*.exe
       - src-tauri/target/release/bundle/msi/*.msi
+      - concours-petanque-portable.zip
     expire_in: 30 days
