@@ -2,7 +2,6 @@ import { melanger, rng } from '../alea'
 import {
   type Driver,
   type Equipe,
-  type EtatPhase,
   type Match,
   type NouveauMatch,
   gagnant,
