@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Installer Concours de pétanque</title>
+<style>
+  @page { size: A4; margin: 14mm; }
+  body { margin: 0; font: 12px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif; color: #1d1b16; }
+  h1 { font-size: 21px; margin: 0; letter-spacing: -0.01em; }
+  .destinataire { font-size: 12px; color: #444; margin-top: 5px; line-height: 1.5; }
+  .tete { border-bottom: 2px solid #14532d; padding-bottom: 9px; margin-bottom: 13px; }
+  ol { margin: 0 0 12px; padding-left: 22px; }
+  li { margin-bottom: 9px; break-inside: avoid; }
+  li::marker { font-weight: 700; color: #14532d; }
+  li > strong { font-size: 14px; }
+  li p { margin: 3px 0 0; }
+  em { font-style: normal; font-weight: 700; }
+  .ecran {
+    border: 1px solid #ccc; border-radius: 6px; background: #f6f6f6;
+    padding: 9px 12px; margin: 6px 0 0; font-size: 11.5px; line-height: 1.45;
+  }
+  .ecran .faux-titre { font-weight: 700; font-size: 12.5px; margin-bottom: 3px; }
+  .encadre {
+    border: 1px solid #b6d9c3; background: #eef7f1; border-radius: 8px;
+    padding: 10px 13px; margin-bottom: 10px;
+  }
+  .encadre .t { font-weight: 700; color: #14532d; margin-bottom: 4px; font-size: 12.5px; }
+  .encadre p { margin: 0; color: #14532d; }
+  .attention { border-color: #e4c4b2; background: #fdf1ea; }
+  .attention .t, .attention p { color: #9a3412; }
+  .pied { border-top: 1px solid #ccc; margin-top: 10px; padding-top: 8px; font-size: 11px; color: #555; }
+</style>
+</head>
+<body>
+
+<div class="tete">
+  <h1>Installer « Concours de pétanque »</h1>
+  <div class="destinataire">
+    Cette page s'adresse à <strong>la personne qui installe le logiciel</strong>, une seule fois, sur
+    l'ordinateur du club. Comptez cinq minutes. Ensuite, tenir la table de marque ne demande plus
+    rien de particulier&nbsp;: il y a un mode d'emploi séparé pour ça.
+  </div>
+</div>
+
+<div class="encadre">
+  <div class="t">Le plus simple&nbsp;: apportez le fichier sur une clé USB</div>
+  <p>
+    Téléchargez l'installeur sur votre propre ordinateur, copiez-le sur une clé USB ordinaire, puis
+    branchez la clé sur le PC du club. Windows n'affichera alors <strong>aucun avertissement</strong>,
+    parce qu'un fichier qui arrive par une clé n'est plus marqué comme venant d'Internet. Vous
+    pouvez sauter l'étape&nbsp;2.
+  </p>
+</div>
+
+<ol>
+  <li>
+    <strong>Récupérer le fichier</strong>
+    <p>
+      Sur GitLab, ouvrez le projet, puis le menu <em>Build</em> → <em>Pipelines</em>, et téléchargez
+      l'artefact du dernier pipeline vert. Le fichier s'appelle quelque chose comme
+      <em>Concours de pétanque_0.1.0_x64-setup.exe</em>.
+    </p>
+  </li>
+
+  <li>
+    <strong>Si Windows affiche un avertissement bleu</strong>
+    <p>
+      Cela arrive quand le fichier a été téléchargé directement sur ce PC. Ce n'est pas un virus&nbsp;:
+      Windows signale simplement que l'éditeur du logiciel n'a pas payé de certificat de signature.
+      Voici l'écran, et ce qu'il faut cliquer&nbsp;:
+    </p>
+    <div class="ecran">
+      <div class="faux-titre">Windows a protégé votre ordinateur</div>
+      Microsoft Defender SmartScreen a empêché le démarrage d'une application non reconnue.<br><br>
+      → Cliquez sur <em>Informations complémentaires</em> (le petit lien, facile à rater)<br>
+      → Puis sur le bouton <em>Exécuter quand même</em> qui apparaît en bas
+    </div>
+  </li>
+
+  <li>
+    <strong>Dérouler l'installation</strong>
+    <p>
+      Cliquez <em>Suivant</em> jusqu'au bout. Aucun mot de passe administrateur n'est demandé&nbsp;:
+      le logiciel s'installe pour l'utilisateur courant. Sur le dernier écran,
+      <strong>cochez « Créer un raccourci sur le Bureau »</strong> — c'est par là que la personne
+      qui tient la table lancera le logiciel.
+    </p>
+  </li>
+
+  <li>
+    <strong>Vérifier que ça marche</strong>
+    <p>
+      Fermez tout, puis double-cliquez sur l'icône verte du Bureau. La fenêtre doit s'ouvrir sur
+      l'écran <em>1. Réglages</em>, avec un bandeau vert en haut. C'est bon.
+    </p>
+  </li>
+
+  <li>
+    <strong>Laisser le mode d'emploi à côté du clavier</strong>
+    <p>
+      Dans le logiciel, onglet <em>1. Réglages</em>, bouton <em>Imprimer le mode d'emploi</em>.
+      Une page, à poser près de l'ordinateur.
+    </p>
+  </li>
+</ol>
+
+<div class="encadre attention">
+  <div class="t">Si la fenêtre ne s'ouvre pas du tout</div>
+  <p>
+    Le logiciel a besoin de <strong>Microsoft Edge WebView2</strong>, présent d'office sur Windows 11
+    et sur la quasi-totalité des Windows 10. S'il manque sur un poste ancien, l'installeur sait le
+    récupérer si l'ordinateur a Internet. Sinon, téléchargez « WebView2 Runtime » sur le site de
+    Microsoft, sur votre ordinateur, et apportez-le sur la même clé USB.
+  </p>
+</div>
+
+<div class="encadre">
+  <div class="t">Vous préférez ne rien installer&nbsp;?</div>
+  <p>
+    Le pipeline produit aussi <em>concours-petanque-portable.zip</em>. Décompressez-le sur une clé
+    USB et lancez l'exécutable&nbsp;: rien ne s'installe, et le concours en cours reste sur la clé.
+    Gardez le dossier <em>donnees</em> à côté de l'exécutable. Cette solution est pratique pour vous,
+    mais un raccourci sur le Bureau reste plus simple pour la personne qui tient la table.
+  </p>
+</div>
+
+<div class="pied">
+  Ce que verra ensuite la personne qui tient la table&nbsp;: un bandeau vert, en haut de l'écran, qui
+  lui indique à chaque instant la seule chose à faire. Elle n'a rien d'autre à retenir.
+</div>
+
+</body>
+</html>
