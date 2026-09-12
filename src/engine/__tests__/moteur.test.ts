@@ -1,0 +1,250 @@
+import { describe, expect, it } from 'vitest'
+import {
+  classement,
+  clePaire,
+  lancerProchainsMatchs,
+  matchJoue,
+  nomPoule,
+  ordreTableau,
+  placer,
+  qualifiees,
+  repartir,
+  saisirScore,
+  taillesDePoules,
+  termine,
+  vainqueur,
+  type Match,
+  type Tournoi,
+} from '../index'
+import { equipes, jouer, matchsParEquipe, tournoi } from './simulation'
+
+/** Effectifs réalistes pour un concours de club, plus quelques cas tordus. */
+const EFFECTIFS = [4, 6, 8, 9, 12, 13, 15, 16, 17, 20, 24, 31, 32, 48]
+
+describe('répartition en poules', () => {
+  it('ne fait que des poules de 3 ou 4 et privilégie les 4', () => {
+    for (let n = 3; n <= 100; n++) {
+      if (n === 5) continue
+      const tailles = taillesDePoules(n)
+      expect(tailles.reduce((a, b) => a + b, 0), `n=${n}`).toBe(n)
+      expect(tailles.every((t) => t === 3 || t === 4), `n=${n} -> ${tailles}`).toBe(true)
+      expect(tailles.filter((t) => t === 3).length, `n=${n}`).toBeLessThanOrEqual(3)
+    }
+  })
+
+  it('place chaque équipe dans exactement une poule', () => {
+    for (const n of EFFECTIFS) {
+      const poules = repartir(equipes(n), 42)
+      const ids = poules.flat().map((e) => e.id)
+      expect(new Set(ids).size, `n=${n}`).toBe(n)
+    }
+  })
+
+  it('sépare les têtes de série', () => {
+    const eqs = equipes(16).map((e, i) => (i < 4 ? { ...e, seed: i + 1 } : e))
+    const poules = repartir(eqs, 42)
+    for (const p of poules) {
+      expect(p.filter((e) => e.seed !== undefined).length).toBeLessThanOrEqual(1)
+    }
+  })
+})
+
+describe('poule de 4', () => {
+  it('se joue en 5 matchs et qualifie 2 équipes', () => {
+    const { final } = jouer(tournoi(16, 'poules'))
+    expect(termine(final)).toBe(true)
+    for (let i = 0; i < 4; i++) {
+      const groupe = nomPoule(i)
+      const ms = final.matchs.filter((m) => m.groupe === groupe)
+      expect(ms.length, groupe).toBe(5)
+      expect(ms.map((m) => m.libelle)).toContain('Barrage')
+      const eqs = repartir(final.equipes, final.config.graine!)[i]
+      expect(qualifiees(eqs, ms).length, groupe).toBe(2)
+    }
+  })
+
+  it('envoie le perdant des gagnants en barrage, jamais le gagnant', () => {
+    let t: Tournoi = tournoi(4, 'poules')
+    t = lancerProchainsMatchs(t)
+    t = saisirScore(t, t.matchs[0].id, 13, 5) // e? bat e?
+    t = saisirScore(t, t.matchs[1].id, 13, 8)
+    t = lancerProchainsMatchs(t)
+
+    const g = t.matchs.find((m) => m.libelle === 'Gagnants')!
+    const p = t.matchs.find((m) => m.libelle === 'Perdants')!
+    t = saisirScore(t, g.id, 13, 11)
+    t = saisirScore(t, p.id, 13, 2)
+    t = lancerProchainsMatchs(t)
+
+    const barrage = t.matchs.find((m) => m.libelle === 'Barrage')!
+    expect([barrage.equipeA, barrage.equipeB]).toContain(g.equipeB) // perdant des gagnants
+    expect([barrage.equipeA, barrage.equipeB]).toContain(p.equipeA) // gagnant des perdants
+    expect([barrage.equipeA, barrage.equipeB]).not.toContain(g.equipeA)
+  })
+})
+
+describe('système suisse', () => {
+  it("n'impose aucune revanche sur un nombre de tours raisonnable", () => {
+    for (const n of EFFECTIFS) {
+      const { final } = jouer(tournoi(n, 'suisse'))
+      const vus = new Set<string>()
+      for (const m of final.matchs) {
+        if (m.equipeB === null) continue
+        const cle = clePaire(m.equipeA, m.equipeB)
+        expect(vus.has(cle), `n=${n} : ${m.equipeA} vs ${m.equipeB} rejoué`).toBe(false)
+        vus.add(cle)
+      }
+    }
+  })
+
+  it('fait jouer le même nombre de tours à toutes les équipes', () => {
+    for (const n of EFFECTIFS) {
+      const t = tournoi(n, 'suisse', { nbTours: 4 })
+      const { final } = jouer(t)
+      expect(termine(final), `n=${n}`).toBe(true)
+      const parEquipe = new Map(final.equipes.map((e) => [e.id, 0]))
+      for (const m of final.matchs) {
+        parEquipe.set(m.equipeA, parEquipe.get(m.equipeA)! + 1)
+        if (m.equipeB) parEquipe.set(m.equipeB, parEquipe.get(m.equipeB)! + 1)
+      }
+      expect([...new Set(parEquipe.values())], `n=${n}`).toEqual([4])
+    }
+  })
+
+  it('ne donne pas deux exempts à une équipe avant que les autres en aient un', () => {
+    const { final } = jouer(tournoi(9, 'suisse', { nbTours: 5 }))
+    const exempts = new Map<string, number>()
+    for (const m of final.matchs) {
+      if (m.equipeB === null) exempts.set(m.equipeA, (exempts.get(m.equipeA) ?? 0) + 1)
+    }
+    expect(Math.max(...exempts.values())).toBe(1)
+    expect(exempts.size).toBe(5) // 5 tours, 9 équipes : 5 exempts distincts
+  })
+})
+
+describe('tableau à élimination directe', () => {
+  it('désigne un vainqueur unique quel que soit l’effectif', () => {
+    for (const n of EFFECTIFS) {
+      const { final } = jouer(tournoi(n, 'seeding'))
+      expect(termine(final), `n=${n}`).toBe(true)
+      expect(vainqueur(final.matchs), `n=${n}`).not.toBeNull()
+    }
+  })
+
+  it('place les têtes de série 1 et 2 dans des moitiés opposées', () => {
+    for (const taille of [8, 16, 32]) {
+      const ordre = ordreTableau(taille)
+      expect(ordre.indexOf(1)).toBeLessThan(taille / 2)
+      expect(ordre.indexOf(2)).toBeGreaterThanOrEqual(taille / 2)
+    }
+  })
+
+  it('donne les exempts du premier tour aux mieux classées', () => {
+    const eqs = equipes(12).map((e, i) => ({ ...e, seed: i + 1 }))
+    const places = placer(eqs, 42)
+    // 12 équipes dans un tableau de 16 : 4 exempts, pour les seeds 1 à 4.
+    for (let i = 0; i < places.length; i += 2) {
+      if (places[i] === null) expect(places[i + 1]!.seed).toBeLessThanOrEqual(4)
+      if (places[i + 1] === null) expect(places[i]!.seed).toBeLessThanOrEqual(4)
+    }
+  })
+})
+
+describe('multi-chances A/B/C', () => {
+  it('ne renvoie personne chez soi après un seul match', () => {
+    // Le repêchage porte sur le 1er tour : battu d'entrée en A, on repart en B,
+    // battu d'entrée en B, on repart en C. Une équipe sortie au 2e tour d'un
+    // tableau n'est pas repêchée — c'est la règle du format, pas un oubli.
+    for (const n of [8, 16, 32]) {
+      const { final } = jouer(tournoi(n, 'multichances'))
+      expect(termine(final), `n=${n}`).toBe(true)
+      for (const [id, joues] of matchsParEquipe(final)) {
+        expect(joues, `n=${n}, ${id} n'a joué que ${joues} match(s)`).toBeGreaterThanOrEqual(2)
+      }
+    }
+  })
+
+  it('fait jouer 3 matchs à qui perd son entrée en A puis en B', () => {
+    const { final } = jouer(tournoi(16, 'multichances'))
+    const perdantEntree = (groupe: string) =>
+      final.matchs
+        .filter((m) => m.groupe === groupe && m.tour === 1)
+        .map((m) => (m.scoreA! > m.scoreB! ? m.equipeB! : m.equipeA))
+    const sortisEnC = new Set(perdantEntree('B'))
+    const joues = matchsParEquipe(final)
+    for (const id of sortisEnC) {
+      expect(joues.get(id), `${id}`).toBeGreaterThanOrEqual(3)
+    }
+    expect(sortisEnC.size).toBeGreaterThan(0)
+  })
+
+  it('ouvre le tableau B avec les perdants du premier tour de A', () => {
+    const { final } = jouer(tournoi(16, 'multichances'))
+    const perdantsA = final.matchs
+      .filter((m) => m.groupe === 'A' && m.tour === 1)
+      .map((m) => (m.scoreA! > m.scoreB! ? m.equipeB : m.equipeA))
+    const joueursB = new Set(
+      final.matchs
+        .filter((m) => m.groupe === 'B' && m.tour === 1)
+        .flatMap((m) => [m.equipeA, m.equipeB]),
+    )
+    for (const p of perdantsA) expect(joueursB.has(p!), `${p} absent du tableau B`).toBe(true)
+  })
+})
+
+describe('terrains', () => {
+  it("ne met jamais deux matchs en cours sur le même terrain", () => {
+    for (const format of ['poules', 'suisse', 'seeding', 'multichances'] as const) {
+      let t = tournoi(24, format, { nbTerrains: 6 })
+      for (let i = 0; i < 30 && !termine(t); i++) {
+        t = lancerProchainsMatchs(t)
+        const occupes = t.matchs.filter((m) => !matchJoue(m) && m.terrain !== null).map((m) => m.terrain)
+        expect(new Set(occupes).size, format).toBe(occupes.length)
+        expect(occupes.every((n) => n! >= 1 && n! <= 6), format).toBe(true)
+        const suivant = t.matchs.find((m) => !matchJoue(m))
+        if (!suivant) break
+        t = saisirScore(t, suivant.id, 13, 4)
+      }
+    }
+  })
+
+  it('ne laisse aucun terrain libre pendant qu’un match attend', () => {
+    let t = tournoi(24, 'suisse', { nbTerrains: 6 })
+    t = lancerProchainsMatchs(t)
+    const enAttente = t.matchs.filter((m) => !matchJoue(m) && m.terrain === null)
+    const occupes = t.matchs.filter((m) => !matchJoue(m) && m.terrain !== null)
+    expect(enAttente.length > 0 ? occupes.length : 6).toBe(6)
+  })
+})
+
+describe('classement', () => {
+  const ligne = (id: string, sa: number, sb: number, adv: string): Match => ({
+    id, tour: 1, equipeA: id, equipeB: adv, scoreA: sa, scoreB: sb, terrain: null,
+  })
+
+  it('départage par victoires, puis goal-average, puis points marqués', () => {
+    const eqs = equipes(4)
+    const matchs: Match[] = [
+      ligne('e1', 13, 2, 'e2'),
+      ligne('e3', 13, 11, 'e4'),
+      { id: 'm3', tour: 2, equipeA: 'e1', equipeB: 'e3', scoreA: 7, scoreB: 13, terrain: null },
+      { id: 'm4', tour: 2, equipeA: 'e2', equipeB: 'e4', scoreA: 13, scoreB: 9, terrain: null },
+    ]
+    const cl = classement(eqs, matchs)
+    expect(cl[0].equipeId).toBe('e3') // 2 victoires
+    expect(cl[0].victoires).toBe(2)
+    expect(cl[1].equipeId).toBe('e1') // 1 V, diff (13+7) - (2+13) = +5
+    expect(cl[1].diff).toBe(5)
+    expect(cl.at(-1)!.equipeId).toBe('e4') // 0 victoire
+  })
+
+  it('compte un exempt comme une victoire sans match joué', () => {
+    const cl = classement(equipes(2), [
+      { id: 'm1', tour: 1, equipeA: 'e1', equipeB: null, scoreA: 13, scoreB: 7, terrain: null },
+    ])
+    const e1 = cl.find((l) => l.equipeId === 'e1')!
+    expect(e1.victoires).toBe(1)
+    expect(e1.joues).toBe(0)
+    expect(e1.exempts).toBe(1)
+  })
+})
