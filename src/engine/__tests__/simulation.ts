@@ -23,11 +23,16 @@ export function equipes(n: number, formation: Formation = 'doublette'): Equipe[]
   }))
 }
 
-export function tournoi(n: number, format: FormatId, opts: Partial<{ nbTerrains: number; graine: number; nbTours: number }> = {}): Tournoi {
+export function tournoi(
+  n: number,
+  format: FormatId,
+  opts: Partial<{ nbTerrains: number | null; graine: number; nbTours: number }> = {},
+): Tournoi {
   const t = creerTournoi({
     nom: 'Test',
     formation: 'doublette',
-    nbTerrains: opts.nbTerrains ?? 8,
+    // `?? 8` avalerait le null, qui est justement le cas à tester.
+    nbTerrains: opts.nbTerrains === undefined ? 8 : opts.nbTerrains,
     format,
     graine: opts.graine ?? 42,
     nbTours: opts.nbTours,

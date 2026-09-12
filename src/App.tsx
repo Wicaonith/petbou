@@ -103,7 +103,8 @@ export default function App() {
         <h1>{tournoi.nom || 'Concours sans nom'}</h1>
         <span className="meta">
           {tournoi.formation} · {DRIVERS[tournoi.config.format].nom} · {prets} équipe
-          {prets > 1 ? 's' : ''} · {tournoi.nbTerrains} terrains
+          {prets > 1 ? 's' : ''}
+          {tournoi.nbTerrains !== null && ` · ${tournoi.nbTerrains} terrains`}
         </span>
         <div className="droite">
           <button className="secondaire" onClick={ouvrirFichier}>
@@ -259,14 +260,18 @@ function Reglages({
             </select>
           </div>
           <div>
-            <label htmlFor="terrains">Nombre de terrains</label>
+            <label htmlFor="terrains">Nombre de terrains (facultatif)</label>
             <input
               id="terrains"
               type="number"
               min={1}
               max={60}
-              value={tournoi.nbTerrains}
-              onChange={(e) => regler('nbTerrains', Math.max(1, Number(e.target.value) || 1))}
+              placeholder="Non gérés"
+              value={tournoi.nbTerrains ?? ''}
+              onChange={(e) => {
+                const v = e.target.value.trim()
+                regler('nbTerrains', v === '' ? null : Math.max(1, Number(v) || 1))
+              }}
             />
           </div>
           <div>
@@ -277,6 +282,10 @@ function Reglages({
             </select>
           </div>
         </div>
+        <p className="aide" style={{ margin: '16px 0 0' }}>
+          Laissez les terrains vides si vous ne les numérotez pas : les parties seront
+          simplement annoncées ensemble, sans attribution ni attente.
+        </p>
       </div>
 
       <div className="carte">
@@ -333,7 +342,7 @@ function Reglages({
 }
 
 const nouveau = (): Tournoi =>
-  creerTournoi({ nom: '', formation: 'doublette', nbTerrains: 8, format: 'poules' })
+  creerTournoi({ nom: '', formation: 'doublette', nbTerrains: null, format: 'poules' })
 
 function charger(): Tournoi | null {
   try {

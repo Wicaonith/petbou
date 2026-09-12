@@ -41,7 +41,7 @@ function Feuille({
         <span>
           {tournoi.nom || 'Concours'} · {dateFr(tournoi.date)}
         </span>
-        <strong>Terrain {match.terrain ?? '—'}</strong>
+        {match.terrain !== null && <strong>Terrain {match.terrain}</strong>}
       </div>
       <div className="feuille-titre">
         {match.groupe ? `${match.groupe} · ` : ''}

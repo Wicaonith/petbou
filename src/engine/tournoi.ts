@@ -25,7 +25,12 @@ export interface Tournoi {
   nom: string
   date: string
   formation: Formation
-  nbTerrains: number
+  /**
+   * Nombre de terrains numérotés, ou null quand le club n'en tient pas le
+   * compte : beaucoup de boulodromes jouent « là où c'est libre ». Dans ce cas
+   * aucun match ne porte de numéro et tout le tour part en même temps.
+   */
+  nbTerrains: number | null
   equipes: Equipe[]
   config: PhaseConfig
   matchs: Match[]
@@ -37,7 +42,7 @@ export function creerTournoi(init: {
   nom: string
   date?: string
   formation: Formation
-  nbTerrains: number
+  nbTerrains?: number | null
   format: FormatId
   butScore?: number
   nbTours?: number
@@ -48,7 +53,7 @@ export function creerTournoi(init: {
     nom: init.nom,
     date: init.date ?? new Date().toISOString().slice(0, 10),
     formation: init.formation,
-    nbTerrains: init.nbTerrains,
+    nbTerrains: init.nbTerrains ?? null,
     equipes: [],
     config: {
       format: init.format,
@@ -62,6 +67,9 @@ export function creerTournoi(init: {
 }
 
 export const driverDe = (t: Tournoi): Driver => DRIVERS[t.config.format]
+
+/** Le club numérote-t-il ses terrains ? Détermine tout l'affichage des terrains. */
+export const gereTerrains = (t: Tournoi): boolean => t.nbTerrains !== null
 
 export const termine = (t: Tournoi): boolean =>
   t.matchs.length > 0 && driverDe(t).terminee({ equipes: t.equipes, matchs: t.matchs, config: t.config })
@@ -118,8 +126,12 @@ export function annulerScore(t: Tournoi, matchId: string): Tournoi {
  * Pose les matchs en attente sur les terrains libres, dans l'ordre de création.
  * Les matchs déjà sur un terrain n'en changent pas : une équipe déjà partie
  * jouer ne doit pas être déplacée.
+ *
+ * Sans gestion des terrains, aucun numéro n'est attribué et rien n'attend :
+ * tout le tour est lancé d'un coup.
  */
 export function attribuerTerrains(t: Tournoi): Tournoi {
+  if (t.nbTerrains === null) return t
   const occupes = new Set(
     t.matchs.filter((m) => !matchJoue(m) && m.terrain !== null).map((m) => m.terrain!),
   )
