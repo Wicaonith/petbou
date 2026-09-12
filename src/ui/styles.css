@@ -1,0 +1,134 @@
+/* Table de marque : lu à bout de bras, souvent en plein soleil.
+   Gros caractères, contraste franc, zones cliquables larges. */
+:root {
+  --fond: #f4f2ed;
+  --carte: #ffffff;
+  --trait: #d9d4c8;
+  --texte: #1d1b16;
+  --discret: #6d675a;
+  --accent: #14532d;
+  --accent-clair: #dcf0e3;
+  --alerte: #9a3412;
+  --ombre: 0 1px 2px rgba(0, 0, 0, 0.06), 0 4px 12px rgba(0, 0, 0, 0.04);
+  color-scheme: light;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--fond);
+  color: var(--texte);
+  font: 16px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+
+.app { max-width: 1100px; margin: 0 auto; padding: 0 20px 80px; }
+
+/* ---------- En-tête ---------- */
+.entete {
+  display: flex; align-items: baseline; gap: 16px; flex-wrap: wrap;
+  padding: 20px 0 16px; border-bottom: 2px solid var(--trait); margin-bottom: 24px;
+}
+.entete h1 { font-size: 22px; margin: 0; letter-spacing: -0.01em; }
+.entete .meta { color: var(--discret); font-size: 14px; }
+.entete .droite { margin-left: auto; display: flex; gap: 8px; }
+
+/* ---------- Onglets ---------- */
+.onglets { display: flex; gap: 4px; margin-bottom: 24px; flex-wrap: wrap; }
+.onglets button {
+  border: 1px solid transparent; background: none; padding: 10px 18px;
+  border-radius: 8px; font-size: 15px; font-weight: 500; color: var(--discret); cursor: pointer;
+}
+.onglets button:hover { background: #e9e5db; }
+.onglets button[aria-selected='true'] { background: var(--accent); color: #fff; }
+
+/* ---------- Blocs ---------- */
+.carte {
+  background: var(--carte); border: 1px solid var(--trait);
+  border-radius: 12px; padding: 20px; box-shadow: var(--ombre); margin-bottom: 20px;
+}
+.carte > h2 { margin: 0 0 16px; font-size: 17px; }
+.aide { color: var(--discret); font-size: 14px; margin: 0 0 16px; }
+
+/* ---------- Formulaires ---------- */
+label { display: block; font-size: 13px; font-weight: 600; color: var(--discret); margin-bottom: 6px; }
+input, select {
+  width: 100%; padding: 11px 12px; font-size: 16px; font-family: inherit;
+  border: 1px solid var(--trait); border-radius: 8px; background: #fff; color: inherit;
+}
+input:focus, select:focus { outline: 2px solid var(--accent); outline-offset: -1px; border-color: var(--accent); }
+.grille { display: grid; gap: 16px; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); }
+
+button.action {
+  padding: 12px 22px; font-size: 16px; font-weight: 600; font-family: inherit;
+  border: none; border-radius: 8px; background: var(--accent); color: #fff; cursor: pointer;
+}
+button.action:hover { background: #1a6b3b; }
+button.action:disabled { background: #bdb9ae; cursor: not-allowed; }
+button.secondaire {
+  padding: 10px 16px; font-size: 14px; font-weight: 500; font-family: inherit;
+  border: 1px solid var(--trait); border-radius: 8px; background: #fff; color: var(--texte); cursor: pointer;
+}
+button.secondaire:hover { background: #f0ece2; }
+
+/* ---------- Saisie des équipes ---------- */
+.equipes { display: grid; gap: 8px; }
+.ligne-equipe { display: grid; grid-template-columns: 42px 1fr auto; gap: 10px; align-items: center; }
+.ligne-equipe .num {
+  font-variant-numeric: tabular-nums; font-weight: 700; color: var(--discret);
+  text-align: right; font-size: 15px;
+}
+.ligne-equipe .joueurs { display: grid; gap: 8px; grid-template-columns: repeat(var(--taille), 1fr); }
+.ligne-equipe.complete .num { color: var(--accent); }
+.compteur { font-size: 15px; color: var(--discret); margin: 16px 0 0; }
+.compteur strong { color: var(--texte); font-size: 17px; }
+
+/* ---------- Matchs ---------- */
+.matchs { display: grid; gap: 12px; grid-template-columns: repeat(auto-fill, minmax(330px, 1fr)); }
+.match {
+  background: var(--carte); border: 1px solid var(--trait); border-radius: 12px;
+  padding: 14px 16px; box-shadow: var(--ombre);
+}
+.match.joue { background: #faf9f6; border-style: dashed; }
+.match .chapeau {
+  display: flex; justify-content: space-between; align-items: center;
+  font-size: 12px; text-transform: uppercase; letter-spacing: 0.06em;
+  color: var(--discret); margin-bottom: 10px; font-weight: 600;
+}
+.terrain {
+  background: var(--accent); color: #fff; border-radius: 6px;
+  padding: 3px 9px; font-size: 12px; letter-spacing: 0.04em;
+}
+.terrain.attente { background: #b9b3a5; }
+.camp { display: grid; grid-template-columns: 1fr 74px; gap: 10px; align-items: center; margin-bottom: 8px; }
+.camp .nom { font-size: 16px; font-weight: 600; line-height: 1.25; }
+.camp .nom small { display: block; font-weight: 400; color: var(--discret); font-size: 13px; }
+.camp input { text-align: center; font-size: 20px; font-weight: 700; padding: 8px; font-variant-numeric: tabular-nums; }
+.camp .score-fige {
+  text-align: center; font-size: 22px; font-weight: 700; font-variant-numeric: tabular-nums;
+  padding: 8px; border-radius: 8px;
+}
+.camp.gagnant .score-fige { background: var(--accent-clair); color: var(--accent); }
+.match .pied { display: flex; gap: 8px; margin-top: 12px; }
+
+/* ---------- Classement ---------- */
+table { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; }
+th, td { padding: 11px 10px; text-align: right; border-bottom: 1px solid var(--trait); }
+th { font-size: 12px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--discret); }
+th:nth-child(2), td:nth-child(2) { text-align: left; }
+td.rang { font-weight: 700; width: 48px; }
+tbody tr:nth-child(-n + 2) td.rang { color: var(--accent); }
+td .equipe-nom { font-weight: 600; }
+td .equipe-joueurs { color: var(--discret); font-size: 13px; }
+
+.vide { color: var(--discret); text-align: center; padding: 48px 20px; }
+.bandeau {
+  background: var(--accent-clair); border: 1px solid #b6d9c3; color: var(--accent);
+  border-radius: 10px; padding: 14px 16px; margin-bottom: 20px; font-weight: 500;
+}
+
+@media print {
+  .onglets, .entete .droite, button, .aide { display: none !important; }
+  body { background: #fff; }
+  .carte, .match { box-shadow: none; break-inside: avoid; }
+}
