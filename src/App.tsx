@@ -6,6 +6,8 @@ import {
   driverDe,
   enCours,
   lancerProchainsMatchs,
+  propositionDe,
+  retirerAuSort,
   saisirScore,
   annulerScore,
   termine,
@@ -18,6 +20,7 @@ import { SaisieEquipes, equipesDepuisNoms } from './ui/SaisieEquipes'
 import { Feuilles } from './ui/Feuilles'
 import { enregistrer, ouvrir } from './ui/fichier'
 import { Matchs } from './ui/Matchs'
+import { Tirage } from './ui/Tirage'
 import { Classement } from './ui/Classement'
 
 const CLE = 'petanque.tournoi.v1'
@@ -45,7 +48,7 @@ const FORMATS: { id: FormatId; titre: string; quand: string }[] = [
   },
 ]
 
-type Onglet = 'reglages' | 'equipes' | 'matchs' | 'classement'
+type Onglet = 'reglages' | 'equipes' | 'tirage' | 'matchs' | 'classement'
 
 export default function App() {
   const [tournoi, setTournoi] = useState<Tournoi>(() => charger() ?? nouveau())
@@ -69,7 +72,7 @@ export default function App() {
   const regler = <K extends keyof Tournoi>(cle: K, valeur: Tournoi[K]) =>
     setTournoi((t) => ({ ...t, [cle]: valeur }))
 
-  const lancer = () => {
+  const valider = () => {
     setTournoi((t) => lancerProchainsMatchs(t))
     setOnglet('matchs')
   }
@@ -96,6 +99,7 @@ export default function App() {
   const attente = enCours(tournoi).length
   const fini = termine(tournoi)
   const prets = tournoi.equipes.length
+  const aTirer = propositionDe(tournoi).length
 
   return (
     <div className="app">
@@ -138,6 +142,7 @@ export default function App() {
           [
             ['reglages', 'Réglages'],
             ['equipes', `Équipes (${prets})`],
+            ['tirage', aTirer > 0 ? `Tirage · ${aTirer} à lancer` : 'Tirage'],
             ['matchs', attente > 0 ? `Matchs · ${attente} en cours` : 'Matchs'],
             ['classement', 'Classement'],
           ] as const
@@ -149,11 +154,11 @@ export default function App() {
       </nav>
 
       {fini && <div className="bandeau">Concours terminé. Le classement final est définitif.</div>}
-      {!fini && lance && attente === 0 && (
+      {!fini && lance && attente === 0 && onglet !== 'tirage' && (
         <div className="bandeau">
           Tous les scores du tour sont saisis.{' '}
-          <button className="action" style={{ marginLeft: 8 }} onClick={lancer}>
-            Lancer le tour suivant
+          <button className="action" style={{ marginLeft: 8 }} onClick={() => setOnglet('tirage')}>
+            Voir le tirage du tour suivant
           </button>
         </div>
       )}
@@ -185,14 +190,22 @@ export default function App() {
             <>
               <SaisieEquipes formation={tournoi.formation} noms={noms} onChange={setNoms} />
               <div className="carte">
-                <button className="action" onClick={lancer} disabled={prets < 2}>
-                  Lancer le concours avec {prets} équipe{prets > 1 ? 's' : ''}
+                <button className="action" onClick={() => setOnglet('tirage')} disabled={prets < 2}>
+                  Tirer au sort les {prets} équipe{prets > 1 ? 's' : ''}
                 </button>
                 {prets < 2 && <p className="aide" style={{ marginTop: 12 }}>Il faut au moins 2 équipes complètes.</p>}
               </div>
             </>
           )}
         </>
+      )}
+
+      {onglet === 'tirage' && (
+        <Tirage
+          tournoi={tournoi}
+          onRetirer={() => setTournoi((t) => retirerAuSort(t))}
+          onValider={valider}
+        />
       )}
 
       {onglet === 'matchs' && attente > 0 && (

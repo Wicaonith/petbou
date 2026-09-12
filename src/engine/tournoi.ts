@@ -9,6 +9,7 @@ import {
   type FormatId,
   type Formation,
   type Match,
+  type NouveauMatch,
   type PhaseConfig,
   matchJoue,
 } from './types'
@@ -80,15 +81,35 @@ export const enCours = (t: Tournoi): Match[] => t.matchs.filter((m) => !matchJou
 export const classementDe = (t: Tournoi): Ligne[] => classement(t.equipes, t.matchs)
 
 /**
+ * Le tirage tel qu'il serait s'il était validé maintenant, sans rien engager.
+ *
+ * C'est une fonction pure de (équipes, résultats, graine) : l'écran de tirage
+ * peut donc l'afficher, et le relancer, sans que rien ne parte sur les terrains.
+ */
+export const propositionDe = (t: Tournoi): NouveauMatch[] =>
+  driverDe(t).prochainsMatchs({ equipes: t.equipes, matchs: t.matchs, config: t.config })
+
+/**
+ * Un tirage ne se relance que tant que rien n'a été joué.
+ *
+ * Passé la première partie, la graine détermine aussi la composition des poules
+ * et le placement dans le tableau : en changer rétroactivement réécrirait un
+ * concours déjà commencé.
+ */
+export const peutRetirer = (t: Tournoi): boolean => t.matchs.length === 0
+
+/** Relance le tirage avec une nouvelle graine. Sans effet si une partie a été jouée. */
+export function retirerAuSort(t: Tournoi, graine = Math.floor(Math.random() * 2 ** 31)): Tournoi {
+  if (!peutRetirer(t)) return t
+  return { ...t, config: { ...t.config, graine } }
+}
+
+/**
  * Produit les matchs suivants et les pose sur les terrains libres.
  * Sans effet si le tour en cours n'est pas complet ou si le tournoi est fini.
  */
 export function lancerProchainsMatchs(t: Tournoi): Tournoi {
-  const nouveaux = driverDe(t).prochainsMatchs({
-    equipes: t.equipes,
-    matchs: t.matchs,
-    config: t.config,
-  })
+  const nouveaux = propositionDe(t)
   if (nouveaux.length === 0) return t
 
   const [exA, exB] = t.config.scoreExempt ?? SCORE_EXEMPT_DEFAUT

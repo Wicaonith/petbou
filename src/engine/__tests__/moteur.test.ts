@@ -6,7 +6,10 @@ import {
   matchJoue,
   nomPoule,
   ordreTableau,
+  peutRetirer,
   placer,
+  propositionDe,
+  retirerAuSort,
   qualifiees,
   repartir,
   saisirScore,
@@ -192,6 +195,51 @@ describe('multi-chances A/B/C', () => {
         .flatMap((m) => [m.equipeA, m.equipeB]),
     )
     for (const p of perdantsA) expect(joueursB.has(p!), `${p} absent du tableau B`).toBe(true)
+  })
+})
+
+describe('tirage', () => {
+  it("propose sans rien engager", () => {
+    const t = tournoi(12, 'poules')
+    expect(propositionDe(t).length).toBeGreaterThan(0)
+    expect(propositionDe(t).length).toBe(propositionDe(t).length)
+    expect(t.matchs.length, 'proposer ne doit créer aucun match').toBe(0)
+  })
+
+  it('donne un tirage différent à chaque relance, tant que rien n’est joué', () => {
+    const t = tournoi(12, 'poules', { graine: 1 })
+    const avant = repartir(t.equipes, t.config.graine!).map((p) => p.map((e) => e.id).join())
+    const relance = retirerAuSort(t, 12345)
+    const apres = repartir(relance.equipes, relance.config.graine!).map((p) => p.map((e) => e.id).join())
+    expect(relance.config.graine).toBe(12345)
+    expect(apres).not.toEqual(avant)
+  })
+
+  it('refuse de relancer une fois la première partie jouée', () => {
+    // Changer la graine en cours de route réécrirait la composition des poules.
+    let t = lancerProchainsMatchs(tournoi(12, 'poules', { graine: 1 }))
+    const poulesAvant = repartir(t.equipes, t.config.graine!).map((p) => p.map((e) => e.id).join())
+    expect(peutRetirer(t)).toBe(false)
+    t = retirerAuSort(t, 999)
+    expect(t.config.graine).toBe(1)
+    expect(repartir(t.equipes, t.config.graine!).map((p) => p.map((e) => e.id).join())).toEqual(poulesAvant)
+  })
+
+  it('ne propose rien tant que le tour en cours n’est pas terminé', () => {
+    const t = lancerProchainsMatchs(tournoi(12, 'poules'))
+    expect(propositionDe(t)).toEqual([])
+  })
+
+  it('propose exactement ce qui sera créé à la validation', () => {
+    for (const format of ['poules', 'suisse', 'seeding', 'multichances'] as const) {
+      const t = tournoi(16, format)
+      const propose = propositionDe(t)
+      const valide = lancerProchainsMatchs(t)
+      expect(valide.matchs.length, format).toBe(propose.length)
+      expect(valide.matchs.map((m) => [m.equipeA, m.equipeB]), format).toEqual(
+        propose.map((m) => [m.equipeA, m.equipeB]),
+      )
+    }
   })
 })
 

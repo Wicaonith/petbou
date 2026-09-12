@@ -159,3 +159,15 @@ td .equipe-joueurs { color: var(--discret); font-size: 13px; }
   .feuille-camps td.case { width: 26mm; border: 1.5px solid #000; height: 13mm; }
   .feuille-pied { margin-top: auto; padding-top: 12px; font-size: 10px; color: #777; border-top: 1px dotted #bbb; }
 }
+
+/* ---------- Composition des poules ---------- */
+.poules { display: grid; gap: 16px; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); }
+.poule { border: 1px solid var(--trait); border-radius: 10px; overflow: hidden; }
+.poule-tete {
+  background: var(--accent); color: #fff; padding: 10px 16px; font-size: 15px; font-weight: 700;
+}
+.poule-ligne {
+  display: grid; grid-template-columns: 26px 1fr; gap: 10px; align-items: baseline;
+  padding: 12px 16px; border-top: 1px solid var(--trait); font-size: 16px; font-weight: 600;
+}
+.poule-rang { font-weight: 700; color: var(--discret); font-size: 14px; }
