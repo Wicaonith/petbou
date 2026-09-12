@@ -23,9 +23,9 @@ import { Matchs } from './ui/Matchs'
 import { Tirage } from './ui/Tirage'
 import { Affichage } from './ui/Affichage'
 import { Bilan } from './ui/Bilan'
+import { ouvrirSecondEcran } from './ui/secondEcran'
+import { ecrire, lire } from './stockage'
 import { Classement } from './ui/Classement'
-
-const CLE = 'petanque.tournoi.v1'
 
 const FORMATS: { id: FormatId; titre: string; quand: string }[] = [
   {
@@ -53,8 +53,8 @@ const FORMATS: { id: FormatId; titre: string; quand: string }[] = [
 type Onglet = 'reglages' | 'equipes' | 'tirage' | 'matchs' | 'classement'
 
 export default function App() {
-  const [tournoi, setTournoi] = useState<Tournoi>(() => charger() ?? nouveau())
-  const [noms, setNoms] = useState<string[]>(() => chargerNoms())
+  const [tournoi, setTournoi] = useState<Tournoi>(() => lire()?.tournoi ?? nouveau())
+  const [noms, setNoms] = useState<string[]>(() => lire()?.noms ?? [])
   const [onglet, setOnglet] = useState<Onglet>('reglages')
   const [projection, setProjection] = useState(false)
 
@@ -63,7 +63,7 @@ export default function App() {
   // Sauvegarde à chaque frappe : un PC qui s'éteint en plein concours ne doit
   // rien coûter de plus qu'un redémarrage.
   useEffect(() => {
-    localStorage.setItem(CLE, JSON.stringify({ tournoi, noms }))
+    ecrire({ tournoi, noms })
   }, [tournoi, noms])
 
   // Tant qu'aucun match n'est lancé, les équipes suivent la saisie.
@@ -118,8 +118,21 @@ export default function App() {
             className="secondaire"
             onClick={() => setProjection(true)}
             disabled={tournoi.equipes.length === 0}
+            title="Occupe cette fenêtre. Pour un PC à un seul écran."
           >
-            Projeter
+            Projeter ici
+          </button>
+          <button
+            className="secondaire"
+            onClick={() =>
+              ouvrirSecondEcran(tournoi.nom).catch(() =>
+                alert("La fenêtre d'affichage n'a pas pu être ouverte."),
+              )
+            }
+            disabled={tournoi.equipes.length === 0}
+            title="Ouvre une seconde fenêtre à glisser sur la télé. La saisie reste possible ici."
+          >
+            Second écran
           </button>
           <button className="secondaire" onClick={ouvrirFichier}>
             Ouvrir
@@ -390,20 +403,3 @@ function Reglages({
 const nouveau = (): Tournoi =>
   creerTournoi({ nom: '', formation: 'doublette', nbTerrains: null, format: 'poules' })
 
-function charger(): Tournoi | null {
-  try {
-    const brut = localStorage.getItem(CLE)
-    return brut ? (JSON.parse(brut).tournoi as Tournoi) : null
-  } catch {
-    return null
-  }
-}
-
-function chargerNoms(): string[] {
-  try {
-    const brut = localStorage.getItem(CLE)
-    return brut ? ((JSON.parse(brut).noms as string[]) ?? []) : []
-  } catch {
-    return []
-  }
-}

@@ -1,14 +1,18 @@
 {
   "$schema": "../gen/schemas/desktop-schema.json",
   "identifier": "default",
-  "description": "Enregistrer et rouvrir un fichier de concours choisi par l'utilisateur.",
-  "windows": ["main"],
+  "description": "Enregistrer et rouvrir un fichier de concours choisi par l'utilisateur, et ouvrir la fenêtre d'affichage public.",
+  "windows": [
+    "main",
+    "affichage"
+  ],
   "permissions": [
     "core:default",
     "dialog:allow-save",
     "dialog:allow-open",
     "fs:allow-read-text-file",
     "fs:allow-write-text-file",
-    "fs:default"
+    "fs:default",
+    "core:webview:allow-create-webview-window"
   ]
 }

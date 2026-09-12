@@ -16,8 +16,11 @@ import {
  * question qu'ils viennent poser à la table de marque — « je joue où, contre qui,
  * et où j'en suis ».
  */
-export function Affichage({ tournoi, onFermer }: { tournoi: Tournoi; onFermer: () => void }) {
+export function Affichage({ tournoi, onFermer }: { tournoi: Tournoi; onFermer?: () => void }) {
+  // Sans `onFermer`, l'écran occupe sa propre fenêtre : ni plein écran forcé,
+  // ni touche Échap — c'est la fenêtre elle-même que l'on ferme.
   useEffect(() => {
+    if (!onFermer) return
     document.documentElement.requestFullscreen?.().catch(() => {
       // Refusé (navigateur, réglage système) : l'écran reste utilisable en fenêtre.
     })
@@ -47,9 +50,11 @@ export function Affichage({ tournoi, onFermer }: { tournoi: Tournoi; onFermer: (
           {tournoi.formation} · {tournoi.equipes.length} équipes
         </span>
         <span className="tour">{dernierTour > 0 ? `Tour ${dernierTour}` : 'Avant le tirage'}</span>
-        <button className="fermer" onClick={onFermer} aria-label="Quitter l'affichage public">
-          Échap
-        </button>
+        {onFermer && (
+          <button className="fermer" onClick={onFermer} aria-label="Quitter l'affichage public">
+            Échap
+          </button>
+        )}
       </div>
 
       <div className="affichage-corps">
