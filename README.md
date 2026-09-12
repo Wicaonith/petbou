@@ -42,6 +42,21 @@ Dans les deux cas Windows doit disposer de **Microsoft Edge WebView2**,
 présent d'office sur Windows 11 et sur la quasi-totalité des Windows 10.
 L'installeur sait l'installer au besoin ; la version portable, non.
 
+## Mettre le logiciel sur le PC du club
+
+`docs/installation.html` est une page à imprimer, destinée à la personne qui
+installe le logiciel une seule fois. Elle couvre le point qui bloque vraiment :
+l'installeur n'étant pas signé, Windows affiche un avertissement au premier
+lancement — sauf si le fichier arrive par une clé USB, qui lui fait perdre sa
+marque « téléchargé depuis Internet ».
+
+```sh
+node outils/pdf.mjs docs/installation.html installation.pdf
+```
+
+Le mode d'emploi de la table de marque, lui, s'imprime depuis le logiciel
+(onglet Réglages).
+
 ## Développement
 
 ```sh
