@@ -18,6 +18,9 @@ import {
 } from '../index'
 import { equipes, jouer, matchsParEquipe, tournoi } from './simulation'
 
+const enCoursSansTerrain = (t: Tournoi): number =>
+  t.matchs.filter((m) => !matchJoue(m) && m.terrain === null).length
+
 /** Effectifs réalistes pour un concours de club, plus quelques cas tordus. */
 const EFFECTIFS = [4, 6, 8, 9, 12, 13, 15, 16, 17, 20, 24, 31, 32, 48]
 
@@ -206,6 +209,23 @@ describe('terrains', () => {
         t = saisirScore(t, suivant.id, 13, 4)
       }
     }
+  })
+
+  it('n’attribue aucun terrain quand le club n’en gère pas', () => {
+    for (const format of ['poules', 'suisse', 'seeding', 'multichances'] as const) {
+      const { final } = jouer(tournoi(16, format, { nbTerrains: null }))
+      expect(termine(final), format).toBe(true)
+      expect(final.matchs.every((m) => m.terrain === null), format).toBe(true)
+    }
+  })
+
+  it('lance tout le tour d’un coup quand les terrains ne sont pas gérés', () => {
+    // Avec 6 terrains, 2 des 8 affiches attendraient ; sans gestion, aucune.
+    const avec = lancerProchainsMatchs(tournoi(16, 'suisse', { nbTerrains: 6 }))
+    const sans = lancerProchainsMatchs(tournoi(16, 'suisse', { nbTerrains: null }))
+    expect(enCoursSansTerrain(avec)).toBe(2)
+    expect(enCoursSansTerrain(sans)).toBe(8)
+    expect(sans.matchs.length).toBe(8)
   })
 
   it('ne laisse aucun terrain libre pendant qu’un match attend', () => {

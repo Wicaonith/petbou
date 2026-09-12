@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { type Equipe, type Match, matchJoue, type Tournoi } from '../engine'
+import { type Equipe, gereTerrains, type Match, matchJoue, type Tournoi } from '../engine'
 
 interface Props {
   tournoi: Tournoi
@@ -9,6 +9,7 @@ interface Props {
 
 export function Matchs({ tournoi, onScore, onAnnuler }: Props) {
   const parId = new Map(tournoi.equipes.map((e) => [e.id, e]))
+  const gere = gereTerrains(tournoi)
   const enAttente = tournoi.matchs.filter((m) => !matchJoue(m))
   const joues = tournoi.matchs.filter(matchJoue).reverse()
 
@@ -28,12 +29,20 @@ export function Matchs({ tournoi, onScore, onAnnuler }: Props) {
         <div className="carte">
           <h2>À jouer ({enAttente.length})</h2>
           <p className="aide">
-            Saisissez les deux scores puis <kbd>Entrée</kbd>. Le terrain se libère aussitôt et
-            passe au match suivant en attente.
+            Saisissez le score du perdant, le {tournoi.config.butScore} du gagnant se met tout
+            seul, puis <kbd>Entrée</kbd>.
+            {gere && ' Le terrain se libère aussitôt et passe au match suivant en attente.'}
           </p>
           <div className="matchs">
             {enAttente.map((m) => (
-              <CarteMatch key={m.id} match={m} parId={parId} but={tournoi.config.butScore} onScore={onScore} />
+              <CarteMatch
+                key={m.id}
+                match={m}
+                parId={parId}
+                but={tournoi.config.butScore}
+                gere={gere}
+                onScore={onScore}
+              />
             ))}
           </div>
         </div>
@@ -44,7 +53,7 @@ export function Matchs({ tournoi, onScore, onAnnuler }: Props) {
           <h2>Résultats ({joues.length})</h2>
           <div className="matchs">
             {joues.map((m) => (
-              <CarteJouee key={m.id} match={m} parId={parId} onAnnuler={onAnnuler} />
+              <CarteJouee key={m.id} match={m} parId={parId} gere={gere} onAnnuler={onAnnuler} />
             ))}
           </div>
         </div>
@@ -55,14 +64,16 @@ export function Matchs({ tournoi, onScore, onAnnuler }: Props) {
 
 const nomDe = (parId: Map<string, Equipe>, id: string) => parId.get(id)?.nom ?? id
 
-function Chapeau({ match }: { match: Match }) {
+function Chapeau({ match, gere }: { match: Match; gere: boolean }) {
   return (
     <div className="chapeau">
       <span>
         {match.groupe ? `${match.groupe} · ` : ''}
         {match.libelle ?? `Tour ${match.tour}`}
       </span>
-      {match.equipeB !== null &&
+      {/* Sans gestion des terrains il n'y a rien à annoncer : ni numéro, ni attente. */}
+      {gere &&
+        match.equipeB !== null &&
         (match.terrain !== null ? (
           <span className="terrain">Terrain {match.terrain}</span>
         ) : (
@@ -76,11 +87,13 @@ function CarteMatch({
   match,
   parId,
   but,
+  gere,
   onScore,
 }: {
   match: Match
   parId: Map<string, Equipe>
   but: number
+  gere: boolean
   onScore: (id: string, a: number, b: number) => void
 }) {
   const [a, setA] = useState('')
@@ -94,7 +107,7 @@ function CarteMatch({
 
   return (
     <div className="match">
-      <Chapeau match={match} />
+      <Chapeau match={match} gere={gere} />
       {([match.equipeA, match.equipeB] as const).map((id, k) =>
         id === null ? null : (
           <div className="camp" key={id}>
@@ -131,16 +144,18 @@ function CarteMatch({
 function CarteJouee({
   match,
   parId,
+  gere,
   onAnnuler,
 }: {
   match: Match
   parId: Map<string, Equipe>
+  gere: boolean
   onAnnuler: (id: string) => void
 }) {
   const aGagne = match.equipeB === null || match.scoreA! > match.scoreB!
   return (
     <div className="match joue">
-      <Chapeau match={match} />
+      <Chapeau match={match} gere={gere} />
       <div className={`camp${aGagne ? ' gagnant' : ''}`}>
         <span className="nom">{nomDe(parId, match.equipeA)}</span>
         <span className="score-fige">{match.scoreA}</span>
