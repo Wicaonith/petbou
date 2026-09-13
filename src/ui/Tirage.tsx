@@ -1,3 +1,4 @@
+import { useEffect, useRef, useState } from 'react'
 import {
   type Equipe,
   enCours,
@@ -29,6 +30,7 @@ interface Props {
 export function Tirage({ tournoi, onRetirer, onValider }: Props) {
   const proposition = propositionDe(tournoi)
   const premier = tournoi.matchs.length === 0
+  const [aConfirmer, setAConfirmer] = useState(false)
 
   if (tournoi.equipes.length < 2) {
     return (
@@ -71,7 +73,7 @@ export function Tirage({ tournoi, onRetirer, onValider }: Props) {
 
       <div className="carte">
         <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
-          <button className="action" onClick={onValider}>
+          <button className="action" onClick={() => setAConfirmer(true)}>
             {gereTerrains(tournoi) ? 'Valider et envoyer sur les terrains' : 'Valider le tirage'}
           </button>
           {peutRetirer(tournoi) && (
@@ -92,7 +94,91 @@ export function Tirage({ tournoi, onRetirer, onValider }: Props) {
           </p>
         )}
       </div>
+
+      {aConfirmer && (
+        <Confirmation
+          tournoi={tournoi}
+          proposition={proposition}
+          premier={premier}
+          tour={tour}
+          onAnnuler={() => setAConfirmer(false)}
+          onValider={() => {
+            setAConfirmer(false)
+            onValider()
+          }}
+        />
+      )}
     </>
+  )
+}
+
+/**
+ * Dernière porte avant que les parties partent.
+ *
+ * Valider est le seul geste de l'application qu'on ne peut pas défaire : la
+ * liste des équipes se fige, et le tirage ne se relance plus. Un clic de trop
+ * sur l'écran de tirage, au milieu du bruit d'un boulodrome, et une équipe
+ * arrivée en retard ne peut plus être inscrite.
+ *
+ * La fenêtre dit ce qui part et ce qui ne sera plus possible, jamais
+ * « êtes-vous sûr » : on ne sait pas répondre à une question qui ne dit pas ce
+ * qu'elle engage. L'élément <dialog> est natif, donc Échap ferme et le clavier
+ * reste prisonnier de la fenêtre sans code à écrire.
+ */
+function Confirmation({
+  tournoi,
+  proposition,
+  premier,
+  tour,
+  onAnnuler,
+  onValider,
+}: {
+  tournoi: Tournoi
+  proposition: NouveauMatch[]
+  premier: boolean
+  tour: number
+  onAnnuler: () => void
+  onValider: () => void
+}) {
+  const ref = useRef<HTMLDialogElement>(null)
+  useEffect(() => ref.current?.showModal(), [])
+
+  const parties = proposition.filter((m) => m.equipeB !== null).length
+  const exempt = proposition.length - parties
+  const terrains = gereTerrains(tournoi)
+
+  return (
+    <dialog
+      className="modale"
+      ref={ref}
+      onCancel={onAnnuler}
+      onClick={(e) => e.target === ref.current && onAnnuler()}
+    >
+      <h2>{terrains ? 'Envoyer les parties sur les terrains ?' : 'Lancer les parties ?'}</h2>
+      <p>
+        <strong>
+          {parties} partie{parties > 1 ? 's' : ''}
+        </strong>{' '}
+        {premier ? 'du premier tour' : `du tour ${tour}`}
+        {terrains ? ' vont être annoncées avec leur numéro de terrain.' : ' vont être annoncées.'}
+        {exempt > 0 && ` Une équipe est exempte : elle passe le tour avec une victoire acquise.`}
+      </p>
+      {premier && (
+        <p className="attention">
+          Ensuite, la liste des équipes sera figée : plus aucune équipe ne pourra être ajoutée ni
+          retirée. Vérifiez qu'il n'en manque aucune.
+        </p>
+      )}
+      <p className="attention">Ce tirage ne pourra plus être relancé.</p>
+      <div className="modale-pied">
+        <button className="action" onClick={onValider} autoFocus>
+          Oui, valider le tirage
+        </button>
+        <button className="secondaire" onClick={onAnnuler}>
+          Non, revenir au tirage
+        </button>
+      </div>
+    </dialog>
   )
 }
 

@@ -90,6 +90,22 @@ button.secondaire:hover { background: #f0ece2; }
 }
 .equipes-engagees li { padding: 4px 0; }
 
+/* ---------- Fenêtre de confirmation ---------- */
+/* Assez large pour que le texte ne se lise pas en colonne étroite, et des
+   boutons de la même taille qu'ailleurs : on y clique dans le bruit, debout. */
+.modale {
+  border: 1px solid var(--trait); border-radius: 14px; padding: 24px 26px;
+  max-width: 30em; width: calc(100% - 32px);
+  background: var(--carte); color: var(--texte); box-shadow: var(--ombre);
+}
+.modale::backdrop { background: rgba(29, 27, 22, 0.45); }
+.modale h2 { margin: 0 0 14px; font-size: 20px; }
+.modale p { margin: 0 0 12px; font-size: 16px; line-height: 1.45; }
+/* Ce qui ne sera plus possible après, à distinguer de ce qui va se passer. */
+.modale p.attention { color: var(--alerte); }
+.modale-pied { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 20px; }
+.modale-pied button { flex: 1 1 auto; }
+
 /* ---------- Dossard ---------- */
 /* Le numéro se lit avant les noms sans leur voler la vedette : couleur discrète,
    largeur fixe pour que les noms restent alignés d'une ligne à l'autre, et une
