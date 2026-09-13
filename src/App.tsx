@@ -193,7 +193,13 @@ export default function App() {
 
       {onglet === 'reglages' && (
         <>
-          <Reglages tournoi={tournoi} lance={lance} regler={regler} setTournoi={setTournoi} />
+          <Reglages
+            tournoi={tournoi}
+            lance={lance}
+            regler={regler}
+            setTournoi={setTournoi}
+            aller={setOnglet}
+          />
           <div className="carte">
             <button className="secondaire" onClick={() => imprimer('guide')}>
               Imprimer le mode d’emploi
@@ -390,11 +396,13 @@ function Reglages({
   lance,
   regler,
   setTournoi,
+  aller,
 }: {
   tournoi: Tournoi
   lance: boolean
   regler: <K extends keyof Tournoi>(cle: K, valeur: Tournoi[K]) => void
   setTournoi: (maj: (t: Tournoi) => Tournoi) => void
+  aller: (o: Onglet) => void
 }) {
   const config = (champ: 'format' | 'butScore' | 'nbTours', valeur: unknown) =>
     setTournoi((t) => ({ ...t, config: { ...t.config, [champ]: valeur } }))
@@ -506,6 +514,13 @@ function Reglages({
             </p>
           </div>
         )}
+
+        {/* Le format choisi, la page est finie : le pas suivant se prend ici, sans
+            remonter chercher un onglet. Dire « joueurs » et non « équipes », parce
+            que ce qui se tape est une liste de noms. */}
+        <button className="action" style={{ marginTop: 24 }} onClick={() => aller('equipes')}>
+          {lance ? 'Voir les équipes engagées' : 'Saisir les joueurs'}
+        </button>
       </div>
     </>
   )
