@@ -211,7 +211,7 @@ function Affiches({ tournoi, proposition }: { tournoi: Tournoi; proposition: Nou
             {proposition
               .filter((m) => (m.groupe ?? '') === g)
               .map((m, i) => (
-                <div className="match" key={`${g}-${i}`}>
+                <div className="match affiche" key={`${g}-${i}`}>
                   <div className="chapeau">
                     <span>{m.libelle ?? `Tour ${m.tour}`}</span>
                   </div>

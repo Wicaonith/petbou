@@ -19,7 +19,7 @@ export function Classement({ tournoi }: { tournoi: Tournoi }) {
         Départage : victoires, puis goal-average (différence de points), puis points marqués,
         puis confrontation directe.
       </p>
-      <table>
+      <table className="classement">
         <thead>
           <tr>
             <th style={{ textAlign: 'right' }}>Rang</th>
