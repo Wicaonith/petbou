@@ -11,6 +11,8 @@ export interface Section {
   lignes: Ligne[]
   /** Vainqueur du tableau, quand il y en a un. Absent pour un classement global. */
   vainqueur?: string
+  /** Groupe des matchs de ce tableau, pour en dessiner l'arbre. Absent si global. */
+  groupe?: string
 }
 
 /**
@@ -42,13 +44,14 @@ export function classementParTableau(t: Tournoi): Section[] {
     }
   }
 
-  const sections = presents.map((g) => {
+  const sections: Section[] = presents.map((g) => {
     const matchs = t.matchs.filter((m) => m.groupe === g)
     const equipes = equipesDe(parId, [...dernier].filter(([, x]) => x === g).map(([id]) => id))
     return {
       titre: titreDe(g),
       lignes: classement(equipes, matchs),
       vainqueur: vainqueur(matchs) ?? undefined,
+      groupe: g,
     }
   })
 
@@ -60,6 +63,7 @@ export function classementParTableau(t: Tournoi): Section[] {
       titre: 'Éliminées avant les tableaux',
       lignes: classement(sansTableau, t.matchs),
       vainqueur: undefined,
+      groupe: undefined,
     })
   }
   return sections
