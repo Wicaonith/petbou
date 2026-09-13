@@ -1,7 +1,18 @@
+![Concours de pétanque](docs/identite/bandeau-readme.png)
+
 # Concours de pétanque
 
-Application de gestion de concours de pétanque pour la table de marque, prévue
-pour tourner sur un PC, hors ligne, sans compte ni connexion.
+Application de gestion de concours de pétanque, écrite pour **la Bouillonne**,
+association de quartier de Montoir-de-Bretagne, et utilisable par n'importe quel
+club.
+
+L'opérateur saisit les joueurs et choisit une formule ; le logiciel en déduit les
+poules, les tours, le tableau, les exempts et l'attribution des terrains. Il suit
+les scores, tient le classement à jour, imprime les feuilles de match et le bilan
+de fin de concours, et propose un affichage à projeter pour que les joueurs
+voient où en est le tournoi sans venir le demander à la table.
+
+Tout fonctionne hors ligne, sans compte ni connexion, et tient sur une clé USB.
 
 ## Principe
 
