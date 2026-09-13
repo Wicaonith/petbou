@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 import {
   DRIVERS,
   classement,
+  classementParTableau,
   clePaire,
   dejaRencontrees,
   lancerProchainsMatchs,
@@ -159,6 +160,48 @@ describe('tableaux finals après les poules', () => {
     const prevusSans = DRIVERS.poules.toursPrevus(16, sans.config)
     // 4 poules : 2 tours de tableau en plus (demi-finales puis finale).
     expect(prevusAvec).toBe(prevusSans + 2)
+  })
+})
+
+describe('classement par tableau', () => {
+  it('donne un classement par tableau en multi-chances, avec son vainqueur', () => {
+    const { final } = jouer(tournoi(16, 'multichances'))
+    const sections = classementParTableau(final)
+
+    expect(sections.map((s) => s.titre)).toEqual(['Tableau A', 'Tableau B', 'Tableau C'])
+    for (const s of sections) {
+      expect(s.vainqueur).toBeTruthy()
+      // Personne n'apparaît deux fois : une équipe est classée là où elle a fini.
+      expect(new Set(s.lignes.map((l) => l.equipeId)).size).toBe(s.lignes.length)
+    }
+    const tous = sections.flatMap((s) => s.lignes.map((l) => l.equipeId))
+    expect(new Set(tous).size).toBe(tous.length)
+    expect(tous.length).toBe(final.equipes.length)
+  })
+
+  it('sépare les tableaux finals des poules et garde les éliminées', () => {
+    const { final } = jouer(tournoi(16, 'poules'))
+    const sections = classementParTableau(final)
+
+    expect(sections.map((s) => s.titre)).toEqual([
+      'Tableau A',
+      'Tableau B',
+      'Éliminées avant les tableaux',
+    ])
+    // 4 poules : 4 qualifiées par tableau, et les 8 autres éliminées en poules.
+    expect(sections[0].lignes.length).toBe(4)
+    expect(sections[1].lignes.length).toBe(4)
+    expect(sections[2].lignes.length).toBe(8)
+    expect(sections[2].vainqueur).toBeUndefined()
+  })
+
+  it('garde un classement unique quand le format n’a qu’un tableau', () => {
+    for (const t of [tournoi(12, 'suisse'), tournoi(12, 'seeding'), tournoi(12, 'poules', { tableauFinal: false })]) {
+      const sections = classementParTableau(jouer(t).final)
+      expect(sections.length).toBe(1)
+      expect(sections[0].titre).toBe('Classement')
+      expect(sections[0].lignes.length).toBe(12)
+    }
   })
 })
 

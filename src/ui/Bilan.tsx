@@ -1,4 +1,4 @@
-import { classementDe, matchJoue, type Tournoi } from '../engine'
+import { classementParTableau, matchJoue, type Ligne, type Tournoi } from '../engine'
 import { NumEquipe } from './NumEquipe'
 
 /**
@@ -7,10 +7,17 @@ import { NumEquipe } from './NumEquipe'
  * Le podium d'abord, parce que c'est ce que les gens viennent regarder, puis le
  * classement complet : dans une association tout le monde veut voir sa ligne,
  * pas seulement les trois premiers.
+ *
+ * Quand le concours comporte plusieurs tableaux, la feuille les sépare : un
+ * podium pour le tableau principal, puis un classement par tableau. Une liste
+ * unique ferait voisiner le vainqueur du C et le finaliste du A comme s'ils
+ * avaient disputé la même chose.
  */
 export function Bilan({ tournoi }: { tournoi: Tournoi }) {
-  const lignes = classementDe(tournoi)
-  const podium = lignes.slice(0, 3)
+  const sections = classementParTableau(tournoi)
+  const principale = sections[0]
+  const plusieurs = sections.length > 1
+  const podium = principale.lignes.slice(0, 3)
   const joues = tournoi.matchs.filter((m) => matchJoue(m) && m.equipeB !== null).length
   const tours = tournoi.matchs.reduce((max, m) => Math.max(max, m.tour), 0)
   const parId = new Map(tournoi.equipes.map((e) => [e.id, e]))
@@ -28,6 +35,13 @@ export function Bilan({ tournoi }: { tournoi: Tournoi }) {
         </div>
       </div>
 
+      {podium.length === 3 && plusieurs && (
+        <div className="bilan-section">
+          {/* « du tableau A » : l'article impose la minuscule au nom commun,
+              jamais à la lettre qui désigne le tableau. */}
+          Podium du {principale.titre.charAt(0).toLowerCase() + principale.titre.slice(1)}
+        </div>
+      )}
       {podium.length === 3 && (
         <div className="bilan-podium">
           {[podium[1], podium[0], podium[2]].map((l, i) => {
@@ -53,38 +67,14 @@ export function Bilan({ tournoi }: { tournoi: Tournoi }) {
         </div>
       )}
 
-      <div className="bilan-section">Classement complet</div>
-      <table className="bilan-table">
-        <thead>
-          <tr>
-            <th>Rang</th>
-            <th style={{ textAlign: 'left' }}>Équipe</th>
-            <th>J</th>
-            <th>V</th>
-            <th>Pour</th>
-            <th>Contre</th>
-            <th>Diff.</th>
-          </tr>
-        </thead>
-        <tbody>
-          {lignes.map((l) => (
-            <tr key={l.equipeId}>
-              <td className={l.rang <= 3 ? 'rang podium' : 'rang'}>{l.rang}</td>
-              <td style={{ textAlign: 'left' }}>
-                <NumEquipe n={l.numero} />
-                {l.nom}
-              </td>
-              <td>{l.joues}</td>
-              <td>
-                <strong>{l.victoires}</strong>
-              </td>
-              <td>{l.pointsPour}</td>
-              <td>{l.pointsContre}</td>
-              <td>{l.diff > 0 ? `+${l.diff}` : l.diff}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+      {sections.map((section) => (
+        <div key={section.titre}>
+          <div className="bilan-section">
+            {plusieurs ? section.titre : 'Classement complet'}
+          </div>
+          <TableBilan lignes={section.lignes} />
+        </div>
+      ))}
 
       <div className="bilan-pied">
         <span>
@@ -100,6 +90,42 @@ export function Bilan({ tournoi }: { tournoi: Tournoi }) {
         </span>
       </div>
     </div>
+  )
+}
+
+function TableBilan({ lignes }: { lignes: Ligne[] }) {
+  return (
+    <table className="bilan-table">
+      <thead>
+        <tr>
+          <th>Rang</th>
+          <th style={{ textAlign: 'left' }}>Équipe</th>
+          <th>J</th>
+          <th>V</th>
+          <th>Pour</th>
+          <th>Contre</th>
+          <th>Diff.</th>
+        </tr>
+      </thead>
+      <tbody>
+        {lignes.map((l) => (
+          <tr key={l.equipeId}>
+            <td className={l.rang <= 3 ? 'rang podium' : 'rang'}>{l.rang}</td>
+            <td style={{ textAlign: 'left' }}>
+              <NumEquipe n={l.numero} />
+              {l.nom}
+            </td>
+            <td>{l.joues}</td>
+            <td>
+              <strong>{l.victoires}</strong>
+            </td>
+            <td>{l.pointsPour}</td>
+            <td>{l.pointsContre}</td>
+            <td>{l.diff > 0 ? `+${l.diff}` : l.diff}</td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
   )
 }
 
