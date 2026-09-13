@@ -1,5 +1,6 @@
 import { classementParTableau, type Section, type Tournoi } from '../engine'
 import { NumEquipe } from './NumEquipe'
+import { Tableau } from './Tableau'
 
 /**
  * Le classement, découpé par tableau quand le format en comporte plusieurs.
@@ -28,15 +29,30 @@ export function Classement({ tournoi }: { tournoi: Tournoi }) {
         puis confrontation directe.
       </p>
       {sections.map((s) => (
-        <SectionClassement key={s.titre} section={s} plusieurs={sections.length > 1} />
+        <SectionClassement
+          key={s.titre}
+          section={s}
+          plusieurs={sections.length > 1}
+          tournoi={tournoi}
+        />
       ))}
     </div>
   )
 }
 
-function SectionClassement({ section, plusieurs }: { section: Section; plusieurs: boolean }) {
+function SectionClassement({
+  section,
+  plusieurs,
+  tournoi,
+}: {
+  section: Section
+  plusieurs: boolean
+  tournoi: Tournoi
+}) {
   if (section.lignes.length === 0) return null
   const gagnante = section.lignes.find((l) => l.equipeId === section.vainqueur)
+  const matchs = section.groupe ? tournoi.matchs.filter((m) => m.groupe === section.groupe) : []
+  const parId = new Map(tournoi.equipes.map((e) => [e.id, e]))
 
   return (
     <div className="section-tableau">
@@ -54,6 +70,10 @@ function SectionClassement({ section, plusieurs }: { section: Section; plusieurs
           )}
         </div>
       )}
+      {/* L'arbre avant le tableau de chiffres : c'est lui qui répond à
+          « qui je joue après », le classement ne dit que l'ordre d'arrivée. */}
+      {matchs.length > 0 && <Tableau matchs={matchs} equipes={parId} />}
+
       <table className="classement">
         <thead>
           <tr>

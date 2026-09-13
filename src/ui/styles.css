@@ -139,6 +139,52 @@ button.secondaire:hover { background: #f0ece2; }
   background: var(--accent-clair); border-radius: 8px; padding: 5px 10px;
 }
 
+/* ---------- Tableau en arbre ---------- */
+/* Tout est en em à partir de la taille du conteneur : le même arbre tient dans
+   l'onglet Classement comme sur un vidéoprojecteur, sans second jeu de règles.
+   Les tours sont des colonnes ; chaque paire porte le trait qui rejoint le tour
+   suivant, et les parties d'une paire sont centrées sur leurs quarts de hauteur,
+   ce qui suffit à aligner l'arbre sans calculer une seule position. */
+.arbre {
+  display: flex; gap: 2.2em; align-items: stretch;
+  overflow-x: auto; padding: 0.2em 0 0.6em; font-size: 14px;
+}
+.arbre-tour { display: flex; flex-direction: column; min-width: 13em; flex: 1; }
+.arbre-tour-titre {
+  font-size: 0.78em; text-transform: uppercase; letter-spacing: 0.06em;
+  color: var(--discret); font-weight: 700; margin-bottom: 0.6em;
+}
+.arbre-colonne { display: flex; flex-direction: column; justify-content: space-around; flex: 1; gap: 0.8em; }
+.arbre-paire {
+  display: flex; flex-direction: column; justify-content: space-around;
+  flex: 1; gap: 0.8em; position: relative;
+}
+/* Le trait vertical qui réunit les deux parties d'une paire vers la suivante. */
+.arbre-tour:not(:last-child) .arbre-paire::after {
+  content: ''; position: absolute; right: -1.1em; top: 25%; bottom: 25%;
+  border-right: 2px solid var(--trait);
+  border-radius: 0 6px 6px 0;
+}
+.arbre-partie {
+  border: 1px solid var(--trait); border-radius: 6px; overflow: hidden;
+  background: var(--carte); position: relative;
+}
+.arbre-partie.vide { background: transparent; border-style: dashed; }
+/* Le petit trait horizontal qui sort de chaque partie vers sa paire. */
+.arbre-tour:not(:last-child) .arbre-partie::after {
+  content: ''; position: absolute; right: -1.1em; top: 50%;
+  width: 1.1em; border-top: 2px solid var(--trait);
+}
+.arbre-camp {
+  display: flex; align-items: center; justify-content: space-between; gap: 0.5em;
+  padding: 0.45em 0.6em; min-height: 2.3em; font-size: 0.95em; font-weight: 600;
+}
+.arbre-camp + .arbre-camp { border-top: 1px solid var(--trait); }
+.arbre-camp.gagnant { background: var(--accent-clair); color: var(--accent); }
+.arbre-camp.exempt { color: var(--discret); font-weight: 400; font-style: italic; }
+.arbre-nom { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.arbre-score { font-variant-numeric: tabular-nums; font-weight: 700; }
+
 /* ---------- Fenêtre de confirmation ---------- */
 /* Assez large pour que le texte ne se lise pas en colonne étroite, et des
    boutons de la même taille qu'ailleurs : on y clique dans le bruit, debout. */
@@ -292,6 +338,14 @@ td .equipe-joueurs { color: var(--discret); font-size: 13px; }
 .affichage-corps { flex-grow: 1; display: flex; gap: 1.1em; padding: 1.1em 1.5em; min-height: 0; }
 .affichage-parties { flex-grow: 1; display: flex; flex-direction: column; gap: 0.7em; min-width: 0; }
 .affichage-classement { width: 21em; flex-shrink: 0; display: flex; flex-direction: column; gap: 0.7em; }
+/* Un arbre a besoin de plus de largeur qu'une colonne de classement. */
+.affichage-classement.large { width: 46%; min-width: 26em; }
+/* Sur un écran projeté, rien ne défile : l'arbre doit tenir. Les colonnes se
+   compriment et les noms trop longs se coupent, comme sur les tableaux papier
+   affichés au club. */
+.affichage-classement .arbre { font-size: 0.8em; flex: 1; min-height: 0; overflow: hidden; gap: 1.4em; }
+.affichage-classement .arbre-tour { min-width: 0; }
+.affichage-classement .arbre-camp { min-height: 0; padding: 0.35em 0.45em; }
 .affichage-section {
   font-size: 0.78em; font-weight: 700; text-transform: uppercase;
   letter-spacing: 0.09em; color: var(--discret);

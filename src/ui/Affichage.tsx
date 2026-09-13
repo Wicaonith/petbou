@@ -1,6 +1,7 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import {
   classementDe,
+  classementParTableau,
   enCours,
   gereTerrains,
   type Match,
@@ -8,6 +9,7 @@ import {
   type Tournoi,
 } from '../engine'
 import { NumEquipe } from './NumEquipe'
+import { Tableau } from './Tableau'
 
 /**
  * Écran public, à projeter ou à brancher sur une télé du club.
@@ -42,6 +44,10 @@ export function Affichage({ tournoi, onFermer }: { tournoi: Tournoi; onFermer?: 
   const affiches = [...attente, ...joues].slice(0, 12)
   const lignes = classementDe(tournoi)
   const gere = gereTerrains(tournoi)
+  // Pendant les tableaux, l'arbre remplace le classement : il dit à la fois où
+  // en est chacun et qui l'attend, ce que la liste des victoires ne dit pas.
+  const tableaux = classementParTableau(tournoi).filter((s) => s.groupe !== undefined)
+  const montre = useRotation(tableaux.length)
 
   return (
     <div className="affichage">
@@ -72,7 +78,20 @@ export function Affichage({ tournoi, onFermer }: { tournoi: Tournoi; onFermer?: 
           </div>
         </div>
 
-        <div className="affichage-classement">
+        <div className={`affichage-classement${tableaux.length > 0 ? ' large' : ''}`}>
+          {tableaux.length > 0 ? (
+            <>
+              <div className="affichage-section">
+                {tableaux[montre].titre}
+                {tableaux.length > 1 && ` — ${montre + 1} sur ${tableaux.length}`}
+              </div>
+              <Tableau
+                matchs={tournoi.matchs.filter((m) => m.groupe === tableaux[montre].groupe)}
+                equipes={new Map(tournoi.equipes.map((e) => [e.id, e]))}
+              />
+            </>
+          ) : (
+            <>
           <div className="affichage-section">Classement</div>
           <div className="affichage-table">
             {lignes.slice(0, 10).map((l) => (
@@ -87,6 +106,8 @@ export function Affichage({ tournoi, onFermer }: { tournoi: Tournoi; onFermer?: 
               </div>
             ))}
           </div>
+            </>
+          )}
         </div>
       </div>
 
@@ -97,6 +118,23 @@ export function Affichage({ tournoi, onFermer }: { tournoi: Tournoi; onFermer?: 
       </div>
     </div>
   )
+}
+
+/**
+ * Fait défiler les tableaux, un à la fois.
+ *
+ * Trois arbres côte à côte sur un vidéoprojecteur seraient illisibles, et
+ * n'en montrer qu'un priverait les joueurs des autres. Le titre reste affiché
+ * en permanence pour que personne ne se demande lequel il regarde.
+ */
+function useRotation(combien: number): number {
+  const [i, setI] = useState(0)
+  useEffect(() => {
+    if (combien < 2) return
+    const t = setInterval(() => setI((x) => (x + 1) % combien), 12000)
+    return () => clearInterval(t)
+  }, [combien])
+  return combien === 0 ? 0 : i % combien
 }
 
 function Partie({ match, tournoi, gere }: { match: Match; tournoi: Tournoi; gere: boolean }) {
