@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import {
+  DRIVERS,
   classement,
   clePaire,
   dejaRencontrees,
@@ -87,6 +88,77 @@ describe('poule de 4', () => {
     expect([barrage.equipeA, barrage.equipeB]).toContain(g.equipeB) // perdant des gagnants
     expect([barrage.equipeA, barrage.equipeB]).toContain(p.equipeA) // gagnant des perdants
     expect([barrage.equipeA, barrage.equipeB]).not.toContain(g.equipeA)
+  })
+})
+
+describe('tableaux finals après les poules', () => {
+  /** Les deux qualifiées de chaque poule, dans l'ordre : 1re puis 2e. */
+  const qualifieesParPoule = (t: Tournoi): string[][] =>
+    repartir(t.equipes, t.config.graine ?? 1).map((eqs, i) =>
+      qualifiees(
+        eqs,
+        t.matchs.filter((m) => m.groupe === nomPoule(i)),
+      ),
+    )
+
+  const equipesDuGroupe = (t: Tournoi, groupe: string): Set<string> => {
+    const ids = new Set<string>()
+    for (const m of t.matchs.filter((x) => x.groupe === groupe)) {
+      ids.add(m.equipeA)
+      if (m.equipeB !== null) ids.add(m.equipeB)
+    }
+    return ids
+  }
+
+  it('envoie les 1res de poule en tableau A et les 2es en tableau B', () => {
+    for (const n of [16, 20, 24, 32]) {
+      const { final } = jouer(tournoi(n, 'poules'))
+      const qualifiees = qualifieesParPoule(final)
+      const premieres = new Set(qualifiees.map((q) => q[0]))
+      const secondes = new Set(qualifiees.map((q) => q[1]))
+
+      for (const id of equipesDuGroupe(final, 'Tableau A')) expect(premieres.has(id)).toBe(true)
+      for (const id of equipesDuGroupe(final, 'Tableau B')) expect(secondes.has(id)).toBe(true)
+    }
+  })
+
+  it('désigne un vainqueur dans chacun des deux tableaux', () => {
+    for (const n of [16, 24, 32]) {
+      const { final } = jouer(tournoi(n, 'poules'))
+      expect(termine(final)).toBe(true)
+      for (const groupe of ['Tableau A', 'Tableau B']) {
+        expect(vainqueur(final.matchs.filter((m) => m.groupe === groupe))).not.toBeNull()
+      }
+    }
+  })
+
+  it('n’ouvre aucun tableau tant qu’une poule n’est pas allée au bout', () => {
+    // 16 équipes, 4 poules : on joue tout sauf le barrage de la dernière poule.
+    let t = tournoi(16, 'poules')
+    for (let i = 0; i < 20 && propositionDe(t).length > 0; i++) {
+      t = lancerProchainsMatchs(t)
+      const aJouer = t.matchs.filter((m) => !matchJoue(m))
+      // On laisse toujours le dernier match en suspens.
+      for (const m of aJouer.slice(0, -1)) t = saisirScore(t, m.id, 13, 7)
+    }
+    const enSuspens = t.matchs.filter((m) => !matchJoue(m))
+    expect(enSuspens.length).toBeGreaterThan(0)
+    expect(t.matchs.some((m) => m.groupe === 'Tableau A')).toBe(false)
+  })
+
+  it('s’arrête aux poules quand le tableau final n’est pas demandé', () => {
+    const { final } = jouer(tournoi(16, 'poules', { tableauFinal: false }))
+    expect(termine(final)).toBe(true)
+    expect(final.matchs.every((m) => m.groupe?.startsWith('Poule'))).toBe(true)
+  })
+
+  it('annonce des tours qui couvrent les poules et le tableau', () => {
+    const t = tournoi(16, 'poules')
+    const sans = tournoi(16, 'poules', { tableauFinal: false })
+    const prevusAvec = DRIVERS.poules.toursPrevus(16, t.config)
+    const prevusSans = DRIVERS.poules.toursPrevus(16, sans.config)
+    // 4 poules : 2 tours de tableau en plus (demi-finales puis finale).
+    expect(prevusAvec).toBe(prevusSans + 2)
   })
 })
 

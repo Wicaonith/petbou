@@ -16,6 +16,10 @@ contre qui au tour suivant**.
 
 Chaque format est un fichier de `src/engine/formats/` implémentant l'interface
 `Driver` (`src/engine/types.ts`) : `prochainsMatchs`, `terminee`, `toursPrevus`.
+Un format peut enchaîner plusieurs phases derrière cette interface : les poules
+ouvrent deux tableaux à élimination directe une fois toutes les poules jouées
+(1res en A, 2es en B), en réutilisant `matchsTableau` du format seeding. Les
+phases se distinguent par `Match.groupe`, jamais par un état à part.
 L'orchestrateur (`src/engine/tournoi.ts`) ne connaît que cette interface.
 **Ajouter un format ne touche à rien d'autre** que le fichier du format et la
 table `DRIVERS`.

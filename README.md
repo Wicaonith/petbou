@@ -24,7 +24,7 @@ exempts, attribution des terrains.
 
 | Format | Ce qu'il fait |
 |---|---|
-| Poules | Poules de 4 (complétées par des poules de 3), 2 qualifiés par poule, avec barrage |
+| Poules | Poules de 4 (complétées par des poules de 3), 2 qualifiés par poule, avec barrage, puis deux tableaux à élimination directe : les premières de poule en A, les deuxièmes en B |
 | Système suisse | Chaque équipe rencontre une équipe au même nombre de victoires, sans revanche |
 | Élimination directe | Tableau avec têtes de série et exempts au premier tour |
 | Multi-chances A/B/C | Les battus d'entrée repartent dans le tableau suivant |

@@ -7,6 +7,7 @@ import {
   type NouveauMatch,
   nomPoule,
   peutRetirer,
+  TABLEAUX_FINALS,
   propositionDe,
   repartir,
   termine,
@@ -61,10 +62,20 @@ export function Tirage({ tournoi, onRetirer, onValider }: Props) {
   const parties = proposition.filter((m) => m.equipeB !== null).length
   const exempt = proposition.length - parties
 
+  /**
+   * Les tableaux finals renumérotent leurs tours à partir de 1 : annoncer
+   * « tour 1 » après trois tours de poules ferait croire à un redémarrage.
+   * On les nomme donc par ce qu'ils sont.
+   */
+  const finals = proposition.every((m) =>
+    (TABLEAUX_FINALS as readonly string[]).includes(m.groupe ?? ''),
+  )
+  const quoi = finals ? 'des tableaux finals' : premier ? 'du premier tour' : `du tour ${tour}`
+
   return (
     <>
       <div className="bandeau">
-        Tirage {premier ? 'du premier tour' : `du tour ${tour}`} — <strong>pas encore validé</strong>
+        Tirage {quoi} — <strong>pas encore validé</strong>
         . Rien n’est parti sur les terrains
         {peutRetirer(tournoi) ? ' : vous pouvez le relancer autant de fois que nécessaire.' : '.'}
       </div>
@@ -116,7 +127,7 @@ export function Tirage({ tournoi, onRetirer, onValider }: Props) {
             <strong>
               {parties} partie{parties > 1 ? 's' : ''}
             </strong>{' '}
-            {premier ? 'du premier tour' : `du tour ${tour}`}
+            {quoi}
             {gereTerrains(tournoi)
               ? ' vont être annoncées avec leur numéro de terrain.'
               : ' vont être annoncées.'}

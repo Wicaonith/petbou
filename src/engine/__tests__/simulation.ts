@@ -27,7 +27,12 @@ export function equipes(n: number, formation: Formation = 'doublette'): Equipe[]
 export function tournoi(
   n: number,
   format: FormatId,
-  opts: Partial<{ nbTerrains: number | null; graine: number; nbTours: number }> = {},
+  opts: Partial<{
+    nbTerrains: number | null
+    graine: number
+    nbTours: number
+    tableauFinal: boolean
+  }> = {},
 ): Tournoi {
   const t = creerTournoi({
     nom: 'Test',
@@ -37,6 +42,7 @@ export function tournoi(
     format,
     graine: opts.graine ?? 42,
     nbTours: opts.nbTours,
+    tableauFinal: opts.tableauFinal,
   })
   return { ...t, equipes: equipes(n) }
 }

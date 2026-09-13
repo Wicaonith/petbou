@@ -58,6 +58,14 @@ input, select {
 }
 input:focus, select:focus { outline: 2px solid var(--accent); outline-offset: -1px; border-color: var(--accent); }
 .grille { display: grid; gap: 16px; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); }
+/* Une case à cocher se lit en une ligne avec son intitulé, à la taille du texte
+   courant : les étiquettes grises de 13 px conviennent aux champs, pas à un
+   réglage qui décide de la forme du concours. */
+label.case {
+  display: flex; align-items: center; gap: 10px; margin-bottom: 0;
+  font-size: 16px; font-weight: 600; color: var(--texte); cursor: pointer;
+}
+label.case input { width: 20px; height: 20px; accent-color: var(--accent); cursor: pointer; }
 
 button.action {
   padding: 12px 22px; font-size: 16px; font-weight: 600; font-family: inherit;

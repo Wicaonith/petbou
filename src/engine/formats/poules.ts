@@ -10,7 +10,11 @@ import {
   matchJoue,
   perdant,
 } from '../types'
-import { taillesDePoules } from './commun'
+import { taillesDePoules, tailleTableau } from './commun'
+import { matchsTableau, vainqueur } from './seeding'
+
+/** Les deux tableaux qui suivent les poules : les 1res en A, les 2es en B. */
+export const TABLEAUX_FINALS = ['Tableau A', 'Tableau B'] as const
 
 export const nomPoule = (i: number): string => `Poule ${i + 1}`
 
@@ -48,26 +52,72 @@ export function repartir(equipes: readonly Equipe[], graine: number): Equipe[][]
 export const poules: Driver = {
   nom: 'Poules',
 
-  toursPrevus: (nbEquipes) => {
+  toursPrevus: (nbEquipes, config) => {
     const tailles = taillesDePoules(nbEquipes)
-    return Math.max(...tailles.map((t) => (t === 4 ? 3 : t === 3 ? 3 : t)), 0)
+    const enPoules = Math.max(...tailles.map((t) => (t === 4 ? 3 : t === 3 ? 3 : t)), 0)
+    if (!config.tableauFinal || tailles.length < 2) return enPoules
+    // Une qualifiée par poule et par tableau : les deux tableaux ont la même
+    // taille, donc le même nombre de tours.
+    return enPoules + Math.log2(tailleTableau(tailles.length))
   },
 
   terminee(etat) {
-    const groupes = repartir(etat.equipes, etat.config.graine ?? 1)
-    return groupes.every((eqs, i) => pouleTerminee(eqs, matchsDe(etat, nomPoule(i))))
+    if (!poulesFinies(etat)) return false
+    if (!etat.config.tableauFinal) return true
+    return tableauxFinals(etat).every(
+      (t) => t.equipes.length < 2 || vainqueur(t.matchs) !== null,
+    )
   },
 
   prochainsMatchs(etat) {
-    const groupes = repartir(etat.equipes, etat.config.graine ?? 1)
-    const sortie: NouveauMatch[] = []
-    // Chaque poule avance à son rythme : une poule rapide ne doit pas
-    // attendre les autres pour lancer son tour suivant.
-    groupes.forEach((eqs, i) => {
-      sortie.push(...prochainsDeLaPoule(eqs, matchsDe(etat, nomPoule(i)), nomPoule(i)))
-    })
-    return sortie
+    // Tant qu'une poule n'est pas allée au bout, on reste en poules : chacune
+    // avance à son rythme, une poule rapide n'attend pas les autres.
+    if (!poulesFinies(etat)) {
+      const groupes = repartir(etat.equipes, etat.config.graine ?? 1)
+      const sortie: NouveauMatch[] = []
+      groupes.forEach((eqs, i) => {
+        sortie.push(...prochainsDeLaPoule(eqs, matchsDe(etat, nomPoule(i)), nomPoule(i)))
+      })
+      return sortie
+    }
+
+    if (!etat.config.tableauFinal) return []
+    return tableauxFinals(etat).flatMap((t) => matchsTableau(t.equipes, t.matchs, t.nom, t.graine))
   },
+}
+
+const poulesFinies = (etat: EtatPhase): boolean =>
+  repartir(etat.equipes, etat.config.graine ?? 1).every((eqs, i) =>
+    pouleTerminee(eqs, matchsDe(etat, nomPoule(i))),
+  )
+
+/**
+ * Les deux tableaux finals, une fois toutes les poules jouées.
+ *
+ * Les premières de poule ne se rencontrent qu'entre elles, les secondes de
+ * même : deux concours parallèles, comme le A et le B d'un club. Chaque
+ * tableau a sa propre graine, sinon les deux tirages seraient jumeaux.
+ */
+function tableauxFinals(etat: EtatPhase): {
+  nom: string
+  equipes: Equipe[]
+  matchs: Match[]
+  graine: number
+}[] {
+  const graine = etat.config.graine ?? 1
+  const parId = new Map(etat.equipes.map((e) => [e.id, e]))
+  const parPoule = repartir(etat.equipes, graine).map((eqs, i) =>
+    qualifiees(eqs, matchsDe(etat, nomPoule(i))),
+  )
+
+  return TABLEAUX_FINALS.map((nom, rang) => ({
+    nom,
+    equipes: parPoule
+      .map((q) => parId.get(q[rang]))
+      .filter((e): e is Equipe => e !== undefined),
+    matchs: matchsDe(etat, nom),
+    graine: graine + rang + 1,
+  }))
 }
 
 const matchsDe = (etat: EtatPhase, groupe: string): Match[] =>
