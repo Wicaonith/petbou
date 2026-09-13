@@ -29,8 +29,22 @@ export interface Section {
 export function classementParTableau(t: Tournoi): Section[] {
   const groupes = groupesDeTableau(t)
   const presents = groupes.filter((g) => t.matchs.some((m) => m.groupe === g))
-  if (presents.length < 2) {
+
+  if (presents.length === 0) {
     return [{ titre: 'Classement', lignes: classement(t.equipes, t.matchs) }]
+  }
+
+  // Un seul tableau — l'élimination directe, ou un multi-chances dont le B n'est
+  // pas encore ouvert : rien à découper, mais il y a bien un arbre à dessiner.
+  if (presents.length === 1) {
+    return [
+      {
+        titre: 'Tableau',
+        lignes: classement(t.equipes, t.matchs),
+        vainqueur: vainqueur(matchsDuGroupe(t, presents[0])) ?? undefined,
+        groupe: presents[0],
+      },
+    ]
   }
 
   const parId = new Map(t.equipes.map((e) => [e.id, e]))
@@ -71,6 +85,7 @@ export function classementParTableau(t: Tournoi): Section[] {
 
 /** Les noms de groupe qui désignent un tableau, selon le format. */
 function groupesDeTableau(t: Tournoi): string[] {
+  if (t.config.format === 'seeding') return ['A']
   if (t.config.format === 'multichances') return [...TABLEAUX]
   if (t.config.format === 'poules' && t.config.tableauFinal) return [...TABLEAUX_FINALS]
   return []

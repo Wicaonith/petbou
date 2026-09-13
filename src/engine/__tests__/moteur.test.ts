@@ -195,13 +195,27 @@ describe('classement par tableau', () => {
     expect(sections[2].vainqueur).toBeUndefined()
   })
 
-  it('garde un classement unique quand le format n’a qu’un tableau', () => {
-    for (const t of [tournoi(12, 'suisse'), tournoi(12, 'seeding'), tournoi(12, 'poules', { tableauFinal: false })]) {
+  it('garde un classement unique quand le format n’a pas de tableau', () => {
+    for (const t of [tournoi(12, 'suisse'), tournoi(12, 'poules', { tableauFinal: false })]) {
       const sections = classementParTableau(jouer(t).final)
       expect(sections.length).toBe(1)
       expect(sections[0].titre).toBe('Classement')
+      expect(sections[0].groupe).toBeUndefined()
       expect(sections[0].lignes.length).toBe(12)
     }
+  })
+
+  /**
+   * L'élimination directe n'a qu'un tableau, donc rien à découper — mais c'est
+   * le format où l'arbre compte le plus. Il lui faut son groupe malgré tout.
+   */
+  it('donne son groupe au tableau unique de l’élimination directe', () => {
+    const { final } = jouer(tournoi(12, 'seeding'))
+    const sections = classementParTableau(final)
+    expect(sections.length).toBe(1)
+    expect(sections[0].groupe).toBe('A')
+    expect(sections[0].vainqueur).toBeTruthy()
+    expect(sections[0].lignes.length).toBe(12)
   })
 })
 
