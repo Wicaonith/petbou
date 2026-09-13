@@ -126,6 +126,19 @@ button.secondaire:hover { background: #f0ece2; }
 /* Le gagnant se repère à son cadre, pas seulement à la teinte de son score. */
 .camp.gagnant { border-color: var(--accent); background: var(--accent-clair); }
 
+/* Le titre du tableau et son vainqueur, au-dessus de chaque classement.
+   Le vainqueur est le résultat ; le reste du tri n'est qu'un ordre d'arrivée. */
+.section-tableau + .section-tableau { margin-top: 28px; }
+.section-tete {
+  display: flex; align-items: baseline; justify-content: space-between;
+  gap: 12px; flex-wrap: wrap; margin-bottom: 4px;
+}
+.section-tete h3 { margin: 0; font-size: 17px; }
+.section-vainqueur {
+  font-size: 15px; font-weight: 600; color: var(--accent);
+  background: var(--accent-clair); border-radius: 8px; padding: 5px 10px;
+}
+
 /* ---------- Fenêtre de confirmation ---------- */
 /* Assez large pour que le texte ne se lise pas en colonne étroite, et des
    boutons de la même taille qu'ailleurs : on y clique dans le bruit, debout. */
