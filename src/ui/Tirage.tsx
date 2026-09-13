@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import {
+  classementDe,
   type Equipe,
   enCours,
   gereTerrains,
@@ -166,13 +167,31 @@ function CompositionDesPoules({ tournoi }: { tournoi: Tournoi }) {
 function Affiches({ tournoi, proposition }: { tournoi: Tournoi; proposition: NouveauMatch[] }) {
   const parId = new Map<string, Equipe>(tournoi.equipes.map((e) => [e.id, e]))
 
+  /**
+   * Le nombre de victoires, affiché sous chaque nom dès qu'il y a eu un tour.
+   *
+   * Sans lui, une affiche qui oppose une équipe à 1 victoire à une équipe à 0
+   * passe pour une erreur d'appariement — alors qu'elle découle d'un exempt qui
+   * a rendu un groupe impair, ou d'une revanche que le logiciel a évitée. Avec
+   * lui, l'opérateur voit sur quoi le tirage s'est appuyé et peut le défendre
+   * devant les joueurs.
+   */
+  const aJoue = tournoi.matchs.length > 0
+  const victoires = new Map(classementDe(tournoi).map((l) => [l.equipeId, l.victoires]))
+
   const nom = (id: string) => {
     const e = parId.get(id)
     if (!e) return id
+    const v = victoires.get(id) ?? 0
     return (
       <>
         <NumEquipe n={e.numero} />
         {e.nom}
+        {aJoue && (
+          <small>
+            {v} victoire{v > 1 ? 's' : ''}
+          </small>
+        )}
       </>
     )
   }
@@ -204,7 +223,12 @@ function Affiches({ tournoi, proposition }: { tournoi: Tournoi; proposition: Nou
                       {m.equipeB === null ? (
                         <>
                           Exempt
-                          <small>Passe le tour, victoire acquise</small>
+                          <small>
+                            Passe le tour, victoire acquise.{' '}
+                            {aJoue
+                              ? 'Désignée parce qu’elle est la dernière au classement à n’avoir pas encore été exempte.'
+                              : 'Désignée au hasard : personne n’a encore joué.'}
+                          </small>
                         </>
                       ) : (
                         nom(m.equipeB)
