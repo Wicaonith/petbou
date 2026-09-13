@@ -270,6 +270,25 @@ export default function App() {
         />
       )}
 
+      {/* Le bandeau du haut nomme déjà l'étape suivante, mais après le dernier
+          score saisi on est en bas d'une liste de cinquante résultats, et il est
+          hors de l'écran. L'action se reprend donc ici, là où l'œil se trouve. */}
+      {onglet === 'matchs' && attente === 0 && (fini || aTirer > 0) && (
+        <div className="carte">
+          <button
+            className="action"
+            onClick={() => setOnglet(fini ? 'classement' : 'tirage')}
+          >
+            {fini ? 'Voir le classement final' : 'Voir le tirage suivant'}
+          </button>
+          <p className="aide" style={{ margin: '12px 0 0' }}>
+            {fini
+              ? 'Tous les scores sont saisis et le concours est allé à son terme.'
+              : 'Tous les scores sont saisis : les parties suivantes attendent d’être tirées.'}
+          </p>
+        </div>
+      )}
+
       {onglet === 'classement' && (
         <>
           <Classement tournoi={tournoi} />
