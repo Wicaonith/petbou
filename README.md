@@ -33,6 +33,28 @@ Les quatre formats partagent un même noyau (équipes, tours, matchs, terrains,
 classement) : `src/engine/formats/` ne contient que la règle d'appariement propre
 à chaque format.
 
+## Télécharger
+
+**https://gitlab.com/wicaonith/petbou/-/releases**
+
+Cette page ne change jamais d'adresse et ne périme pas : c'est le lien à donner.
+Les fichiers vivent dans le registre de paquets du projet, là où un lien vers un
+artefact de pipeline serait supprimé au bout de trente jours.
+
+Publier une version :
+
+```sh
+git tag v0.1.0 && git push --tags
+```
+
+L'étiquette déclenche la compilation Windows, l'envoi des fichiers et la
+création de la page. Rien à faire à la main.
+
+Un exécutable qui arrive par téléchargement porte la marque « téléchargé depuis
+Internet » et Windows affiche un avertissement au premier lancement. C'est
+pratique pour qui prépare le poste ; pour la personne qui tient la table, la
+clé USB reste le chemin le plus simple — voir plus bas.
+
 ## Distribution
 
 Le pipeline GitLab produit trois choses sur un runner Windows :
