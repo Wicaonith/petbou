@@ -37,6 +37,10 @@ installeur-windows:
       allow_failure: true
   cache:
     key: windows-deps
+    # « always » : un échec à la publication ne doit pas jeter la chaîne Rust
+    # et le registre des caisses, qui coûtent près de vingt minutes du forfait
+    # à reconstruire. Le prochain essai doit être bon marché.
+    when: always
     paths:
       - .cargo/registry/
       - src-tauri/target/
@@ -77,9 +81,12 @@ installeur-windows:
     # c'est ce qui permet de donner au club un lien encore valide dans six mois.
     # Les noms perdent accents et espaces : une adresse doit pouvoir être écrite
     # à la main, ou dictée au téléphone.
-    - 'curl.exe --fail --silent --show-error --header $jeton --upload-file concours-petanque-portable.zip "$paquet/concours-petanque-portable.zip"'
-    - 'curl.exe --fail --silent --show-error --header $jeton --upload-file $setup "$paquet/concours-petanque-setup.exe"'
-    - 'curl.exe --fail --silent --show-error --header $jeton --upload-file $msi "$paquet/concours-petanque.msi"'
+    # --fail-with-body plutôt que --fail : sans le corps de la réponse, un refus
+    # ne dit pas pourquoi, et chaque diagnostic coûte vingt minutes de forfait.
+    - '$envoyer = { param($fichier, $nom) curl.exe --fail-with-body --silent --show-error --write-out "  -> HTTP %{http_code}" --header $jeton --upload-file $fichier "$paquet/$nom"; if ($LASTEXITCODE -ne 0) { throw "Envoi de $nom refuse. Si le code est 403, verifiez que le registre de paquets est active : Parametres > General > Visibilite, fonctionnalites, permissions > Paquets." } }'
+    - '& $envoyer "concours-petanque-portable.zip" "concours-petanque-portable.zip"'
+    - '& $envoyer $setup "concours-petanque-setup.exe"'
+    - '& $envoyer $msi "concours-petanque.msi"'
 
     # L'API des versions crée l'étiquette elle-même à partir du commit : aucun
     # jeton d'écriture sur le dépôt à créer, à stocker, ni à renouveler quand il
@@ -90,7 +97,7 @@ installeur-windows:
     - '$lien = { param($nom, $fichier) @{ name = $nom; url = "$paquet/$fichier"; link_type = "package" } }'
     - '$corps = @{ name = "Concours de petanque v$version"; tag_name = "v$version"; ref = $env:CI_COMMIT_SHA; description = [IO.File]::ReadAllText((Join-Path $PWD "docs/notes-de-version.md")); assets = @{ links = @((& $lien "Version portable (rien a installer)" "concours-petanque-portable.zip"), (& $lien "Installeur, si WebView2 manque" "concours-petanque-setup.exe"), (& $lien "MSI, pour un poste gere" "concours-petanque.msi")) } }'
     - '[IO.File]::WriteAllText((Join-Path $PWD version.json), ($corps | ConvertTo-Json -Depth 6), (New-Object Text.UTF8Encoding $false))'
-    - 'curl.exe --fail --silent --show-error --header $jeton --header "Content-Type: application/json" --data-binary "@version.json" "$env:CI_API_V4_URL/projects/$env:CI_PROJECT_ID/releases"'
+    - 'curl.exe --fail-with-body --silent --show-error --header $jeton --header "Content-Type: application/json" --data-binary "@version.json" "$env:CI_API_V4_URL/projects/$env:CI_PROJECT_ID/releases"'
     - 'if ($LASTEXITCODE -ne 0) { throw "La version v$version existe deja : changez le numero dans src-tauri/tauri.conf.json avant de republier." }'
     - 'Write-Host "Publie : https://gitlab.com/$env:CI_PROJECT_PATH/-/releases/v$version"'
   artifacts:
@@ -102,4 +109,7 @@ installeur-windows:
       # manque sur un poste ancien.
       - src-tauri/target/release/bundle/nsis/*.exe
       - src-tauri/target/release/bundle/msi/*.msi
+    # Même chose : si la publication échoue, les fichiers compilés restent
+    # récupérables plutôt que perdus avec le job.
+    when: always
     expire_in: 30 days
