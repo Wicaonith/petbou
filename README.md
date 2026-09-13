@@ -41,14 +41,19 @@ Cette page ne change jamais d'adresse et ne périme pas : c'est le lien à donne
 Les fichiers vivent dans le registre de paquets du projet, là où un lien vers un
 artefact de pipeline serait supprimé au bout de trente jours.
 
-Publier une version :
+Publier une version, en deux gestes :
 
-```sh
-git tag v0.1.0 && git push --tags
-```
+1. Changer le numéro dans `src-tauri/tauri.conf.json`, commiter, pousser.
+2. Onglet **CI/CD → Pipelines**, bouton ▶ sur le job `installeur-windows`.
 
-L'étiquette déclenche la compilation Windows, l'envoi des fichiers et la
-création de la page. Rien à faire à la main.
+Le job compile, envoie les trois fichiers, crée l'étiquette de version et la
+page de téléchargement. Rien à taguer à la main : l'API des versions crée
+l'étiquette elle-même, ce qui évite d'avoir à créer un jeton d'écriture sur le
+dépôt — un jeton qui expirerait au bout d'un an, probablement la veille d'un
+concours.
+
+Republier le même numéro échoue exprès, avec le message qui dit quoi faire : une
+version publiée ne doit pas changer de contenu dans le dos de qui l'a téléchargée.
 
 Un exécutable qui arrive par téléchargement porte la marque « téléchargé depuis
 Internet » et Windows affiche un avertissement au premier lancement. C'est
