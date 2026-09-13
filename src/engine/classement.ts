@@ -2,6 +2,8 @@ import { type Equipe, type Match, matchJoue, gagnant } from './types'
 
 export interface Ligne {
   equipeId: string
+  /** Dossard, repris tel quel : le classement doit se lire comme les feuilles. */
+  numero: number
   nom: string
   joues: number
   victoires: number
@@ -24,6 +26,7 @@ export function classement(equipes: Equipe[], matchs: Match[]): Ligne[] {
   for (const e of equipes) {
     lignes.set(e.id, {
       equipeId: e.id,
+      numero: e.numero,
       nom: e.nom,
       joues: 0,
       victoires: 0,

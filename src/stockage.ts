@@ -1,4 +1,4 @@
-import type { Tournoi } from './engine'
+import { numeroterEquipes, type Tournoi } from './engine'
 
 /**
  * Sauvegarde locale, partagée par les deux fenêtres.
@@ -19,7 +19,9 @@ export function lire(): Etat | null {
     const brut = localStorage.getItem(CLE)
     if (!brut) return null
     const etat = JSON.parse(brut) as Etat
-    return etat?.tournoi?.config ? { tournoi: etat.tournoi, noms: etat.noms ?? [] } : null
+    return etat?.tournoi?.config
+      ? { tournoi: numeroterEquipes(etat.tournoi), noms: etat.noms ?? [] }
+      : null
   } catch {
     return null
   }

@@ -67,6 +67,18 @@ export function creerTournoi(init: {
   }
 }
 
+/**
+ * Donne leur dossard aux équipes d'un concours enregistré avant qu'il existe.
+ *
+ * Un concours commencé le jour de la mise à jour doit continuer à s'ouvrir, et
+ * une saison archivée à se relire. L'ordre d'inscription redonne exactement les
+ * numéros qu'aurait attribués la saisie.
+ */
+export function numeroterEquipes(t: Tournoi): Tournoi {
+  if (t.equipes.every((e) => typeof e.numero === 'number')) return t
+  return { ...t, equipes: t.equipes.map((e, i) => ({ ...e, numero: e.numero ?? i + 1 })) }
+}
+
 export const driverDe = (t: Tournoi): Driver => DRIVERS[t.config.format]
 
 /** Le club numérote-t-il ses terrains ? Détermine tout l'affichage des terrains. */

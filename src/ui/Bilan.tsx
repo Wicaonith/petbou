@@ -1,4 +1,5 @@
 import { classementDe, matchJoue, type Tournoi } from '../engine'
+import { NumEquipe } from './NumEquipe'
 
 /**
  * Bilan de fin de concours, une page A4 à imprimer ou à punaiser au club.
@@ -56,7 +57,7 @@ export function Bilan({ tournoi }: { tournoi: Tournoi }) {
       <table className="bilan-table">
         <thead>
           <tr>
-            <th>#</th>
+            <th>Rang</th>
             <th style={{ textAlign: 'left' }}>Équipe</th>
             <th>J</th>
             <th>V</th>
@@ -69,7 +70,10 @@ export function Bilan({ tournoi }: { tournoi: Tournoi }) {
           {lignes.map((l) => (
             <tr key={l.equipeId}>
               <td className={l.rang <= 3 ? 'rang podium' : 'rang'}>{l.rang}</td>
-              <td style={{ textAlign: 'left' }}>{l.nom}</td>
+              <td style={{ textAlign: 'left' }}>
+                <NumEquipe n={l.numero} />
+                {l.nom}
+              </td>
               <td>{l.joues}</td>
               <td>
                 <strong>{l.victoires}</strong>

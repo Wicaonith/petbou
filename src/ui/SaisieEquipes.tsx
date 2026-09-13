@@ -11,6 +11,7 @@ export function equipesDepuisNoms(noms: string[], formation: Formation): Equipe[
     if (membres.some((m) => m === '')) continue
     equipes.push({
       id: `eq${equipes.length + 1}`,
+      numero: equipes.length + 1,
       nom: membres.join(' / '),
       joueurs: membres.map((nom, j) => ({ id: `eq${equipes.length + 1}j${j}`, nom })),
     })

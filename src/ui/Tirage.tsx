@@ -10,6 +10,7 @@ import {
   termine,
   type Tournoi,
 } from '../engine'
+import { NumEquipe } from './NumEquipe'
 
 interface Props {
   tournoi: Tournoi
@@ -111,7 +112,10 @@ function CompositionDesPoules({ tournoi }: { tournoi: Tournoi }) {
             {equipes.map((e, k) => (
               <div className="poule-ligne" key={e.id}>
                 <span className="poule-rang">{k + 1}</span>
-                <span>{e.nom}</span>
+                <span>
+                  <NumEquipe n={e.numero} />
+                  {e.nom}
+                </span>
               </div>
             ))}
           </div>
@@ -123,7 +127,16 @@ function CompositionDesPoules({ tournoi }: { tournoi: Tournoi }) {
 
 function Affiches({ tournoi, proposition }: { tournoi: Tournoi; proposition: NouveauMatch[] }) {
   const parId = new Map<string, Equipe>(tournoi.equipes.map((e) => [e.id, e]))
-  const nom = (id: string) => parId.get(id)?.nom ?? id
+  const nom = (id: string) => {
+    const e = parId.get(id)
+    if (!e) return id
+    return (
+      <>
+        <NumEquipe n={e.numero} />
+        {e.nom}
+      </>
+    )
+  }
 
   // Les tableaux A/B/C et les poules se lisent groupe par groupe, pas en vrac.
   const groupes = [...new Set(proposition.map((m) => m.groupe ?? ''))]
