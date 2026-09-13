@@ -12,6 +12,7 @@ import {
   annulerScore,
   termine,
   toursRecommandes,
+  SCORE_EXEMPT_DEFAUT,
   type FormatId,
   type Formation,
   type Tournoi,
@@ -423,7 +424,10 @@ function Reglages({
   setTournoi: (maj: (t: Tournoi) => Tournoi) => void
   aller: (o: Onglet) => void
 }) {
-  const config = (champ: 'format' | 'butScore' | 'nbTours' | 'tableauFinal', valeur: unknown) =>
+  const config = (
+    champ: 'format' | 'butScore' | 'nbTours' | 'tableauFinal' | 'scoreExempt',
+    valeur: unknown,
+  ) =>
     setTournoi((t) => ({ ...t, config: { ...t.config, [champ]: valeur } }))
 
   const prevus = driverDe(tournoi).toursPrevus(tournoi.equipes.length, tournoi.config)
@@ -480,6 +484,8 @@ function Reglages({
           Laissez les terrains vides si vous ne les numérotez pas : les parties seront
           simplement annoncées ensemble, sans attribution ni attente.
         </p>
+
+        <ScoreExempt tournoi={tournoi} config={config} />
       </div>
 
       <div className="carte">
@@ -561,6 +567,77 @@ function Reglages({
         </button>
       </div>
     </>
+  )
+}
+
+/**
+ * Ce que marque une équipe exempte.
+ *
+ * L'exempt est toujours une victoire — la question est de savoir s'il compte
+ * aussi au goal-average. Le 13-7 est l'usage le plus répandu, mais il offre +6
+ * de départage à une équipe qui n'a pas lancé une boule, ce que tous les clubs
+ * n'acceptent pas. Le réglage existe donc, avec l'usage courant par défaut.
+ */
+function ScoreExempt({
+  tournoi,
+  config,
+}: {
+  tournoi: Tournoi
+  config: (champ: 'scoreExempt', valeur: unknown) => void
+}) {
+  const [pour, contre] = tournoi.config.scoreExempt ?? SCORE_EXEMPT_DEFAUT
+  const aucun = pour === 0 && contre === 0
+  const courant = pour === 13 && contre === 7
+  const choix = aucun ? 'aucun' : courant ? 'courant' : 'autre'
+
+  return (
+    <div style={{ marginTop: 20, maxWidth: 420 }}>
+      <label htmlFor="exempt">Une équipe exempte (qui passe le tour) marque</label>
+      <select
+        id="exempt"
+        value={choix}
+        onChange={(e) =>
+          config(
+            'scoreExempt',
+            e.target.value === 'aucun' ? [0, 0] : e.target.value === 'courant' ? [13, 7] : [13, 0],
+          )
+        }
+      >
+        <option value="courant">13 à 7 — l’usage le plus répandu</option>
+        <option value="aucun">Aucun point</option>
+        <option value="autre">Un autre score</option>
+      </select>
+
+      {choix === 'autre' && (
+        <div style={{ display: 'flex', gap: 10, alignItems: 'center', marginTop: 10 }}>
+          <input
+            type="number"
+            min={0}
+            max={99}
+            aria-label="Points marqués par l’équipe exempte"
+            value={pour}
+            onChange={(e) => config('scoreExempt', [Number(e.target.value) || 0, contre])}
+            style={{ width: 80 }}
+          />
+          <span>à</span>
+          <input
+            type="number"
+            min={0}
+            max={99}
+            aria-label="Points encaissés par l’équipe exempte"
+            value={contre}
+            onChange={(e) => config('scoreExempt', [pour, Number(e.target.value) || 0])}
+            style={{ width: 80 }}
+          />
+        </div>
+      )}
+
+      <p className="aide" style={{ marginTop: 8 }}>
+        {aucun
+          ? 'L’exempt reste une victoire, mais ne compte pas au goal-average : personne ne gagne de départage sans avoir joué.'
+          : 'L’exempt compte comme une victoire acquise, et ces points entrent dans le goal-average.'}
+      </p>
+    </div>
   )
 }
 

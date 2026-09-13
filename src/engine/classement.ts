@@ -47,7 +47,10 @@ export function classement(equipes: Equipe[], matchs: Match[]): Ligne[] {
     if (m.equipeB === null) {
       a.exempts += 1
       a.victoires += 1
-      a.pointsPour += m.scoreA!
+      // Sans points attribués, l'exempt ne pèse pas sur le goal-average : le
+      // club qui choisit ce réglage refuse qu'une équipe gagne du départage
+      // sans avoir lancé une boule.
+      a.pointsPour += m.scoreA ?? 0
       a.pointsContre += m.scoreB ?? 0
       continue
     }
