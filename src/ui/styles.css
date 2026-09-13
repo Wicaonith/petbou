@@ -340,6 +340,8 @@ td .equipe-joueurs { color: var(--discret); font-size: 13px; }
 .affichage-classement { width: 21em; flex-shrink: 0; display: flex; flex-direction: column; gap: 0.7em; }
 /* Un arbre a besoin de plus de largeur qu'une colonne de classement. */
 .affichage-classement.large { width: 46%; min-width: 26em; }
+/* Aucune partie en cours : plus rien à gauche, le tableau prend l'écran. */
+.affichage-classement.seul { width: 100%; }
 /* Sur un écran projeté, rien ne défile : l'arbre doit tenir. Les colonnes se
    compriment et les noms trop longs se coupent, comme sur les tableaux papier
    affichés au club. */
