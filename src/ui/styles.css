@@ -117,11 +117,14 @@ button.secondaire:hover { background: #f0ece2; }
 .classement td:first-child { border-left: 1px solid var(--trait); border-radius: 8px 0 0 8px; }
 .classement td:last-child { border-right: 1px solid var(--trait); border-radius: 0 8px 8px 0; }
 
-.match.affiche .camp {
-  grid-template-columns: 1fr;
+.match .camp {
   border: 1px solid var(--trait); border-radius: 8px;
-  padding: 10px 12px; background: var(--carte);
+  padding: 8px 10px; background: var(--carte);
 }
+/* Sans score à saisir, le nom occupe toute la largeur du cadre. */
+.match.affiche .camp { grid-template-columns: 1fr; padding: 10px 12px; }
+/* Le gagnant se repère à son cadre, pas seulement à la teinte de son score. */
+.camp.gagnant { border-color: var(--accent); background: var(--accent-clair); }
 
 /* ---------- Fenêtre de confirmation ---------- */
 /* Assez large pour que le texte ne se lise pas en colonne étroite, et des
@@ -145,11 +148,12 @@ button.secondaire:hover { background: #f0ece2; }
    taille relative pour suivre celle du texte, de la feuille A4 au vidéoprojecteur. */
 .numero {
   display: inline-block; min-width: 2em; margin-right: 0.5em; padding: 0 0.3em;
-  border-radius: 6px; background: var(--fond); color: var(--discret);
-  font-variant-numeric: tabular-nums; font-weight: 700; font-size: 0.85em;
+  border-radius: 6px; border: 1px solid var(--trait);
+  background: #e7e2d6; color: var(--texte);
+  font-variant-numeric: tabular-nums; font-weight: 700; font-size: 0.9em;
   text-align: center;
 }
-.camp.gagnant .numero { background: #fff; color: var(--accent); }
+.camp.gagnant .numero { background: #fff; border-color: var(--accent); color: var(--accent); }
 .affichage-rang.tete .numero { background: #fff; }
 
 /* À l'impression, un aplat gris dépend du réglage « imprimer les fonds » :
