@@ -48,7 +48,13 @@ installeur-windows:
     - choco install -y nodejs-lts --no-progress
     - choco install -y visualstudio2022-workload-vctools --no-progress
     - choco install -y rustup.install --no-progress
-    - $env:Path = "$env:USERPROFILE\.cargo\bin;C:\Program Files\nodejs;$env:Path"
+    # CARGO_HOME est déplacé dans le projet pour que le cache retienne le
+    # registre, et rustup-init respecte cette variable : il y installe donc
+    # aussi rustup.exe et cargo.exe. Les chercher dans le profil de
+    # l’utilisateur ne les y trouve pas — c’est ce qui a fait échouer le
+    # premier passage réel du pipeline. Les deux chemins sont donnés.
+    - $env:Path = "$env:CARGO_HOME\bin;$env:USERPROFILE\.cargo\bin;C:\Program Files\nodejs;$env:Path"
+    - Get-Command rustup, cargo, node | Select-Object Name, Source
     - rustup default stable-x86_64-pc-windows-msvc
     - node --version; rustc --version
   script:
