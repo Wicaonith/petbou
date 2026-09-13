@@ -97,6 +97,24 @@ button.secondaire:hover { background: #f0ece2; }
   padding: 10px 12px; background: var(--carte); font-weight: 600;
 }
 
+/* Une équipe par cadre, partout où l'on vient en chercher une précise : la
+   liste des engagées, le classement, le tirage. Des lignes qui se touchent se
+   lisent mal quand les noms sont longs et qu'on regarde vite, debout. */
+.classement { border-collapse: separate; border-spacing: 0 6px; }
+.classement th { border: none; padding-bottom: 2px; }
+.classement td {
+  background: var(--carte);
+  border-top: 1px solid var(--trait); border-bottom: 1px solid var(--trait);
+}
+.classement td:first-child { border-left: 1px solid var(--trait); border-radius: 8px 0 0 8px; }
+.classement td:last-child { border-right: 1px solid var(--trait); border-radius: 0 8px 8px 0; }
+
+.match.affiche .camp {
+  grid-template-columns: 1fr;
+  border: 1px solid var(--trait); border-radius: 8px;
+  padding: 10px 12px; background: var(--carte);
+}
+
 /* ---------- Fenêtre de confirmation ---------- */
 /* Assez large pour que le texte ne se lise pas en colonne étroite, et des
    boutons de la même taille qu'ailleurs : on y clique dans le bruit, debout. */
