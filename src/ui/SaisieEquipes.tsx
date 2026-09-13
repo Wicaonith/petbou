@@ -1,5 +1,6 @@
-import { useRef } from 'react'
+import { useRef, useState } from 'react'
 import { melanger, rng, type Equipe, type Formation } from '../engine'
+import { Confirmation } from './Confirmation'
 
 /** Découpe une liste plate de joueurs en équipes de la bonne taille. */
 export function equipesDepuisNoms(noms: string[], formation: Formation): Equipe[] {
@@ -36,6 +37,8 @@ interface Props {
 export function SaisieEquipes({ formation, noms, onChange }: Props) {
   const taille = formation === 'doublette' ? 2 : 3
   const refs = useRef<(HTMLInputElement | null)[]>([])
+  // Les deux boutons défont un travail de frappe que rien ne permet de retrouver.
+  const [aConfirmer, setAConfirmer] = useState<'melee' | 'effacer' | null>(null)
   const nbLignes = Math.floor(noms.length / taille) + 1
 
   const ecrire = (i: number, valeur: string) => {
@@ -149,15 +152,58 @@ export function SaisieEquipes({ formation, noms, onChange }: Props) {
       <div style={{ display: 'flex', gap: 8, marginTop: 16, flexWrap: 'wrap' }}>
         <button
           className="secondaire"
-          onClick={() => onChange(melanger(noms.filter(Boolean), rng(Date.now())))}
+          onClick={() => setAConfirmer('melee')}
           disabled={joueursSaisis < taille * 2}
         >
           Tirer les équipes au sort (mêlée)
         </button>
-        <button className="secondaire" onClick={() => onChange([])} disabled={joueursSaisis === 0}>
+        <button
+          className="secondaire"
+          onClick={() => setAConfirmer('effacer')}
+          disabled={joueursSaisis === 0}
+        >
           Tout effacer
         </button>
       </div>
+
+      {aConfirmer === 'melee' && (
+        <Confirmation
+          titre="Refaire les équipes au hasard ?"
+          action="Oui, mélanger les joueurs"
+          retour="Non, garder ces équipes"
+          onAnnuler={() => setAConfirmer(null)}
+          onValider={() => {
+            setAConfirmer(null)
+            onChange(melanger(noms.filter(Boolean), rng(Date.now())))
+          }}
+        >
+          <p>
+            Les <strong>{joueursSaisis} joueurs</strong> saisis vont être répartis au hasard dans
+            de nouvelles {formation}s.
+          </p>
+          <p className="attention">
+            Les équipes que vous avez composées vous-même seront perdues.
+          </p>
+        </Confirmation>
+      )}
+
+      {aConfirmer === 'effacer' && (
+        <Confirmation
+          titre="Effacer toute la liste ?"
+          action="Oui, tout effacer"
+          retour="Non, garder la liste"
+          onAnnuler={() => setAConfirmer(null)}
+          onValider={() => {
+            setAConfirmer(null)
+            onChange([])
+          }}
+        >
+          <p>
+            Les <strong>{joueursSaisis} joueurs</strong> saisis vont être supprimés.
+          </p>
+          <p className="attention">Rien ne permet de les retrouver : il faudra tout retaper.</p>
+        </Confirmation>
+      )}
     </div>
   )
 }
