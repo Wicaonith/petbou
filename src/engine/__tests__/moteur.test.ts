@@ -424,6 +424,29 @@ describe('classement', () => {
     expect(cl.at(-1)!.equipeId).toBe('e4') // 0 victoire
   })
 
+  /**
+   * Le club peut refuser que l'exempt pèse sur le goal-average. « Aucun point »
+   * s'écrit alors 0-0, jamais des scores nuls : matchJoue() prendrait l'exempt
+   * pour une partie en cours, et le tour ne se terminerait jamais.
+   */
+  it('accepte un exempt sans points, sans bloquer le tour', () => {
+    const base = tournoi(9, 'suisse', { nbTours: 3 })
+    const { final } = jouer({ ...base, config: { ...base.config, scoreExempt: [0, 0] } })
+
+    expect(termine(final)).toBe(true)
+    const exempts = final.matchs.filter((m) => m.equipeB === null)
+    expect(exempts.length).toBeGreaterThan(0)
+    expect(exempts.every(matchJoue)).toBe(true)
+
+    for (const m of exempts) {
+      const l = classement(final.equipes, final.matchs).find((x) => x.equipeId === m.equipeA)!
+      // La victoire est bien acquise, mais l'exempt n'a rien ajouté au départage.
+      expect(l.victoires).toBeGreaterThan(0)
+      expect(m.scoreA).toBe(0)
+      expect(m.scoreB).toBe(0)
+    }
+  })
+
   it('compte un exempt comme une victoire sans match joué', () => {
     const cl = classement(equipes(2), [
       { id: 'm1', tour: 1, equipeA: 'e1', equipeB: null, scoreA: 13, scoreB: 7, terrain: null },

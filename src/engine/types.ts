@@ -67,7 +67,15 @@ export interface PhaseConfig {
    * promet depuis toujours : « les 2 meilleures de chaque groupe continuent ».
    */
   tableauFinal?: boolean
-  /** Score attribué à une équipe exempte (victoire administrative). */
+  /**
+   * Score attribué à une équipe exempte (victoire administrative).
+   *
+   * Un exempt est toujours une victoire ; la question est de savoir s'il pèse
+   * aussi sur le goal-average. Le 13-7 est l'usage le plus répandu, mais il
+   * offre +6 à une équipe qui n'a pas lancé une boule : à chaque club de
+   * trancher. « Aucun point » s'écrit [0, 0] et non null — des scores nuls
+   * feraient passer l'exempt pour une partie non jouée, qui bloquerait le tour.
+   */
   scoreExempt?: [number, number]
   /**
    * Graine du tirage au sort. Fixée une fois au lancement de la phase : le
