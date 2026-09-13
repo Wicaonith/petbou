@@ -12,7 +12,8 @@
     "tauri": "tauri",
     "app:dev": "tauri dev",
     "app:build": "tauri build",
-    "docs": "node outils/pdf.mjs docs/installation.html installation.pdf"
+    "docs": "node outils/pdf.mjs docs/installation.html installation.pdf",
+    "app:portable": "tauri build && node outils/portable.mjs"
   },
   "dependencies": {
     "@tauri-apps/api": "^2.11.1",

@@ -22,3 +22,6 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Dossier assemblé par outils/portable.mjs
+/portable

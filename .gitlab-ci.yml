@@ -51,16 +51,10 @@ installeur-windows:
   script:
     - npm ci
     - npm run app:build
-    # Version portable, la voie principale : le même exécutable, plus un dossier
-    # `donnees` qui le fait écrire à côté de lui. Posé sur une clé USB, le
-    # concours suit. L'archive contient UN dossier, pour qu'une décompression
-    # ne dissémine pas trois fichiers sur le Bureau.
-    - $dossier = "portable/Concours de petanque"
-    - New-Item -ItemType Directory -Force -Path "$dossier/donnees" | Out-Null
-    - $exe = Get-ChildItem src-tauri/target/release/*.exe | Select-Object -First 1
-    - Copy-Item $exe.FullName "$dossier/Concours de petanque.exe"
-    - Copy-Item PORTABLE.txt "$dossier/LISEZ-MOI.txt"
-    - Compress-Archive -Path $dossier -DestinationPath concours-petanque-portable.zip -Force
+    # Le même script qu'en local, pour que l'archive du pipeline soit
+    # exactement ce qu'obtient quelqu'un qui compile sur sa machine.
+    - node outils/portable.mjs
+    - Compress-Archive -Path "portable/Concours de petanque" -DestinationPath concours-petanque-portable.zip -Force
   artifacts:
     name: "concours-petanque-$CI_COMMIT_SHORT_SHA"
     paths:
