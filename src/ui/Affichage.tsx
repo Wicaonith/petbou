@@ -41,13 +41,18 @@ export function Affichage({ tournoi, onFermer }: { tournoi: Tournoi; onFermer?: 
   // une équipe qui vient de rentrer veut voir son score, et entre deux tours
   // l'écran ne doit jamais être vide devant les joueurs.
   const joues = tournoi.matchs.filter(matchJoue).reverse()
-  const affiches = [...attente, ...joues].slice(0, 12)
   const lignes = classementDe(tournoi)
   const gere = gereTerrains(tournoi)
   // Pendant les tableaux, l'arbre remplace le classement : il dit à la fois où
   // en est chacun et qui l'attend, ce que la liste des victoires ne dit pas.
   const tableaux = classementParTableau(tournoi).filter((s) => s.groupe !== undefined)
   const montre = useRotation(tableaux.length)
+
+  // Avec un arbre, les derniers résultats sont déjà lisibles dedans : les
+  // répéter à côté vole la place du tableau. Ne restent à gauche que les
+  // parties en cours, qui portent le numéro de terrain — la seule chose que
+  // l'arbre ne dit pas. Aucune en cours : le tableau prend tout l'écran.
+  const affiches = tableaux.length > 0 ? attente.slice(0, 12) : [...attente, ...joues].slice(0, 12)
 
   return (
     <div className="affichage">
@@ -65,20 +70,26 @@ export function Affichage({ tournoi, onFermer }: { tournoi: Tournoi; onFermer?: 
       </div>
 
       <div className="affichage-corps">
-        <div className="affichage-parties">
-          <div className="affichage-section">
-            {attente.length > 0
-              ? `${attente.length} partie${attente.length > 1 ? 's' : ''} en cours`
-              : 'Derniers résultats'}
+        {affiches.length > 0 && (
+          <div className="affichage-parties">
+            <div className="affichage-section">
+              {attente.length > 0
+                ? `${attente.length} partie${attente.length > 1 ? 's' : ''} en cours`
+                : 'Derniers résultats'}
+            </div>
+            <div className="affichage-grille">
+              {affiches.map((m) => (
+                <Partie key={m.id} match={m} tournoi={tournoi} gere={gere} />
+              ))}
+            </div>
           </div>
-          <div className="affichage-grille">
-            {affiches.map((m) => (
-              <Partie key={m.id} match={m} tournoi={tournoi} gere={gere} />
-            ))}
-          </div>
-        </div>
+        )}
 
-        <div className={`affichage-classement${tableaux.length > 0 ? ' large' : ''}`}>
+        <div
+          className={`affichage-classement${tableaux.length > 0 ? ' large' : ''}${
+            affiches.length === 0 ? ' seul' : ''
+          }`}
+        >
           {tableaux.length > 0 ? (
             <>
               <div className="affichage-section">
