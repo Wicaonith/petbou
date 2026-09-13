@@ -1,5 +1,5 @@
 import { isTauri } from '@tauri-apps/api/core'
-import type { Tournoi } from '../engine'
+import { numeroterEquipes, type Tournoi } from '../engine'
 
 const EXT = 'petanque'
 
@@ -64,7 +64,7 @@ export async function ouvrir(): Promise<Sauvegarde | null> {
   if (donnees?.version !== 1 || !donnees.tournoi?.config) {
     throw new Error("Ce fichier n'est pas un concours enregistré par cette application.")
   }
-  return donnees
+  return { ...donnees, tournoi: numeroterEquipes(donnees.tournoi) }
 }
 
 function lireDepuisNavigateur(): Promise<string | null> {

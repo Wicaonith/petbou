@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { type Equipe, gereTerrains, type Match, matchJoue, type Tournoi } from '../engine'
+import { NumEquipe } from './NumEquipe'
 
 interface Props {
   tournoi: Tournoi
@@ -62,7 +63,19 @@ export function Matchs({ tournoi, onScore, onAnnuler }: Props) {
   )
 }
 
-const nomDe = (parId: Map<string, Equipe>, id: string) => parId.get(id)?.nom ?? id
+const equipeDe = (parId: Map<string, Equipe>, id: string): Equipe =>
+  parId.get(id) ?? { id, numero: 0, nom: id, joueurs: [] }
+
+/** Dossard puis noms, dans cet ordre partout : c'est l'ordre dans lequel on annonce. */
+function NomEquipe({ parId, id }: { parId: Map<string, Equipe>; id: string }) {
+  const e = equipeDe(parId, id)
+  return (
+    <span className="nom">
+      <NumEquipe n={e.numero} />
+      {e.nom}
+    </span>
+  )
+}
 
 function Chapeau({ match, gere }: { match: Match; gere: boolean }) {
   return (
@@ -111,11 +124,11 @@ function CarteMatch({
       {([match.equipeA, match.equipeB] as const).map((id, k) =>
         id === null ? null : (
           <div className="camp" key={id}>
-            <span className="nom">{nomDe(parId, id)}</span>
+            <NomEquipe parId={parId} id={id} />
             <input
               inputMode="numeric"
               value={k === 0 ? a : b}
-              aria-label={`Score de ${nomDe(parId, id)}`}
+              aria-label={`Score de l'équipe ${equipeDe(parId, id).numero}, ${equipeDe(parId, id).nom}`}
               onChange={(e) => {
                 const v = e.target.value.replace(/\D/g, '').slice(0, 2)
                 // Saisir le score du perdant suffit : le gagnant est au but.
@@ -157,7 +170,7 @@ function CarteJouee({
     <div className="match joue">
       <Chapeau match={match} gere={gere} />
       <div className={`camp${aGagne ? ' gagnant' : ''}`}>
-        <span className="nom">{nomDe(parId, match.equipeA)}</span>
+        <NomEquipe parId={parId} id={match.equipeA} />
         <span className="score-fige">{match.scoreA}</span>
       </div>
       {match.equipeB === null ? (
@@ -170,7 +183,7 @@ function CarteJouee({
       ) : (
         <>
           <div className={`camp${aGagne ? '' : ' gagnant'}`}>
-            <span className="nom">{nomDe(parId, match.equipeB)}</span>
+            <NomEquipe parId={parId} id={match.equipeB} />
             <span className="score-fige">{match.scoreB}</span>
           </div>
           <div className="pied">

@@ -1,4 +1,5 @@
-import { type Match, matchJoue, type Tournoi } from '../engine'
+import { type Equipe, type Match, matchJoue, type Tournoi } from '../engine'
+import { NumEquipe } from './NumEquipe'
 
 /**
  * Feuilles de match à imprimer et à confier aux équipes.
@@ -14,7 +15,7 @@ export function Feuilles({ tournoi }: { tournoi: Tournoi }) {
   return (
     <div className="feuilles">
       {aJouer.map((m) => (
-        <Feuille key={m.id} match={m} tournoi={tournoi} nom={(id: string) => parId.get(id)?.nom ?? id} />
+        <Feuille key={m.id} match={m} tournoi={tournoi} equipe={(id: string) => parId.get(id)} />
       ))}
     </div>
   )
@@ -29,12 +30,23 @@ function dateFr(iso: string): string {
 function Feuille({
   match,
   tournoi,
-  nom,
+  equipe,
 }: {
   match: Match
   tournoi: Tournoi
-  nom: (id: string) => string
+  equipe: (id: string) => Equipe | undefined
 }) {
+  /** Sur le papier aussi : c'est par le numéro que la table retrouve la partie. */
+  const camp = (id: string) => {
+    const e = equipe(id)
+    if (!e) return id
+    return (
+      <>
+        <NumEquipe n={e.numero} />
+        {e.nom}
+      </>
+    )
+  }
   return (
     <div className="feuille">
       <div className="feuille-tete">
@@ -50,11 +62,11 @@ function Feuille({
       <table className="feuille-camps">
         <tbody>
           <tr>
-            <td>{nom(match.equipeA)}</td>
+            <td>{camp(match.equipeA)}</td>
             <td className="case" />
           </tr>
           <tr>
-            <td>{nom(match.equipeB!)}</td>
+            <td>{camp(match.equipeB!)}</td>
             <td className="case" />
           </tr>
         </tbody>

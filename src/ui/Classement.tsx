@@ -1,4 +1,5 @@
 import { classementDe, type Tournoi } from '../engine'
+import { NumEquipe } from './NumEquipe'
 
 export function Classement({ tournoi }: { tournoi: Tournoi }) {
   const lignes = classementDe(tournoi)
@@ -21,7 +22,7 @@ export function Classement({ tournoi }: { tournoi: Tournoi }) {
       <table>
         <thead>
           <tr>
-            <th style={{ textAlign: 'right' }}>#</th>
+            <th style={{ textAlign: 'right' }}>Rang</th>
             <th>Équipe</th>
             <th>J</th>
             <th>V</th>
@@ -36,7 +37,10 @@ export function Classement({ tournoi }: { tournoi: Tournoi }) {
             <tr key={l.equipeId}>
               <td className="rang">{l.rang}</td>
               <td>
-                <div className="equipe-nom">{l.nom}</div>
+                <div className="equipe-nom">
+                  <NumEquipe n={l.numero} />
+                  {l.nom}
+                </div>
                 {l.exempts > 0 && (
                   <div className="equipe-joueurs">
                     {l.exempts} exempt{l.exempts > 1 ? 's' : ''}

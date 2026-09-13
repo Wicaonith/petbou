@@ -15,6 +15,7 @@ export function equipes(n: number, formation: Formation = 'doublette'): Equipe[]
   const taille = formation === 'doublette' ? 2 : 3
   return Array.from({ length: n }, (_, i) => ({
     id: `e${i + 1}`,
+    numero: i + 1,
     nom: `Équipe ${i + 1}`,
     joueurs: Array.from({ length: taille }, (_, j) => ({
       id: `e${i + 1}j${j + 1}`,

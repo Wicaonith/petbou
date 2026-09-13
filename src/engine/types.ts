@@ -13,6 +13,14 @@ export interface Joueur {
 
 export interface Equipe {
   id: string
+  /**
+   * Numéro de dossard, donné à la saisie dans l'ordre d'inscription.
+   *
+   * Au boulodrome une équipe s'appelle par son numéro : c'est lui qu'on annonce,
+   * qu'on écrit sur la feuille et qu'on cherche des yeux sur l'écran. Il est donc
+   * affiché partout à côté des noms, jamais à leur place.
+   */
+  numero: number
   /** Nom affiché. Par défaut les noms des joueurs concaténés. */
   nom: string
   joueurs: Joueur[]

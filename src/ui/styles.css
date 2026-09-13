@@ -83,6 +83,32 @@ button.secondaire:hover { background: #f0ece2; }
 .compteur { font-size: 15px; color: var(--discret); margin: 16px 0 0; }
 .compteur strong { color: var(--texte); font-size: 17px; }
 
+/* Liste figée une fois le concours lancé : on y cherche un dossard, pas un rang. */
+.equipes-engagees {
+  list-style: none; margin: 0; padding: 0;
+  display: grid; gap: 6px; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+}
+.equipes-engagees li { padding: 4px 0; }
+
+/* ---------- Dossard ---------- */
+/* Le numéro se lit avant les noms sans leur voler la vedette : couleur discrète,
+   largeur fixe pour que les noms restent alignés d'une ligne à l'autre, et une
+   taille relative pour suivre celle du texte, de la feuille A4 au vidéoprojecteur. */
+.numero {
+  display: inline-block; min-width: 2em; margin-right: 0.5em; padding: 0 0.3em;
+  border-radius: 6px; background: var(--fond); color: var(--discret);
+  font-variant-numeric: tabular-nums; font-weight: 700; font-size: 0.85em;
+  text-align: center;
+}
+.camp.gagnant .numero { background: #fff; color: var(--accent); }
+.affichage-rang.tete .numero { background: #fff; }
+
+/* À l'impression, un aplat gris dépend du réglage « imprimer les fonds » :
+   un trait, lui, sort toujours. */
+@media print {
+  .numero { background: none; border: 1px solid var(--trait); color: #000; }
+}
+
 /* ---------- Matchs ---------- */
 .matchs { display: grid; gap: 12px; grid-template-columns: repeat(auto-fill, minmax(330px, 1fr)); }
 .match {

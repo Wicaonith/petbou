@@ -27,6 +27,7 @@ import { Guide } from './ui/Guide'
 import { ouvrirSecondEcran } from './ui/secondEcran'
 import { ecrire, lire } from './stockage'
 import { Classement } from './ui/Classement'
+import { NumEquipe } from './ui/NumEquipe'
 
 /**
  * Les formats présentés par ce que le club en obtient, pas par leur nom de
@@ -216,13 +217,14 @@ export default function App() {
           {lance ? (
             <div className="carte">
               <h2>Équipes engagées</h2>
-              <ol>
+              <ul className="equipes-engagees">
                 {tournoi.equipes.map((e) => (
-                  <li key={e.id} style={{ padding: '4px 0' }}>
+                  <li key={e.id}>
+                    <NumEquipe n={e.numero} />
                     {e.nom}
                   </li>
                 ))}
-              </ol>
+              </ul>
             </div>
           ) : (
             <>
