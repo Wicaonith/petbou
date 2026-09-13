@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 import {
   classement,
   clePaire,
+  dejaRencontrees,
   lancerProchainsMatchs,
   matchJoue,
   nomPoule,
@@ -125,6 +126,51 @@ describe('système suisse', () => {
     }
     expect(Math.max(...exempts.values())).toBe(1)
     expect(exempts.size).toBe(5) // 5 tours, 9 équipes : 5 exempts distincts
+  })
+
+  /**
+   * Cas remonté du terrain : à 9 équipes, le tour 2 sort une équipe à
+   * 1 victoire contre une équipe à 0, ce qui ressemble à une erreur.
+   *
+   * Ce n'en est pas une, et ce test fige le pourquoi. L'exempt part à la
+   * dernière au classement, donc il ampute le groupe des battus : 4 battus
+   * moins l'exempt, il en reste 3, un nombre impair, et l'un d'eux doit
+   * forcément monter d'un cran. Ensuite la non-revanche décide lequel : le
+   * voisin naturel de e4 est e9, mais ils se sont déjà rencontrés au tour 1.
+   */
+  it('croise les groupes de victoires plutôt que d’imposer une revanche', () => {
+    const base = tournoi(9, 'suisse', { nbTours: 4 })
+    const m = (id: string, a: string, b: string | null, sa: number, sb: number): Match => ({
+      id, tour: 1, equipeA: a, equipeB: b, scoreA: sa, scoreB: sb, terrain: null,
+    })
+    const apresTour1: Tournoi = {
+      ...base,
+      matchs: [
+        m('m1', 'e3', 'e5', 13, 4),
+        m('m2', 'e4', 'e9', 13, 9),
+        m('m3', 'e1', 'e2', 13, 5),
+        m('m4', 'e7', 'e8', 13, 5),
+        m('m5', 'e6', null, 13, 7),
+      ],
+    }
+
+    const tour2 = propositionDe(apresTour1)
+    const affiche = (id: string) => tour2.find((x) => x.equipeA === id || x.equipeB === id)!
+
+    // L'exempt va à la dernière du classement qui n'en a pas encore eu :
+    // e6 a déjà été exempte, e5 est dernière.
+    expect(tour2.find((x) => x.equipeB === null)!.equipeA).toBe('e5')
+
+    // e4 (1 victoire) rencontre e2 (0 victoire) parce que son voisin de
+    // classement e9 serait une revanche du tour 1.
+    expect(affiche('e4')).toMatchObject({ equipeA: 'e4', equipeB: 'e2' })
+    const rencontrees = dejaRencontrees(apresTour1.matchs)
+    expect(rencontrees.has(clePaire('e4', 'e9'))).toBe(true)
+
+    // Et aucune des cinq affiches n'est une revanche.
+    for (const x of tour2) {
+      if (x.equipeB !== null) expect(rencontrees.has(clePaire(x.equipeA, x.equipeB))).toBe(false)
+    }
   })
 })
 
