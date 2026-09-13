@@ -38,7 +38,7 @@ const FORMATS: { id: FormatId; titre: string; quand: string; conseille?: boolean
   {
     id: 'poules',
     titre: 'Poules',
-    quand: 'Des groupes de 4 équipes, les 2 meilleures de chaque groupe continuent. Chacun joue au moins 2 parties. C’est ce que font la plupart des clubs.',
+    quand: 'Des groupes de 4 équipes, puis les 2 meilleures de chaque groupe continuent : les premières dans le tableau A, les deuxièmes dans le tableau B. Chacun joue au moins 2 parties. C’est ce que font la plupart des clubs.',
     conseille: true,
   },
   {
@@ -404,7 +404,7 @@ function Reglages({
   setTournoi: (maj: (t: Tournoi) => Tournoi) => void
   aller: (o: Onglet) => void
 }) {
-  const config = (champ: 'format' | 'butScore' | 'nbTours', valeur: unknown) =>
+  const config = (champ: 'format' | 'butScore' | 'nbTours' | 'tableauFinal', valeur: unknown) =>
     setTournoi((t) => ({ ...t, config: { ...t.config, [champ]: valeur } }))
 
   const prevus = driverDe(tournoi).toursPrevus(tournoi.equipes.length, tournoi.config)
@@ -496,6 +496,25 @@ function Reglages({
             </button>
           ))}
         </div>
+
+        {tournoi.config.format === 'poules' && (
+          <div style={{ marginTop: 20 }}>
+            <label className="case">
+              <input
+                type="checkbox"
+                disabled={lance}
+                checked={tournoi.config.tableauFinal !== false}
+                onChange={(e) => config('tableauFinal', e.target.checked)}
+              />
+              Enchaîner sur les tableaux finals
+            </label>
+            <p className="aide" style={{ marginTop: 8 }}>
+              Les premières de chaque groupe jouent le tableau A, les deuxièmes le tableau B,
+              jusqu’à un vainqueur dans chacun. Décochez si le concours doit s’arrêter à la fin
+              des poules.
+            </p>
+          </div>
+        )}
 
         {tournoi.config.format === 'suisse' && (
           <div style={{ marginTop: 20, maxWidth: 240 }}>

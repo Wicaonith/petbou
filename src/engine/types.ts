@@ -59,6 +59,14 @@ export interface PhaseConfig {
   butScore: number
   /** Nombre de tours voulu. Utilisé par le système suisse uniquement. */
   nbTours?: number
+  /**
+   * Poules uniquement : enchaîner sur deux tableaux à élimination directe.
+   *
+   * Les premières de poule y jouent le tableau A, les secondes le tableau B.
+   * C'est ce que fait la plupart des clubs, et ce que la description du format
+   * promet depuis toujours : « les 2 meilleures de chaque groupe continuent ».
+   */
+  tableauFinal?: boolean
   /** Score attribué à une équipe exempte (victoire administrative). */
   scoreExempt?: [number, number]
   /**

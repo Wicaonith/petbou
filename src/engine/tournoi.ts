@@ -47,6 +47,7 @@ export function creerTournoi(init: {
   format: FormatId
   butScore?: number
   nbTours?: number
+  tableauFinal?: boolean
   graine?: number
 }): Tournoi {
   return {
@@ -60,6 +61,11 @@ export function creerTournoi(init: {
       format: init.format,
       butScore: init.butScore ?? 13,
       nbTours: init.nbTours,
+      // Les poules s'enchaînent sur les tableaux finals sauf refus explicite :
+      // c'est ce que fait la plupart des clubs, et ce que la description du
+      // format annonce. Un concours enregistré avant leur existence n'a pas le
+      // réglage, et reste donc en poules seules.
+      tableauFinal: init.tableauFinal ?? true,
       scoreExempt: SCORE_EXEMPT_DEFAUT,
       graine: init.graine ?? Math.floor(Math.random() * 2 ** 31),
     },
