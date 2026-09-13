@@ -88,7 +88,14 @@ button.secondaire:hover { background: #f0ece2; }
   list-style: none; margin: 0; padding: 0;
   display: grid; gap: 6px; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
 }
-.equipes-engagees li { padding: 4px 0; }
+/* Chaque équipe dans son cadre : on vient y vérifier qu'une équipe précise est
+   bien inscrite, et deux lignes qui se touchent se lisent mal quand les noms
+   sont longs ou qu'on regarde vite. */
+.equipes-engagees li {
+  display: flex; align-items: baseline;
+  border: 1px solid var(--trait); border-radius: 8px;
+  padding: 10px 12px; background: var(--carte); font-weight: 600;
+}
 
 /* ---------- Fenêtre de confirmation ---------- */
 /* Assez large pour que le texte ne se lise pas en colonne étroite, et des
