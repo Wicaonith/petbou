@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import {
   DRIVERS,
+  apercu,
   classement,
   classementParTableau,
   clePaire,
@@ -19,6 +20,7 @@ import {
   taillesDePoules,
   termine,
   vainqueur,
+  type FormatId,
   type Match,
   type Tournoi,
 } from '../index'
@@ -160,6 +162,74 @@ describe('tableaux finals après les poules', () => {
     const prevusSans = DRIVERS.poules.toursPrevus(16, sans.config)
     // 4 poules : 2 tours de tableau en plus (demi-finales puis finale).
     expect(prevusAvec).toBe(prevusSans + 2)
+  })
+})
+
+describe('aperçu du déroulement', () => {
+  /**
+   * L'écran annonce à l'opératrice ce que le format va donner avec ses équipes.
+   * Si ces chiffres ne sont pas exactement ceux que le moteur joue ensuite, le
+   * logiciel ment sur son propre déroulement — et personne ne s'en aperçoit
+   * avant le jour du concours. Ces tests confrontent donc l'annonce au tirage
+   * réel, format par format et effectif par effectif.
+   */
+  const reel = (t: Tournoi) => {
+    const lance = lancerProchainsMatchs(t)
+    const premiers = lance.matchs.filter((m) => m.tour === 1 || m.groupe?.startsWith('Poule'))
+    return {
+      parties: premiers.filter((m) => m.equipeB !== null).length,
+      exempts: premiers.filter((m) => m.equipeB === null).length,
+    }
+  }
+
+  it('annonce le premier tour que le moteur lance vraiment', () => {
+    for (const format of ['poules', 'suisse', 'seeding', 'multichances'] as FormatId[]) {
+      for (const n of EFFECTIFS) {
+        const t = tournoi(n, format, { nbTerrains: null })
+        const annonce = apercu(format, n, t.config)
+        const joue = reel(t)
+        expect({ format, n, ...joue }).toEqual({
+          format,
+          n,
+          parties: annonce.premieresParties,
+          exempts: annonce.exempts,
+        })
+      }
+    }
+  })
+
+  it('annonce le nombre de tours que le concours joue vraiment', () => {
+    for (const format of ['seeding', 'multichances'] as FormatId[]) {
+      for (const n of EFFECTIFS) {
+        const t = tournoi(n, format, { nbTerrains: null })
+        const { final } = jouer(t)
+        const joues = final.matchs.reduce((max, m) => Math.max(max, m.tour), 0)
+        // Le tableau A donne le nombre de tours : les suivants sont plus courts.
+        expect(joues).toBe(apercu(format, n, t.config).tours)
+      }
+    }
+  })
+
+  it('annonce les poules que le moteur compose vraiment', () => {
+    for (const n of EFFECTIFS) {
+      const t = tournoi(n, 'poules', { nbTerrains: null })
+      const annonce = apercu('poules', n, t.config)
+      expect(repartir(t.equipes, t.config.graine ?? 1).map((p) => p.length)).toEqual(annonce.poules)
+    }
+  })
+
+  it('annonce les tableaux qui s’ouvrent vraiment', () => {
+    for (const n of [16, 24, 32]) {
+      for (const format of ['poules', 'multichances'] as FormatId[]) {
+        const t = tournoi(n, format, { nbTerrains: null })
+        const { final } = jouer(t)
+        const attendus = apercu(format, n, t.config).tableaux!.map((x) => x.nom)
+        const ouverts = classementParTableau(final)
+          .filter((s) => s.groupe !== undefined)
+          .map((s) => s.titre)
+        expect(ouverts).toEqual(attendus)
+      }
+    }
   })
 })
 

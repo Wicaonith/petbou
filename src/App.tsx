@@ -28,6 +28,7 @@ import { Guide } from './ui/Guide'
 import { ouvrirSecondEcran } from './ui/secondEcran'
 import { ecrire, lire } from './stockage'
 import { Classement } from './ui/Classement'
+import { Deroulement } from './ui/Deroulement'
 import { NumEquipe } from './ui/NumEquipe'
 
 /**
@@ -39,13 +40,13 @@ const FORMATS: { id: FormatId; titre: string; quand: string; conseille?: boolean
   {
     id: 'poules',
     titre: 'Poules',
-    quand: 'Des groupes de 4 équipes, puis les 2 meilleures de chaque groupe continuent : les premières dans le tableau A, les deuxièmes dans le tableau B. Chacun joue au moins 2 parties. C’est ce que font la plupart des clubs.',
-    conseille: true,
+    quand: 'Des groupes de 4 équipes, puis les 2 meilleures de chaque groupe continuent : les premières dans le tableau A, les deuxièmes dans le tableau B. Chacun joue au moins 2 parties.',
   },
   {
     id: 'suisse',
     titre: 'Tout le monde joue tous les tours',
-    quand: 'Personne n’est éliminé. Chaque équipe joue le même nombre de parties, contre des équipes qui ont gagné autant qu’elle. À choisir si vous voulez que tout le monde joue toute la journée.',
+    quand: 'Personne n’est éliminé. Chaque équipe joue le même nombre de parties, contre des équipes qui ont gagné autant qu’elle. Tout le monde joue toute la journée, et il n’y a aucun tableau à suivre.',
+    conseille: true,
   },
   {
     id: 'multichances',
@@ -558,6 +559,8 @@ function Reglages({
             </p>
           </div>
         )}
+
+        <Deroulement tournoi={tournoi} />
 
         {/* Le format choisi, la page est finie : le pas suivant se prend ici, sans
             remonter chercher un onglet. Dire « joueurs » et non « équipes », parce
