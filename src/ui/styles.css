@@ -139,6 +139,23 @@ button.secondaire:hover { background: #f0ece2; }
   background: var(--accent-clair); border-radius: 8px; padding: 5px 10px;
 }
 
+/* ---------- Déroulement du format ---------- */
+/* Lu une fois, avant de lancer le concours, par quelqu'un qui veut savoir dans
+   quoi il s'engage. D'où des étapes numérotées comme une recette, et les
+   chiffres de SON concours détachés dans un encadré. */
+.deroulement { margin-top: 24px; border-top: 1px solid var(--trait); padding-top: 18px; }
+.deroulement h3 { margin: 0 0 12px; font-size: 16px; }
+.deroulement-etapes { margin: 0; padding-left: 22px; display: grid; gap: 8px; }
+.deroulement-etapes li { line-height: 1.45; }
+.deroulement-etapes li::marker { font-weight: 700; color: var(--accent); }
+.deroulement-exemple {
+  margin-top: 16px; background: var(--accent-clair); border: 1px solid #b6d9c3;
+  border-radius: 10px; padding: 14px 16px;
+}
+.deroulement-titre { font-weight: 700; color: var(--accent); margin-bottom: 8px; }
+.deroulement-exemple ul { margin: 0; padding-left: 20px; display: grid; gap: 5px; }
+.deroulement-exemple li { color: var(--accent); }
+
 /* ---------- Tableau en arbre ---------- */
 /* Tout est en em à partir de la taille du conteneur : le même arbre tient dans
    l'onglet Classement comme sur un vidéoprojecteur, sans second jeu de règles.
