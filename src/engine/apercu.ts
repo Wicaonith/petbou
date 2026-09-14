@@ -24,6 +24,17 @@ export interface Apercu {
   tableaux?: { nom: string; equipes: number }[]
 }
 
+/**
+ * L'aperçu d'un format pour un effectif et des réglages donnés.
+ *
+ * Il dépend des réglages autant que du format : le même effectif en poules ne
+ * donne pas le même concours selon que les tableaux finals sont cochés ou non,
+ * et le système suisse suit le nombre de tours demandé plutôt que celui qu'il
+ * recommande. D'où `config` en entrée, et non le seul `format`.
+ *
+ * Sous deux équipes il n'y a rien à annoncer : un concours à une équipe n'a ni
+ * tour ni partie, et mieux vaut des zéros qu'une phrase inventée.
+ */
 export function apercu(format: FormatId, nbEquipes: number, config: PhaseConfig): Apercu {
   if (nbEquipes < 2) return { tours: 0, premieresParties: 0, exempts: 0 }
 
@@ -54,11 +65,20 @@ function tableau(n: number): { tours: number; premieresParties: number; exempts:
   }
 }
 
+/**
+ * Poules, puis éventuellement les deux tableaux finals.
+ *
+ * Une poule de 4 se joue en trois tours — les deux parties d'ouverture, puis
+ * gagnantes et perdantes, puis le barrage — et une poule de 3 aussi, chacune
+ * rencontrant les deux autres. Le plus long décide donc du nombre de tours.
+ *
+ * Chaque poule envoie sa première en A et sa deuxième en B : le nombre de
+ * poules donne donc directement l'effectif de chaque tableau.
+ */
 function apercuPoules(n: number, config: PhaseConfig): Apercu {
   const poules = taillesDePoules(n)
-  // Une poule de 4 se joue en 3 tours, une poule de 3 aussi.
   const toursDePoule = Math.max(...poules.map((t) => (t === 4 ? 3 : t === 3 ? 3 : t)), 0)
-  const qualifiees = poules.length // une par poule et par tableau
+  const qualifiees = poules.length
 
   if (!config.tableauFinal || poules.length < 2) {
     return {
@@ -81,11 +101,15 @@ function apercuPoules(n: number, config: PhaseConfig): Apercu {
   }
 }
 
+/**
+ * Système suisse : le seul format dont le nombre de tours se décide, et le seul
+ * où un exempt revient à chaque tour tant que l'effectif est impair — les autres
+ * n'en distribuent qu'au premier tour, pour compléter un tableau.
+ */
 function apercuSuisse(n: number, config: PhaseConfig): Apercu {
   return {
     tours: config.nbTours ?? toursRecommandes(n),
     premieresParties: Math.floor(n / 2),
-    // À effectif impair, une équipe passe le tour, et une seule.
     exempts: n % 2,
   }
 }
