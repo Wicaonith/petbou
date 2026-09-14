@@ -2,10 +2,32 @@
 <html lang="fr">
 <head>
 <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Installer Concours de pétanque</title>
 <style>
   @page { size: A4; margin: 14mm; }
-  body { margin: 0; font: 12px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif; color: #1d1b16; }
+  /* Cette page est aussi servie en ligne. Sur A4 c'est la marge d'impression qui
+     cadre le texte et 12 px suffisent ; sur un écran il faut une colonne, de
+     l'air et des caractères plus grands — souvent lus sur un téléphone, debout.
+     Tout est donc réservé à @media screen, pour que le papier reste intact. */
+  @media screen {
+    body { max-width: 780px; margin: 0 auto; padding: 28px 20px 64px; font-size: 15px; }
+    h1 { font-size: 26px; }
+    .destinataire { font-size: 14px; }
+    li { margin-bottom: 14px; }
+    li > strong { font-size: 17px; }
+    .ecran { font-size: 14px; }
+    .encadre .t { font-size: 15px; }
+    .pied { font-size: 13px; }
+  }
+  /* Fond et color-scheme déclarés : sur papier ils ne changent rien, mais servie
+     en ligne cette page tombait en texte noir sur fond noir dès que le
+     navigateur était en mode sombre — c'est-à-dire sur la moitié des téléphones. */
+  :root { color-scheme: light; }
+  body {
+    margin: 0; background: #fff; color: #1d1b16;
+    font: 12px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif;
+  }
   h1 { font-size: 21px; margin: 0; letter-spacing: -0.01em; }
   .destinataire { font-size: 12px; color: #444; margin-top: 5px; line-height: 1.5; }
   .tete { border-bottom: 2px solid #14532d; padding-bottom: 9px; margin-bottom: 13px; }
