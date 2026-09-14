@@ -121,3 +121,24 @@ installeur-windows:
     # récupérables plutôt que perdus avec le job.
     when: always
     expire_in: 30 days
+
+# La notice d'installation, servie en ligne plutôt que transmise en pièce
+# jointe : une adresse tient dans un SMS, un PDF non, et elle est toujours à
+# jour. Elle s'imprime depuis le navigateur, la mise en page A4 étant conservée.
+#
+# GitLab impose le nom « public » pour le dossier publié. C'est déjà celui des
+# fichiers statiques de Vite : ses deux icônes partent donc en ligne avec la
+# notice, ce qui ne gêne personne et évite d'inventer une seconde convention.
+#
+# https://wicaonith.gitlab.io/petbou/
+pages:
+  stage: build
+  image: alpine:latest
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+  script:
+    - mkdir -p public
+    - cp docs/installation.html public/index.html
+  artifacts:
+    paths:
+      - public

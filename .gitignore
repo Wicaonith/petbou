@@ -25,3 +25,6 @@ dist-ssr
 
 # Dossier assemblé par outils/portable.mjs
 /portable
+
+# Page GitLab Pages, recopiée depuis docs/ par la CI
+public/index.html

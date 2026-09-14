@@ -73,6 +73,8 @@ une page à laisser près du clavier.
 Le jour du concours, le format à choisir est « Tout le monde joue tous les
 tours » — c'est le système suisse.
 
-Un fichier LISEZ-MOI se trouve dans le dossier, il redit tout ceci.
+Un fichier LISEZ-MOI se trouve dans le dossier, il redit tout ceci. Et si vous
+préférez une page à imprimer, tout est repris ici :
+https://wicaonith.gitlab.io/petbou/
 
 Bonne journée,
