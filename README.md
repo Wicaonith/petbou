@@ -82,6 +82,13 @@ L'installeur sait l'installer au besoin ; la version portable, non.
 
 ## Mettre le logiciel sur le PC du club
 
+Deux documents, selon que la personne est en face de vous ou non :
+
+| Document | Pour qui |
+|---|---|
+| `docs/installation.html` | Une page à imprimer, pour qui prépare l'ordinateur une seule fois |
+| `docs/courriel-telechargement.md` | Le même parcours en courriel, quand on ne peut pas apporter la clé soi-même |
+
 `docs/installation.html` est une page à imprimer, destinée à la personne qui
 prépare l'ordinateur une seule fois. Elle couvre le point qui bloque vraiment :
 l'exécutable n'étant pas signé, Windows affiche un avertissement au premier
