@@ -25,7 +25,7 @@ L'orchestrateur (`src/engine/tournoi.ts`) ne connaît que cette interface.
 table `DRIVERS`.
 
 ```
-src/engine/       ~1000 lignes de TypeScript pur, sans React, 35 tests
+src/engine/       ~1000 lignes de TypeScript pur, sans React, 40 tests
   types.ts          modèle de domaine + interface Driver
   tournoi.ts        orchestration : créer, tirer, lancer, saisir, terrains
   classement.ts     départage FFPJP
@@ -67,7 +67,7 @@ plus à comprendre le jour du concours.
 ## Commandes
 
 ```sh
-npm test              # 35 tests du moteur — le garde-fou principal
+npm test              # 40 tests du moteur — le garde-fou principal
 npm run dev           # interface seule, dans le navigateur
 npm run build         # tsc -b && vite build
 npm run lint          # oxlint
@@ -114,8 +114,16 @@ suit la clé USB.
 Compter environ 4 min pour une compilation complète, et ~3,5 Mo d'exécutable.
 
 Le pipeline GitLab (`.gitlab-ci.yml`) tient les tests sur Linux à chaque
-poussée, et le build Windows sur un runner déclenché à la main (les minutes du
-forfait sont comptées) ou sur une étiquette de version.
+poussée. Le job Windows, lui, est **le bouton de publication** : déclenché à la
+main depuis CI/CD (les minutes du forfait sont comptées), il compile, envoie les
+trois fichiers au registre de paquets et crée la page de version. Le numéro vient
+de `tauri.conf.json` ; republier un numéro déjà publié est refusé **avant** de
+compiler, pour ne pas dépenser sept minutes de runner à le découvrir.
+
+Pousser une étiquette ne déclenche rien : un second chemin de publication aurait
+fini par diverger. Le lien donné au club est
+https://gitlab.com/wicaonith/petbou/-/releases, qui ne périme pas — là où un
+artefact de job disparaît au bout de trente jours.
 
 ## Décisions encore ouvertes
 

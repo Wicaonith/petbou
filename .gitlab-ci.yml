@@ -62,6 +62,15 @@ installeur-windows:
     - rustup default stable-x86_64-pc-windows-msvc
     - node --version; rustc --version
   script:
+    # Le numéro de version se vérifie avant de compiler, pas après : republier
+    # un numéro déjà publié doit coûter une seconde, pas sept minutes de runner.
+    - '$version = (Get-Content src-tauri/tauri.conf.json -Raw | ConvertFrom-Json).version'
+    - '$api = "$env:CI_API_V4_URL/projects/$env:CI_PROJECT_ID"'
+    - '$paquet = "$api/packages/generic/concours-petanque/$version"'
+    - '$jeton = "JOB-TOKEN: " + $env:CI_JOB_TOKEN'
+    - '$deja = curl.exe --silent --output NUL --write-out "%{http_code}" --header $jeton "$api/releases/v$version"'
+    - 'if ($deja -eq "200") { throw "La version v$version est deja publiee. Changez le numero dans src-tauri/tauri.conf.json, poussez, puis relancez ce job." }'
+
     - npm ci
     - npm run app:build
     # Le même script qu'en local, pour que l'archive du pipeline soit
@@ -69,11 +78,8 @@ installeur-windows:
     - node outils/portable.mjs
     - Compress-Archive -Path "portable/Concours de petanque" -DestinationPath concours-petanque-portable.zip -Force
 
-    # La version vient de tauri.conf.json, qui nomme déjà les installeurs : une
-    # seule source, donc jamais une version affichée différente de celle publiée.
-    - '$version = (Get-Content src-tauri/tauri.conf.json -Raw | ConvertFrom-Json).version'
-    - '$paquet = "$env:CI_API_V4_URL/projects/$env:CI_PROJECT_ID/packages/generic/concours-petanque/$version"'
-    - '$jeton = "JOB-TOKEN: " + $env:CI_JOB_TOKEN'
+    # Tauri nomme les installeurs d'après la version : on les retrouve donc par
+    # leur extension, la seule chose qui ne bouge pas.
     - '$setup = (Get-ChildItem src-tauri/target/release/bundle/nsis/*.exe | Select-Object -First 1).FullName'
     - '$msi = (Get-ChildItem src-tauri/target/release/bundle/msi/*.msi | Select-Object -First 1).FullName'
 
@@ -81,9 +87,11 @@ installeur-windows:
     # c'est ce qui permet de donner au club un lien encore valide dans six mois.
     # Les noms perdent accents et espaces : une adresse doit pouvoir être écrite
     # à la main, ou dictée au téléphone.
-    # --fail-with-body plutôt que --fail : sans le corps de la réponse, un refus
-    # ne dit pas pourquoi, et chaque diagnostic coûte vingt minutes de forfait.
-    - '$envoyer = { param($fichier, $nom) curl.exe --fail-with-body --silent --show-error --write-out "  -> HTTP %{http_code}" --header $jeton --upload-file $fichier "$paquet/$nom"; if ($LASTEXITCODE -ne 0) { throw "Envoi de $nom refuse. Si le code est 403, verifiez que le registre de paquets est active : Parametres > General > Visibilite, fonctionnalites, permissions > Paquets." } }'
+    # curl ne décide pas de l'arrêt : GitLab coupe le job dès qu'une commande
+    # sort en erreur, et emporterait le script avant la ligne qui explique
+    # pourquoi. On lit donc le code nous-mêmes, puis on lève une erreur qui dit
+    # quoi faire.
+    - '$envoyer = { param($fichier, $nom) $c = curl.exe --silent --output NUL --write-out "%{http_code}" --header $jeton --upload-file $fichier "$paquet/$nom"; Write-Host "$nom  ->  HTTP $c"; if ($c -ne "201") { throw "Envoi de $nom refuse (HTTP $c). Si c est 403, activez le registre de paquets : Parametres > General > Visibilite, fonctionnalites, permissions > Paquets." } }'
     - '& $envoyer "concours-petanque-portable.zip" "concours-petanque-portable.zip"'
     - '& $envoyer $setup "concours-petanque-setup.exe"'
     - '& $envoyer $msi "concours-petanque.msi"'
@@ -97,8 +105,8 @@ installeur-windows:
     - '$lien = { param($nom, $fichier) @{ name = $nom; url = "$paquet/$fichier"; link_type = "package" } }'
     - '$corps = @{ name = "Concours de petanque v$version"; tag_name = "v$version"; ref = $env:CI_COMMIT_SHA; description = [IO.File]::ReadAllText((Join-Path $PWD "docs/notes-de-version.md")); assets = @{ links = @((& $lien "Version portable (rien a installer)" "concours-petanque-portable.zip"), (& $lien "Installeur, si WebView2 manque" "concours-petanque-setup.exe"), (& $lien "MSI, pour un poste gere" "concours-petanque.msi")) } }'
     - '[IO.File]::WriteAllText((Join-Path $PWD version.json), ($corps | ConvertTo-Json -Depth 6), (New-Object Text.UTF8Encoding $false))'
-    - 'curl.exe --fail-with-body --silent --show-error --header $jeton --header "Content-Type: application/json" --data-binary "@version.json" "$env:CI_API_V4_URL/projects/$env:CI_PROJECT_ID/releases"'
-    - 'if ($LASTEXITCODE -ne 0) { throw "La version v$version existe deja : changez le numero dans src-tauri/tauri.conf.json avant de republier." }'
+    - '$code = curl.exe --silent --output reponse.json --write-out "%{http_code}" --header $jeton --header "Content-Type: application/json" --data-binary "@version.json" "$api/releases"'
+    - 'if ($code -ne "201") { throw "Creation de la version refusee (HTTP $code) : " + [IO.File]::ReadAllText((Join-Path $PWD "reponse.json")) }'
     - 'Write-Host "Publie : https://gitlab.com/$env:CI_PROJECT_PATH/-/releases/v$version"'
   artifacts:
     name: "concours-petanque-$CI_COMMIT_SHORT_SHA"
