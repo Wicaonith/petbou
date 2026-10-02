@@ -13,6 +13,7 @@
     "app:dev": "tauri dev",
     "app:build": "tauri build",
     "docs": "node outils/pdf.mjs docs/installation.html installation.pdf",
+    "captures": "vite-node outils/etats-captures.ts && node outils/captures.mjs",
     "app:portable": "tauri build && node outils/portable.mjs"
   },
   "dependencies": {

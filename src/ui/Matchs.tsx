@@ -84,9 +84,13 @@ function Chapeau({ match, gere }: { match: Match; gere: boolean }) {
         {match.groupe ? `${match.groupe} · ` : ''}
         {match.libelle ?? `Tour ${match.tour}`}
       </span>
-      {/* Sans gestion des terrains il n'y a rien à annoncer : ni numéro, ni attente. */}
+      {/* Sans gestion des terrains il n'y a rien à annoncer : ni numéro, ni attente.
+          Une partie jouée non plus : saisir son score libère le terrain, et
+          annoncer « en attente » sur un résultat ferait croire qu'elle reste à
+          jouer — au milieu d'une liste de trente résultats, le jour du concours. */}
       {gere &&
         match.equipeB !== null &&
+        !matchJoue(match) &&
         (match.terrain !== null ? (
           <span className="terrain">Terrain {match.terrain}</span>
         ) : (
