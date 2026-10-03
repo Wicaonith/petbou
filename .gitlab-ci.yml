@@ -72,16 +72,29 @@ installeur-windows:
     - 'if ($deja -eq "200") { throw "La version v$version est deja publiee. Changez le numero dans src-tauri/tauri.conf.json, poussez, puis relancez ce job." }'
 
     - npm ci
+    # Le cache rapporte les installeurs de la version précédente, et ils
+    # s'accumulent : il y en avait deux au passage du 3 octobre. Le dossier
+    # repart donc vide, pour qu'il n'y ait jamais d'ambiguïté sur ce qu'on
+    # publie. Le reste du cache — registre des caisses et objets compilés —
+    # est intact, c'est lui qui fait gagner les dix minutes.
+    - Remove-Item src-tauri/target/release/bundle -Recurse -Force -ErrorAction SilentlyContinue
     - npm run app:build
     # Le même script qu'en local, pour que l'archive du pipeline soit
     # exactement ce qu'obtient quelqu'un qui compile sur sa machine.
     - node outils/portable.mjs
     - Compress-Archive -Path "portable/Concours de petanque" -DestinationPath concours-petanque-portable.zip -Force
 
-    # Tauri nomme les installeurs d'après la version : on les retrouve donc par
-    # leur extension, la seule chose qui ne bouge pas.
-    - '$setup = (Get-ChildItem src-tauri/target/release/bundle/nsis/*.exe | Select-Object -First 1).FullName'
-    - '$msi = (Get-ChildItem src-tauri/target/release/bundle/msi/*.msi | Select-Object -First 1).FullName'
+    # Choisis par leur numéro de version, et non par leur rang dans le dossier :
+    # « Select-Object -First 1 » prenait le premier par ordre alphabétique, donc
+    # 0.1.0 avant 0.2.0. La version 0.2.0 a ainsi publié l'installeur de la
+    # 0.1.0, et rien ne le disait — les deux fichiers portent le même nom une
+    # fois renommés. Une seule correspondance est attendue : au-delà, on
+    # s'arrête plutôt que de deviner.
+    - '$setup = @(Get-ChildItem "src-tauri/target/release/bundle/nsis/*_${version}_*.exe")'
+    - '$msi = @(Get-ChildItem "src-tauri/target/release/bundle/msi/*_${version}_*.msi")'
+    - 'if ($setup.Count -ne 1 -or $msi.Count -ne 1) { throw "Attendu un installeur et un MSI en version $version, trouve $($setup.Count) et $($msi.Count)." }'
+    - '$setup = $setup[0].FullName'
+    - '$msi = $msi[0].FullName'
 
     # Le registre de paquets ne périme pas, contrairement aux artefacts de job :
     # c'est ce qui permet de donner au club un lien encore valide dans six mois.

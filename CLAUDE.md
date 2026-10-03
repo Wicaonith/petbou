@@ -108,7 +108,7 @@ décompression maladroite ne doit pas séparer l'exécutable de son dossier
 à côté de l'exécutable (`src-tauri/src/lib.rs`) — donc qui fait que le concours
 suit la clé USB.
 
-**Deux pièges vérifiés sur la première compilation réelle (13/09/2026) :**
+**Trois pièges vérifiés sur des compilations réelles :**
 
 - L'exécutable produit s'appelle **`petbou.exe`**, d'après le nom du paquet
   Cargo — pas d'après `productName`, faute de `mainBinaryName` dans
@@ -121,6 +121,15 @@ suit la clé USB.
   `%LOCALAPPDATA%\fr.petbou.concours` reste vide. Toute modification de
   `activer_mode_portable()` doit être revérifiée en lançant vraiment
   l'exécutable depuis `portable/`, les tests ne couvrant pas ce chemin.
+
+- Le cache rapporte les installeurs des versions précédentes dans
+  `target/release/bundle/`, et ils s’accumulent. Prendre « le premier fichier du
+  dossier » y choisit le plus petit numéro : la version 0.2.0 a publié
+  l’installeur de la 0.1.0, sans que rien ne le signale — une fois renommés, les
+  deux fichiers portent le même nom. Le dossier est donc vidé avant chaque
+  compilation, et les installeurs choisis sur leur numéro de version. **Vérifier
+  une version publiée se fait sur le fichier, pas sur son nom** :
+  `(Get-Item x.exe).VersionInfo.ProductVersion`.
 
 Compter environ 4 min pour une compilation complète, et ~3,5 Mo d'exécutable.
 
