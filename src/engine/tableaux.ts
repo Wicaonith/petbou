@@ -3,7 +3,7 @@ import { TABLEAUX } from './formats/multichances'
 import { TABLEAUX_FINALS } from './formats/poules'
 import { vainqueur } from './formats/seeding'
 import type { Tournoi } from './tournoi'
-import type { Equipe, Match } from './types'
+import { matchsDuGroupe, type Equipe } from './types'
 
 /** Un classement et le titre sous lequel il se lit. */
 export interface Section {
@@ -41,7 +41,7 @@ export function classementParTableau(t: Tournoi): Section[] {
       {
         titre: 'Tableau',
         lignes: classement(t.equipes, t.matchs),
-        vainqueur: vainqueur(matchsDuGroupe(t, presents[0])) ?? undefined,
+        vainqueur: vainqueur(matchsDuGroupe(t.matchs, presents[0])) ?? undefined,
         groupe: presents[0],
       },
     ]
@@ -59,7 +59,7 @@ export function classementParTableau(t: Tournoi): Section[] {
   }
 
   const sections: Section[] = presents.map((g) => {
-    const matchs = t.matchs.filter((m) => m.groupe === g)
+    const matchs = matchsDuGroupe(t.matchs, g)
     const equipes = equipesDe(parId, [...dernier].filter(([, x]) => x === g).map(([id]) => id))
     return {
       titre: titreDe(g),
@@ -97,7 +97,3 @@ const titreDe = (groupe: string): string =>
 
 const equipesDe = (parId: Map<string, Equipe>, ids: string[]): Equipe[] =>
   ids.map((id) => parId.get(id)).filter((e): e is Equipe => e !== undefined)
-
-/** Le classement d'un tableau ne se calcule que sur ses propres matchs. */
-export const matchsDuGroupe = (t: Tournoi, groupe: string): Match[] =>
-  t.matchs.filter((m) => m.groupe === groupe)

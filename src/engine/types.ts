@@ -112,6 +112,28 @@ export interface Driver {
 
 export const matchJoue = (m: Match): boolean => m.scoreA !== null && m.scoreB !== null
 
+/**
+ * Numéro du dernier tour créé, 0 si rien n'a encore été lancé.
+ *
+ * Les matchs ne sont pas rangés par tour : seul leur numéro le dit. Cette
+ * lecture était refaite à l'identique dans trois formats et deux écrans, et
+ * chaque copie était une occasion de diverger.
+ */
+export const dernierTour = (matchs: readonly Match[]): number =>
+  matchs.reduce((max, m) => Math.max(max, m.tour), 0)
+
+/**
+ * Les matchs d'une poule ou d'un tableau.
+ *
+ * C'est le groupe qui sépare les phases d'un concours — poules puis tableaux
+ * finals, ou les tableaux A/B/C du multi-chances — et non un état à part. Les
+ * lire passe donc toujours par ici.
+ */
+export const matchsDuGroupe = <M extends { groupe?: string }>(
+  matchs: readonly M[],
+  groupe: string,
+): M[] => matchs.filter((m) => m.groupe === groupe)
+
 /** Gagnant d'un match joué. Un exempt est gagné par l'équipe A. */
 export function gagnant(m: Match): string | null {
   if (m.equipeB === null) return m.equipeA

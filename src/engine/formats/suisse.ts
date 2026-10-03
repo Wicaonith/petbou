@@ -1,14 +1,11 @@
 import { classement, dejaRencontrees } from '../classement'
 import { melanger, rng } from '../alea'
-import { type Driver, type EtatPhase, type NouveauMatch, matchJoue } from '../types'
+import { type Driver, type EtatPhase, type NouveauMatch, dernierTour, matchJoue } from '../types'
 import { apparierAuMieux, choisirExempt } from './commun'
 
 /** Nombre de tours par défaut : de quoi départager sans étirer la journée. */
 export const toursRecommandes = (n: number): number =>
   n <= 1 ? 0 : Math.max(3, Math.ceil(Math.log2(n)))
-
-export const dernierTour = (etat: EtatPhase): number =>
-  etat.matchs.reduce((max, m) => Math.max(max, m.tour), 0)
 
 export const tourComplet = (etat: EtatPhase, tour: number): boolean => {
   const ms = etat.matchs.filter((m) => m.tour === tour)
@@ -37,13 +34,13 @@ export const suisse: Driver = {
   toursPrevus: (nbEquipes, config) => config.nbTours ?? toursRecommandes(nbEquipes),
 
   terminee(etat) {
-    const tour = dernierTour(etat)
+    const tour = dernierTour(etat.matchs)
     const voulus = this.toursPrevus(etat.equipes.length, etat.config)
     return tour >= voulus && tourComplet(etat, tour)
   },
 
   prochainsMatchs(etat) {
-    const tour = dernierTour(etat)
+    const tour = dernierTour(etat.matchs)
     // Un tour en cours bloque le suivant : on ne tire qu'avec tous les résultats.
     if (tour > 0 && !tourComplet(etat, tour)) return []
     if (this.terminee(etat)) return []
