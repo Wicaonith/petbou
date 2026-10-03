@@ -14,7 +14,7 @@ import {
   type Tournoi,
 } from '../engine'
 import { Confirmation } from './Confirmation'
-import { NumEquipe } from './NumEquipe'
+import { NomEquipe } from './Equipe'
 
 interface Props {
   tournoi: Tournoi
@@ -163,8 +163,7 @@ function CompositionDesPoules({ tournoi }: { tournoi: Tournoi }) {
               <div className="poule-ligne" key={e.id}>
                 <span className="poule-rang">{k + 1}</span>
                 <span>
-                  <NumEquipe n={e.numero} />
-                  {e.nom}
+                  <NomEquipe equipe={e} />
                 </span>
               </div>
             ))}
@@ -191,19 +190,12 @@ function Affiches({ tournoi, proposition }: { tournoi: Tournoi; proposition: Nou
   const victoires = new Map(classementDe(tournoi).map((l) => [l.equipeId, l.victoires]))
 
   const nom = (id: string) => {
-    const e = parId.get(id)
-    if (!e) return id
     const v = victoires.get(id) ?? 0
     return (
-      <>
-        <NumEquipe n={e.numero} />
-        {e.nom}
-        {aJoue && (
-          <small>
-            {v} victoire{v > 1 ? 's' : ''}
-          </small>
-        )}
-      </>
+      <NomEquipe
+        equipe={parId.get(id)}
+        dessous={aJoue ? `${v} victoire${v > 1 ? 's' : ''}` : undefined}
+      />
     )
   }
 

@@ -1,5 +1,6 @@
 import { type Equipe, type Match, matchJoue, type Tournoi } from '../engine'
-import { NumEquipe } from './NumEquipe'
+import { NomEquipe } from './Equipe'
+import { dateFr } from './format'
 
 /**
  * Feuilles de match à imprimer et à confier aux équipes.
@@ -21,12 +22,6 @@ export function Feuilles({ tournoi }: { tournoi: Tournoi }) {
   )
 }
 
-/** Une feuille qui part sur le terrain se lit en français, pas en ISO. */
-function dateFr(iso: string): string {
-  const [a, m, j] = iso.split('-')
-  return j ? `${j}/${m}/${a}` : iso
-}
-
 function Feuille({
   match,
   tournoi,
@@ -37,16 +32,7 @@ function Feuille({
   equipe: (id: string) => Equipe | undefined
 }) {
   /** Sur le papier aussi : c'est par le numéro que la table retrouve la partie. */
-  const camp = (id: string) => {
-    const e = equipe(id)
-    if (!e) return id
-    return (
-      <>
-        <NumEquipe n={e.numero} />
-        {e.nom}
-      </>
-    )
-  }
+  const camp = (id: string) => <NomEquipe equipe={equipe(id)} />
   return (
     <div className="feuille">
       <div className="feuille-tete">

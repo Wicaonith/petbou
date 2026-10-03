@@ -29,7 +29,7 @@ import { ouvrirSecondEcran } from './ui/secondEcran'
 import { ecrire, lire } from './stockage'
 import { Classement } from './ui/Classement'
 import { Deroulement } from './ui/Deroulement'
-import { NumEquipe } from './ui/NumEquipe'
+import { NomEquipe } from './ui/Equipe'
 
 /**
  * Les formats présentés par ce que le club en obtient, pas par leur nom de
@@ -228,8 +228,7 @@ export default function App() {
               <ul className="equipes-engagees">
                 {tournoi.equipes.map((e) => (
                   <li key={e.id}>
-                    <NumEquipe n={e.numero} />
-                    {e.nom}
+                    <NomEquipe equipe={e} />
                   </li>
                 ))}
               </ul>

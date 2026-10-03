@@ -1,6 +1,6 @@
 import { useState } from 'react'
-import { type Equipe, gereTerrains, type Match, matchJoue, type Tournoi } from '../engine'
-import { NumEquipe } from './NumEquipe'
+import { type Equipe as EquipeT, gereTerrains, type Match, matchJoue, type Tournoi } from '../engine'
+import { NomEquipe as Equipe } from './Equipe'
 
 interface Props {
   tournoi: Tournoi
@@ -74,16 +74,14 @@ export function Matchs({ tournoi, onScore, onAnnuler }: Props) {
   )
 }
 
-const equipeDe = (parId: Map<string, Equipe>, id: string): Equipe =>
+const equipeDe = (parId: Map<string, EquipeT>, id: string): EquipeT =>
   parId.get(id) ?? { id, numero: 0, nom: id, joueurs: [] }
 
-/** Dossard puis noms, dans cet ordre partout : c'est l'ordre dans lequel on annonce. */
-function NomEquipe({ parId, id }: { parId: Map<string, Equipe>; id: string }) {
-  const e = equipeDe(parId, id)
+/** L'enveloppe propre à cet écran ; le dossard et les noms viennent du commun. */
+function NomEquipe({ parId, id }: { parId: Map<string, EquipeT>; id: string }) {
   return (
     <span className="nom">
-      <NumEquipe n={e.numero} />
-      {e.nom}
+      <Equipe equipe={equipeDe(parId, id)} />
     </span>
   )
 }
@@ -119,7 +117,7 @@ function CarteMatch({
   onScore,
 }: {
   match: Match
-  parId: Map<string, Equipe>
+  parId: Map<string, EquipeT>
   but: number
   gere: boolean
   onScore: (id: string, a: number, b: number) => void
@@ -176,7 +174,7 @@ function CarteJouee({
   onAnnuler,
 }: {
   match: Match
-  parId: Map<string, Equipe>
+  parId: Map<string, EquipeT>
   gere: boolean
   onAnnuler: (id: string) => void
 }) {
