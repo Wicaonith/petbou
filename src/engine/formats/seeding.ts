@@ -116,6 +116,18 @@ export function vainqueur(matchs: readonly Match[]): string | null {
   return survivants.length === 1 ? survivants[0] : null
 }
 
+/**
+ * Tableau à élimination directe : on perd, on sort.
+ *
+ * Tout est décidé au placement initial — les rencontres jusqu'à la finale en
+ * découlent, seuls les résultats font avancer. Le tableau est dimensionné à la
+ * puissance de 2 au-dessus de l'effectif, et les places vides deviennent des
+ * exempts au premier tour (voir `placer`).
+ *
+ * `matchsTableau` est extrait du driver plutôt qu'enfermé dedans : les poules
+ * et le multi-chances ouvrent leurs propres tableaux avec, et un second
+ * algorithme de tableau aurait fini par diverger de celui-ci.
+ */
 export const seeding: Driver = {
   nom: 'Tableau à élimination directe',
 

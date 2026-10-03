@@ -39,6 +39,13 @@ export interface Tournoi {
 
 export const SCORE_EXEMPT_DEFAUT: [number, number] = [13, 7]
 
+/**
+ * Un concours vide, prêt à recevoir ses équipes.
+ *
+ * Tout ce qui peut avoir une valeur par défaut en a une : l'opératrice ne doit
+ * pouvoir rien oublier. La graine est tirée ici une fois pour toutes, et non au
+ * moment du tirage, pour qu'un même concours rejoué donne les mêmes poules.
+ */
 export function creerTournoi(init: {
   nom: string
   date?: string

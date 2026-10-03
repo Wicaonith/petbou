@@ -49,6 +49,19 @@ export function repartir(equipes: readonly Equipe[], graine: number): Equipe[][]
   return poules
 }
 
+/**
+ * Poules de 4 à la mode FFPJP, puis deux tableaux finals.
+ *
+ * Chaque poule avance à son rythme : une poule rapide ne doit pas attendre les
+ * autres pour lancer son tour suivant. C'est ce qui impose de repérer les matchs
+ * par leur groupe plutôt que par un compteur de tour commun — deux poules au
+ * même « tour 2 » ne sont pas au même moment de la journée.
+ *
+ * Deux équipes sortent de chaque poule, deux rentrent chez elles. Quand les
+ * tableaux finals sont demandés, les premières disputent le A et les secondes le
+ * B, une fois toutes les poules allées au bout : ce format enchaîne donc deux
+ * phases derrière la seule interface Driver.
+ */
 export const poules: Driver = {
   nom: 'Poules',
 

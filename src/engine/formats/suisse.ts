@@ -15,6 +15,22 @@ export const tourComplet = (etat: EtatPhase, tour: number): boolean => {
   return ms.length > 0 && ms.every(matchJoue)
 }
 
+/**
+ * Système suisse : personne n'est éliminé, et chacun affronte son niveau.
+ *
+ * Le premier tour est tiré au sort. Les suivants apparient les équipes dans
+ * l'ordre du classement, ce qui met face à face celles qui ont gagné autant —
+ * c'est une conséquence de l'ordre, pas une règle imposée.
+ *
+ * La non-revanche, elle, prime : plutôt que de rejouer une affiche, le moteur
+ * descend chercher l'adversaire suivant, quitte à croiser deux équipes qui n'ont
+ * pas le même nombre de victoires. Un tirage qui surprend l'opérateur vient
+ * presque toujours de là, et l'écran de tirage affiche les victoires pour qu'il
+ * puisse le défendre devant les joueurs.
+ *
+ * C'est aussi le seul format dont le nombre de tours se décide à l'avance au
+ * lieu de découler de l'effectif.
+ */
 export const suisse: Driver = {
   nom: 'Système suisse',
 
