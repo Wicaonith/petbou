@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Architecture — Concours de pétanque</title>
+<style>
+  /* Page servie en ligne et destinée à être lue sur un écran, souvent large.
+     Le fond et le color-scheme sont déclarés : sans eux, un navigateur en mode
+     sombre peindrait du texte presque noir sur du noir. */
+  :root { color-scheme: light; }
+  body {
+    margin: 0 auto; max-width: 62rem; padding: 2.5rem 1.25rem 5rem;
+    background: #fff; color: #1d1b16;
+    font: 16px/1.6 system-ui, -apple-system, "Segoe UI", sans-serif;
+  }
+  h1 { font-size: 1.9rem; margin: 0 0 .3rem; letter-spacing: -.01em; }
+  .sous { color: #6d675a; margin: 0 0 2rem; }
+  h2 {
+    font-size: 1.3rem; margin: 2.8rem 0 .8rem;
+    border-bottom: 2px solid #14532d; padding-bottom: .4rem;
+  }
+  h3 { font-size: 1.05rem; margin: 2rem 0 .4rem; }
+  .compte { font-weight: 400; color: #6d675a; font-size: .85rem; }
+  p { margin: .6rem 0; }
+  strong { font-weight: 600; }
+  code { font-family: ui-monospace, "Cascadia Mono", Consolas, monospace; font-size: .92em; }
+  /* L'arborescence déborde sur un téléphone : elle défile dans son cadre
+     plutôt que de faire défiler la page entière de travers. */
+  pre {
+    background: #f4f2ed; border: 1px solid #d9d4c8; border-radius: 8px;
+    padding: 1rem; overflow-x: auto; font-size: 13px; line-height: 1.55;
+  }
+  pre .f { color: #1d1b16; font-weight: 600; }
+  pre .n { color: #6d675a; }
+  pre .r { color: #14532d; }
+  .encadre {
+    border: 1px solid #b6d9c3; background: #eef7f1; border-radius: 10px;
+    padding: 1rem 1.2rem; margin: 1.5rem 0;
+  }
+  .encadre p { margin: .4rem 0; color: #14532d; }
+  .encadre p:first-child { margin-top: 0; font-weight: 700; }
+  .pied { margin-top: 3.5rem; border-top: 1px solid #d9d4c8; padding-top: 1rem; color: #6d675a; font-size: .9rem; }
+  a { color: #14532d; }
+</style>
+</head>
+<body>
+
+<h1>Architecture</h1>
+<p class="sous">
+  Concours de pétanque — <!-- TOTAL --> lignes de source, hors dépendances.
+  Cette page est réécrite à chaque publication : les chiffres sont comptés dans
+  le dépôt, jamais recopiés.
+</p>
+
+<h2>La règle qui tient tout</h2>
+
+<p>
+  Les dépendances ne vont que dans un sens. <strong>Le moteur n'importe rien
+  d'autre que lui-même</strong> — ni React, ni l'interface, ni aucune
+  bibliothèque. Douze fichiers d'interface importent le moteur ; aucun fichier
+  du moteur n'importe l'interface.
+</p>
+
+<p>
+  Ce n'est pas une élégance : c'est ce qui permet de tester les règles du
+  concours sans navigateur, et de refaire un écran sans risquer de changer un
+  appariement. Le moteur est la partie dont une erreur se verrait publiquement
+  le jour du concours ; elle est donc tenue à l'écart de tout ce qui bouge
+  souvent.
+</p>
+
+<div class="encadre">
+  <p>Une seule idée porte les quatre formats</p>
+  <p>
+    Poules, système suisse, élimination directe et multi-chances ne sont pas
+    quatre applications. Ils partagent un noyau — équipes, tours, matchs,
+    terrains, classement — et ne diffèrent que sur une question : <strong>qui
+    joue contre qui au tour suivant</strong>.
+  </p>
+  <p>
+    Chacun est un fichier de <code>formats/</code> qui implémente trois méthodes :
+    <code>prochainsMatchs</code>, <code>terminee</code>, <code>toursPrevus</code>.
+    L'orchestrateur ne connaît que cette interface. Ajouter un cinquième format,
+    c'est un fichier et une ligne dans la table des formats — rien d'autre ne bouge.
+  </p>
+</div>
+
+<h2>Deux conséquences qui ne se devinent pas</h2>
+
+<p>
+  <strong>Un format peut enchaîner plusieurs phases</strong> derrière cette même
+  interface. Les poules ouvrent deux tableaux à élimination directe une fois
+  toutes les poules jouées — les premières en A, les deuxièmes en B. Ce qui
+  sépare les phases, c'est le groupe porté par chaque match, jamais un état
+  rangé à part.
+</p>
+
+<p>
+  <strong>L'algorithme de tableau est extrait</strong> du format à élimination
+  directe plutôt qu'enfermé dedans : les poules et le multi-chances ouvrent
+  leurs propres tableaux avec. Un second algorithme d'arbre aurait fini par
+  diverger du premier, et la divergence ne se serait vue qu'un jour de concours.
+</p>
+
+<h2>L'arborescence</h2>
+
+<!-- ARBORESCENCE -->
+
+<h2>Ce qui n'est pas du code</h2>
+
+<p>
+  <code>docs/</code> contient la notice d'installation — celle que sert cette
+  même adresse — le courriel de téléchargement et le texte des pages de version.
+  Ils font partie du produit autant que l'application : l'utilisatrice finale
+  maîtrise mal l'informatique, et amener le logiciel sur le PC du club est le
+  problème difficile.
+</p>
+
+<p>
+  <code>src-tauri/</code> est la coque Windows. Le Rust se limite à ouvrir la
+  fenêtre et donner accès au disque ; une seule fonction y mérite l'attention,
+  <code>activer_mode_portable()</code>, qui fait écrire les données à côté de
+  l'exécutable dès qu'un dossier <code>donnees</code> est posé auprès de lui.
+  C'est tout ce qui fait qu'un concours en cours suit la clé USB.
+</p>
+
+<div class="pied">
+  <a href="./">← La notice d'installation</a> ·
+  <a href="https://gitlab.com/wicaonith/petbou">Le dépôt</a> ·
+  <a href="https://gitlab.com/wicaonith/petbou/-/releases">Télécharger</a>
+</div>
+
+</body>
+</html>

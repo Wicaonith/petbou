@@ -87,6 +87,7 @@ Deux documents, selon que la personne est en face de vous ou non :
 | Document | Pour qui |
 |---|---|
 | `docs/installation.html` | Une page à imprimer, pour qui prépare l'ordinateur une seule fois. Publiée en ligne sur <https://wicaonith.gitlab.io/petbou/> |
+| `docs/architecture.html` | L’architecture et l’arborescence, pour qui reprend le code. Publiée sur <https://wicaonith.gitlab.io/petbou/architecture.html> |
 | `docs/courriel-telechargement.md` | Le même parcours en courriel, quand on ne peut pas apporter la clé soi-même |
 
 `docs/installation.html` est une page à imprimer, destinée à la personne qui

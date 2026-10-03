@@ -25,16 +25,25 @@ L'orchestrateur (`src/engine/tournoi.ts`) ne connaît que cette interface.
 table `DRIVERS`.
 
 ```
-src/engine/       ~1000 lignes de TypeScript pur, sans React, 40 tests
-  types.ts          modèle de domaine + interface Driver
+src/engine/       le moteur, TypeScript pur, zéro dépendance — 40 tests
+  types.ts          modèle de domaine, interface Driver, et deux lectures
+                    partagées : dernierTour() et matchsDuGroupe()
   tournoi.ts        orchestration : créer, tirer, lancer, saisir, terrains
   classement.ts     départage FFPJP
   tableaux.ts       découpe le classement par tableau, quand le format en a plusieurs
+  apercu.ts         ce qu'un format donnera, chiffré — alimente l'écran de réglages
   alea.ts           tirage reproductible à partir d'une graine
   formats/          poules, suisse, seeding, multichances, commun (appariement)
-src/ui/           ~1600 lignes de React, aucune règle de tournoi
+src/ui/           React, aucune règle de tournoi
+  Equipe.tsx        le dossard et les noms — partagé par tout l'affichage
+  format.ts         mises en forme partagées (dateFr)
 src/stockage.ts   localStorage — aussi le canal vers la fenêtre d'affichage public
+outils/           scripts hors application : captures, portable, PDF, architecture
 ```
+
+**Ne recopie pas de décompte de lignes ici.** Ceux qui s'y trouvaient ont dérivé
+de 40 % en trois semaines sans que personne le voie. `npm run architecture`
+compte dans le dépôt et écrit la page publiée ; c'est la seule source à jour.
 
 Le moteur est la partie dont une erreur se verrait publiquement le jour du
 concours : **garde-la testée et séparée de l'interface**. Aucune règle de
@@ -74,6 +83,8 @@ npm run lint          # oxlint
 npm run app:dev       # application Tauri
 npm run app:portable  # build Windows + dossier portable (Rust + outils C++ requis)
 npm run docs          # docs/installation.html -> installation.pdf
+npm run captures      # six captures d'écran du parcours (serveur de dev requis)
+npm run architecture  # écrit public/architecture.html, arborescence comptée
 ```
 
 ## Compilation Windows
@@ -138,6 +149,20 @@ artefact de job disparaît au bout de trente jours.
    inutile.
 3. **Le nombre de terrains est facultatif** ; sans terrains, tout le tour part
    d'un coup. Vérifier que c'est bien ce que veut le club.
+
+## Ce qui est publié en ligne
+
+GitLab Pages sert deux documents, écrits dans `docs/` et déployés à chaque
+poussée sur `main` :
+
+- <https://wicaonith.gitlab.io/petbou/> — la notice d'installation. **Son
+  adresse ne doit pas bouger** : elle est dans le README, dans le courriel de
+  téléchargement et sur la notice imprimée elle-même.
+- <https://wicaonith.gitlab.io/petbou/architecture.html> — l'architecture et
+  l'arborescence, dont les chiffres sont comptés à la publication.
+
+Ces pages sont aussi faites pour être imprimées : la notice tient sur une seule
+page A4, ce qu'il faut revérifier après chaque modification (`npm run docs`).
 
 ## Maquettes
 

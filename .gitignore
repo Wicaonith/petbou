@@ -28,6 +28,7 @@ dist-ssr
 
 # Page GitLab Pages, recopiée depuis docs/ par la CI
 public/index.html
+public/architecture.html
 
 # Captures d écran, refaites par npm run captures
 /captures
