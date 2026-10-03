@@ -412,6 +412,18 @@ function ProchaineEtape({
   )
 }
 
+/**
+ * Le premier écran : ce qu'il faut décider avant de taper le moindre nom.
+ *
+ * Presque tout y est facultatif. Le nom et la date ne servent qu'aux papiers, les
+ * terrains se laissent vides si le club ne les numérote pas, et le score de
+ * l'exempt a une valeur d'usage. Seul le format engage vraiment la journée,
+ * d'où la place qu'il occupe et le déroulement qui le suit.
+ *
+ * Les réglages propres à un format ne s'affichent que pour lui — le nombre de
+ * tours pour le suisse, les tableaux finals pour les poules. Les trois autres
+ * formats ne les lisent jamais, et n'ont donc pas à se demander ce que c'est.
+ */
 function Reglages({
   tournoi,
   lance,

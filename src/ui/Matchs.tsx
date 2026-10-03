@@ -8,6 +8,17 @@ interface Props {
   onAnnuler: (matchId: string) => void
 }
 
+/**
+ * L'écran de la table de marque : saisir les scores, et rien d'autre.
+ *
+ * C'est le seul écran ouvert toute la journée, consulté debout, par quelqu'un
+ * qu'une équipe vient d'interrompre. D'où une carte par partie plutôt qu'un
+ * tableau — on vise la bonne du regard, pas la bonne ligne — et le score du
+ * perdant seul à taper, celui du gagnant étant toujours le but.
+ *
+ * Les résultats restent affichés en dessous, et chacun reste corrigible : c'est
+ * là qu'on revient quand un score est contesté une heure plus tard.
+ */
 export function Matchs({ tournoi, onScore, onAnnuler }: Props) {
   const parId = new Map(tournoi.equipes.map((e) => [e.id, e]))
   const gere = gereTerrains(tournoi)

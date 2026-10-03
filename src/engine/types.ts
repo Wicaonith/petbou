@@ -119,6 +119,7 @@ export function gagnant(m: Match): string | null {
   return m.scoreA! > m.scoreB! ? m.equipeA : m.equipeB
 }
 
+/** Perdant d'un match joué. Un exempt n'en a pas : personne n'a joué contre. */
 export function perdant(m: Match): string | null {
   if (m.equipeB === null) return null
   if (!matchJoue(m)) return null
