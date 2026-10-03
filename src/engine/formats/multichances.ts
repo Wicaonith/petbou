@@ -5,6 +5,7 @@ import {
   type Match,
   type NouveauMatch,
   matchJoue,
+  matchsDuGroupe,
   perdant,
 } from '../types'
 import { matchsTableau, vainqueur } from './seeding'
@@ -53,7 +54,7 @@ interface EtatTableau {
 function tableauxActifs(etat: EtatPhase): EtatTableau[] {
   const graine = etat.config.graine ?? 1
   const parId = new Map(etat.equipes.map((e) => [e.id, e]))
-  const matchsDe = (t: Tableau) => etat.matchs.filter((m) => m.groupe === t)
+  const matchsDe = (t: Tableau) => matchsDuGroupe(etat.matchs, t)
 
   const actifs: EtatTableau[] = [
     { nom: 'A', equipes: [...etat.equipes], matchs: matchsDe('A'), graine },

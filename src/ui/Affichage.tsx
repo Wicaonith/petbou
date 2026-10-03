@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import {
   classementDe,
   classementParTableau,
+  dernierTour,
   enCours,
   gereTerrains,
   type Match,
@@ -36,7 +37,7 @@ export function Affichage({ tournoi, onFermer }: { tournoi: Tournoi; onFermer?: 
   }, [onFermer])
 
   const attente = enCours(tournoi)
-  const dernierTour = tournoi.matchs.reduce((max, m) => Math.max(max, m.tour), 0)
+  const tour = dernierTour(tournoi.matchs)
   // Les parties en cours d'abord, puis les derniers résultats pour remplir :
   // une équipe qui vient de rentrer veut voir son score, et entre deux tours
   // l'écran ne doit jamais être vide devant les joueurs.
@@ -61,7 +62,7 @@ export function Affichage({ tournoi, onFermer }: { tournoi: Tournoi; onFermer?: 
         <span className="meta">
           {tournoi.formation} · {tournoi.equipes.length} équipes
         </span>
-        <span className="tour">{dernierTour > 0 ? `Tour ${dernierTour}` : 'Avant le tirage'}</span>
+        <span className="tour">{tour > 0 ? `Tour ${tour}` : 'Avant le tirage'}</span>
         {onFermer && (
           <button className="fermer" onClick={onFermer} aria-label="Quitter l'affichage public">
             Échap

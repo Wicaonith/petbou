@@ -1,4 +1,4 @@
-import { classementParTableau, matchJoue, type Ligne, type Tournoi } from '../engine'
+import { classementParTableau, dernierTour, matchJoue, type Ligne, type Tournoi } from '../engine'
 import { NumEquipe } from './NumEquipe'
 
 /**
@@ -19,7 +19,7 @@ export function Bilan({ tournoi }: { tournoi: Tournoi }) {
   const plusieurs = sections.length > 1
   const podium = principale.lignes.slice(0, 3)
   const joues = tournoi.matchs.filter((m) => matchJoue(m) && m.equipeB !== null).length
-  const tours = tournoi.matchs.reduce((max, m) => Math.max(max, m.tour), 0)
+  const tours = dernierTour(tournoi.matchs)
   const parId = new Map(tournoi.equipes.map((e) => [e.id, e]))
 
   const joueursDe = (id: string) => parId.get(id)?.joueurs.map((j) => j.nom) ?? []

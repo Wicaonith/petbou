@@ -4,6 +4,7 @@ import {
   type Equipe,
   type Match,
   type NouveauMatch,
+  dernierTour,
   gagnant,
   matchJoue,
 } from '../types'
@@ -55,7 +56,7 @@ export function matchsTableau(
   if (equipes.length < 2) return []
   if (matchs.some((m) => !matchJoue(m))) return []
 
-  const tour = matchs.reduce((max, m) => Math.max(max, m.tour), 0)
+  const tour = dernierTour(matchs)
 
   if (tour === 0) {
     const places = placer(equipes, graine)
@@ -110,7 +111,7 @@ export function gagnantsDuTour(matchs: readonly Match[], tour: number): string[]
 
 /** Le vainqueur du tableau, s'il est connu. */
 export function vainqueur(matchs: readonly Match[]): string | null {
-  const tour = matchs.reduce((max, m) => Math.max(max, m.tour), 0)
+  const tour = dernierTour(matchs)
   if (tour === 0) return null
   const survivants = gagnantsDuTour(matchs, tour)
   return survivants.length === 1 ? survivants[0] : null

@@ -6,8 +6,10 @@ import {
   type EtatPhase,
   type Match,
   type NouveauMatch,
+  dernierTour,
   gagnant,
   matchJoue,
+  matchsDuGroupe,
   perdant,
 } from '../types'
 import { taillesDePoules, tailleTableau } from './commun'
@@ -134,7 +136,7 @@ function tableauxFinals(etat: EtatPhase): {
 }
 
 const matchsDe = (etat: EtatPhase, groupe: string): Match[] =>
-  etat.matchs.filter((m) => m.groupe === groupe)
+  matchsDuGroupe(etat.matchs, groupe)
 
 /** Les deux équipes qualifiées d'une poule, dans l'ordre. */
 export function qualifiees(equipes: readonly Equipe[], matchs: readonly Match[]): string[] {
@@ -231,7 +233,7 @@ function championnat(
 
   const occupees = new Set<string>()
   const sortie: NouveauMatch[] = []
-  const tour = matchs.reduce((max, m) => Math.max(max, m.tour), 0) + 1
+  const tour = dernierTour(matchs) + 1
 
   for (let i = 0; i < equipes.length; i++) {
     for (let j = i + 1; j < equipes.length; j++) {
