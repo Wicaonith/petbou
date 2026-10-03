@@ -133,12 +133,15 @@ installeur-windows:
 # https://wicaonith.gitlab.io/petbou/
 pages:
   stage: build
-  image: alpine:latest
+  image: node:22
   rules:
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
   script:
     - mkdir -p public
+    # La notice garde la racine : son adresse est déjà dans le README, dans le
+    # courriel et sur la notice imprimée elle-même.
     - cp docs/installation.html public/index.html
+    - node outils/architecture.mjs
   artifacts:
     paths:
       - public
