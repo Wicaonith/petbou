@@ -9,7 +9,7 @@ import {
   matchJoue,
   type Tournoi,
 } from '../engine'
-import { NumEquipe } from './NumEquipe'
+import { NomEquipe } from './Equipe'
 import { Tableau } from './Tableau'
 
 /**
@@ -110,8 +110,7 @@ export function Affichage({ tournoi, onFermer }: { tournoi: Tournoi; onFermer?: 
               <div className={`affichage-rang${l.rang <= 2 ? ' tete' : ''}`} key={l.equipeId}>
                 <span className="rang">{l.rang}</span>
                 <span className="nom">
-                  <NumEquipe n={l.numero} />
-                  {l.nom}
+                  <NomEquipe equipe={l} />
                 </span>
                 <span className="v">{l.victoires}</span>
                 <span className="diff">{l.diff > 0 ? `+${l.diff}` : l.diff}</span>
@@ -150,18 +149,9 @@ function useRotation(combien: number): number {
 }
 
 function Partie({ match, tournoi, gere }: { match: Match; tournoi: Tournoi; gere: boolean }) {
-  const equipe = (id: string) => tournoi.equipes.find((e) => e.id === id)
-  /** Le dossard reste lisible de loin même quand les noms sont longs. */
-  const nom = (id: string) => {
-    const e = equipe(id)
-    if (!e) return id
-    return (
-      <>
-        <NumEquipe n={e.numero} />
-        {e.nom}
-      </>
-    )
-  }
+  const nom = (id: string) => (
+    <NomEquipe equipe={tournoi.equipes.find((e) => e.id === id)} />
+  )
   const joue = matchJoue(match)
   const aGagne = joue && match.scoreB !== null && match.scoreA! > match.scoreB
   const score = (v: number | null, gagnant: boolean) => (

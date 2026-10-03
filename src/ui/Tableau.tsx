@@ -1,5 +1,5 @@
 import { gagnant, libelleTour, matchJoue, type Equipe, type Match } from '../engine'
-import { NumEquipe } from './NumEquipe'
+import { NomEquipe } from './Equipe'
 
 /**
  * Un tableau à élimination directe dessiné en arbre.
@@ -109,8 +109,7 @@ function Camp({
   return (
     <div className={`arbre-camp${gagne ? ' gagnant' : ''}`}>
       <span className="arbre-nom">
-        <NumEquipe n={equipe.numero} />
-        {equipe.nom}
+        <NomEquipe equipe={equipe} />
       </span>
       <span className="arbre-score">{score ?? ''}</span>
     </div>

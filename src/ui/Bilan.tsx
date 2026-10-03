@@ -1,5 +1,6 @@
 import { classementParTableau, dernierTour, matchJoue, type Ligne, type Tournoi } from '../engine'
-import { NumEquipe } from './NumEquipe'
+import { NomEquipe } from './Equipe'
+import { dateFr } from './format'
 
 /**
  * Bilan de fin de concours, une page A4 à imprimer ou à punaiser au club.
@@ -112,8 +113,7 @@ function TableBilan({ lignes }: { lignes: Ligne[] }) {
           <tr key={l.equipeId}>
             <td className={l.rang <= 3 ? 'rang podium' : 'rang'}>{l.rang}</td>
             <td style={{ textAlign: 'left' }}>
-              <NumEquipe n={l.numero} />
-              {l.nom}
+              <NomEquipe equipe={l} />
             </td>
             <td>{l.joues}</td>
             <td>
@@ -127,9 +127,4 @@ function TableBilan({ lignes }: { lignes: Ligne[] }) {
       </tbody>
     </table>
   )
-}
-
-const dateFr = (iso: string): string => {
-  const [a, m, j] = iso.split('-')
-  return j ? `${j}/${m}/${a}` : iso
 }

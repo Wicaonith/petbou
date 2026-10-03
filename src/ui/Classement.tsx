@@ -1,5 +1,5 @@
 import { classementParTableau, type Section, type Tournoi } from '../engine'
-import { NumEquipe } from './NumEquipe'
+import { NomEquipe } from './Equipe'
 import { Tableau } from './Tableau'
 
 /**
@@ -64,8 +64,7 @@ function SectionClassement({
               deviner par la première ligne. */}
           {gagnante && (
             <span className="section-vainqueur">
-              Vainqueur : <NumEquipe n={gagnante.numero} />
-              {gagnante.nom}
+              Vainqueur : <NomEquipe equipe={gagnante} />
             </span>
           )}
         </div>
@@ -93,8 +92,7 @@ function SectionClassement({
               <td className="rang">{l.rang}</td>
               <td>
                 <div className="equipe-nom">
-                  <NumEquipe n={l.numero} />
-                  {l.nom}
+                  <NomEquipe equipe={l} />
                 </div>
                 {l.exempts > 0 && (
                   <div className="equipe-joueurs">
