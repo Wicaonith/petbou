@@ -9,4 +9,5 @@ un poste géré.
 
 Windows affiche un avertissement au premier lancement, l'exécutable n'étant pas
 signé. La notice d'installation explique quoi faire — et pourquoi apporter le
-fichier sur une clé USB évite complètement cet écran.
+fichier sur une clé USB évite complètement cet écran :
+<https://wicaonith.github.io/petbou/>
