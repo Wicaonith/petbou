@@ -56,6 +56,11 @@ jobs:
             throw "La version $v est deja publiee. Changez le numero dans src-tauri/tauri.conf.json, poussez, puis relancez."
           }
           Write-Host "$v est libre."
+          # `gh` a rendu 1 pour dire « cette version n'existe pas » : c'est
+          # précisément le cas qui doit laisser passer. Actions termine chaque
+          # script pwsh par un « exit $LASTEXITCODE » implicite, qui relaierait
+          # ce 1 et ferait échouer le job sur une vérification réussie.
+          exit 0
 
       - name: Cache des caisses Rust
         uses: actions/cache@v4
