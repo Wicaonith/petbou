@@ -168,7 +168,7 @@ toujours la dernière version.
 
 ## Ce qui est publié en ligne
 
-GitLab Pages sert deux documents, écrits dans `docs/` et déployés à chaque
+GitHub Pages sert deux documents, écrits dans `docs/` et déployés à chaque
 poussée sur `main` :
 
 - <https://wicaonith.github.io/petbou/> — la notice d'installation. **Son
@@ -182,5 +182,7 @@ page A4, ce qu'il faut revérifier après chaque modification (`npm run docs`).
 
 ## Maquettes
 
-19 écrans sur canevas, dont les 4 écrans du parcours déclinés pour les 4
-formats : https://claude.ai/code/artifact/434b2839-1c7b-4bb2-9a65-d56c6c63f81b
+19 écrans sur canevas ont servi à dessiner le parcours, dont les 4 écrans
+principaux déclinés pour les 4 formats. Le lien n'est pas repris ici : il mène
+à un espace privé, et une adresse que personne ne peut ouvrir n'a rien à faire
+dans un dépôt public. Les écrans réels, eux, se refont par `npm run captures`.

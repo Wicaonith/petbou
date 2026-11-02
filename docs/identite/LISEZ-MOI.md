@@ -2,7 +2,7 @@
 
 | Fichier | Usage |
 |---|---|
-| `avatar-512.png` | Avatar du projet GitLab (Settings → General → Project avatar). Fond opaque, marque agrandie pour rester lisible à 32 px dans une liste de projets |
+| `avatar-512.png` | Avatar du projet (GitHub : Settings → General → Social preview). Fond opaque, marque agrandie pour rester lisible à 32 px dans une liste de projets |
 | `bandeau-readme.png` | En-tête du README, 1280 × 320. La ligne « la Bouillonne · Montoir-de-Bretagne » en a été retirée en novembre 2026 : le logiciel sert n'importe quel club, et le bandeau le laissait croire réservé |
 
 La marque — boule d'acier striée et cochonnet — est la même que l'icône de

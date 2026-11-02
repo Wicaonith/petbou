@@ -26,7 +26,7 @@ dist-ssr
 # Dossier assemblé par outils/portable.mjs
 /portable
 
-# Page GitLab Pages, recopiée depuis docs/ par la CI
+# Pages publiées, assemblées par le workflow depuis docs/
 coverage
 public/couverture.json
 public/index.html

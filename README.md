@@ -43,20 +43,18 @@ classement) : `src/engine/formats/` ne contient que la règle d'appariement prop
 
 **https://github.com/Wicaonith/petbou/releases/latest**
 
-Cette page ne change jamais d'adresse et ne périme pas : c'est le lien à donner.
-Les fichiers vivent dans le registre de paquets du projet, là où un lien vers un
-artefact de pipeline serait supprimé au bout de trente jours.
+Cette adresse désigne toujours la dernière version : c'est le lien à donner,
+et il n'y en a qu'un à retenir. Les fichiers sont attachés à la version
+elle-même, là où un artefact de workflow serait supprimé au bout de trois mois.
 
 Publier une version, en deux gestes :
 
 1. Changer le numéro dans `src-tauri/tauri.conf.json`, commiter, pousser.
-2. Onglet **CI/CD → Pipelines**, bouton ▶ sur le job `installeur-windows`.
+2. Onglet **Actions → Publier une version → Run workflow**.
 
-Le job compile, envoie les trois fichiers, crée l'étiquette de version et la
-page de téléchargement. Rien à taguer à la main : l'API des versions crée
-l'étiquette elle-même, ce qui évite d'avoir à créer un jeton d'écriture sur le
-dépôt — un jeton qui expirerait au bout d'un an, probablement la veille d'un
-concours.
+Le workflow compile sur Windows, crée l'étiquette de version et y attache les
+trois fichiers. Rien à taguer à la main, et aucun jeton à créer : le jeton
+fourni au workflow suffit, et il ne peut pas expirer la veille d'un concours.
 
 Republier le même numéro échoue exprès, avec le message qui dit quoi faire : une
 version publiée ne doit pas changer de contenu dans le dos de qui l'a téléchargée.
@@ -68,7 +66,7 @@ clé USB reste le chemin le plus simple — voir plus bas.
 
 ## Distribution
 
-Le pipeline GitLab produit trois choses sur un runner Windows :
+Le workflow de publication produit trois choses sur un runner Windows :
 
 | Fichier | Pour quoi |
 |---|---|

@@ -78,6 +78,7 @@ const ROLES = {
       'etats-captures.ts': 'fabrique des concours de démonstration, en passant par le moteur',
       'captures.mjs': 'pilote un navigateur et prend les captures d’écran',
       'architecture.mjs': 'écrit cette page',
+      'badge-couverture.mjs': 'transforme le résumé de couverture en badge pour le README',
       'portable.mjs': 'assemble le dossier portable après la compilation',
       'pdf.mjs': 'rend une page de docs/ en PDF A4',
     },
