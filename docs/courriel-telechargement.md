@@ -6,7 +6,7 @@ téléchargement et le premier lancement ; la notice imprimable
 une feuille à côté du clavier.
 
 **Avant d'envoyer**, remplacer le lien ci-dessous par celui de la version
-courante : ouvrir <https://gitlab.com/wicaonith/petbou/-/releases>, dérouler les
+courante : ouvrir <https://github.com/Wicaonith/petbou/releases/latest>, dérouler les
 fichiers de la version la plus récente, et copier l'adresse de
 `concours-petanque-portable.zip`. Elle contient le numéro de version, elle
 change donc à chaque publication.
@@ -75,6 +75,6 @@ tours » — c'est le système suisse.
 
 Un fichier LISEZ-MOI se trouve dans le dossier, il redit tout ceci. Et si vous
 préférez une page à imprimer, tout est repris ici :
-https://wicaonith.gitlab.io/petbou/
+https://wicaonith.github.io/petbou/
 
 Bonne journée,

@@ -3,8 +3,8 @@
 # Concours de pétanque
 
 Application de gestion de concours de pétanque, écrite pour **la Bouillonne**,
-association de quartier de Montoir-de-Bretagne, et utilisable par n'importe quel
-club.
+association de quartier de Montoir-de-Bretagne, et **utilisable par n'importe
+quel club**.
 
 L'opérateur saisit les joueurs et choisit une formule ; le logiciel en déduit les
 poules, les tours, le tableau, les exempts et l'attribution des terrains. Il suit
@@ -35,7 +35,7 @@ classement) : `src/engine/formats/` ne contient que la règle d'appariement prop
 
 ## Télécharger
 
-**https://gitlab.com/wicaonith/petbou/-/releases**
+**https://github.com/Wicaonith/petbou/releases/latest**
 
 Cette page ne change jamais d'adresse et ne périme pas : c'est le lien à donner.
 Les fichiers vivent dans le registre de paquets du projet, là où un lien vers un
@@ -86,8 +86,8 @@ Deux documents, selon que la personne est en face de vous ou non :
 
 | Document | Pour qui |
 |---|---|
-| `docs/installation.html` | Une page à imprimer, pour qui prépare l'ordinateur une seule fois. Publiée en ligne sur <https://wicaonith.gitlab.io/petbou/> |
-| `docs/architecture.html` | L’architecture et l’arborescence, pour qui reprend le code. Publiée sur <https://wicaonith.gitlab.io/petbou/architecture.html> |
+| `docs/installation.html` | Une page à imprimer, pour qui prépare l'ordinateur une seule fois. Publiée en ligne sur <https://wicaonith.github.io/petbou/> |
+| `docs/architecture.html` | L’architecture et l’arborescence, pour qui reprend le code. Publiée sur <https://wicaonith.github.io/petbou/architecture.html> |
 | `docs/courriel-telechargement.md` | Le même parcours en courriel, quand on ne peut pas apporter la clé soi-même |
 
 `docs/installation.html` est une page à imprimer, destinée à la personne qui

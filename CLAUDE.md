@@ -133,17 +133,24 @@ suit la clé USB.
 
 Compter environ 4 min pour une compilation complète, et ~3,5 Mo d'exécutable.
 
-Le pipeline GitLab (`.gitlab-ci.yml`) tient les tests sur Linux à chaque
-poussée. Le job Windows, lui, est **le bouton de publication** : déclenché à la
-main depuis CI/CD (les minutes du forfait sont comptées), il compile, envoie les
-trois fichiers au registre de paquets et crée la page de version. Le numéro vient
-de `tauri.conf.json` ; republier un numéro déjà publié est refusé **avant** de
-compiler, pour ne pas dépenser sept minutes de runner à le découvrir.
+Trois workflows dans `.github/workflows/` :
 
-Pousser une étiquette ne déclenche rien : un second chemin de publication aurait
-fini par diverger. Le lien donné au club est
-https://gitlab.com/wicaonith/petbou/-/releases, qui ne périme pas — là où un
-artefact de job disparaît au bout de trente jours.
+- **Tests** — à chaque poussée, sur Linux. Le garde-fou doit répondre en moins
+  d'une minute.
+- **Publier une version** — le bouton, déclenché à la main depuis l'onglet
+  Actions. Il compile sur Windows, puis crée la version et y attache les trois
+  fichiers. Le numéro vient de `tauri.conf.json`, la même source que celle qui
+  nomme les installeurs ; republier un numéro déjà publié est refusé **avant** de
+  compiler.
+- **Pages** — les deux documents en ligne, à chaque poussée sur `main`.
+
+Publier est une décision, pas une conséquence : rien ne se publie sur une
+poussée ni sur une étiquette. Un second chemin aurait fini par diverger.
+
+Le runner Windows de GitHub fournit déjà Rust et les outils C++ : il n'y a rien
+à installer, et la compilation est gratuite sur un dépôt public. Le lien donné
+au club est https://github.com/Wicaonith/petbou/releases/latest, qui désigne
+toujours la dernière version.
 
 ## Décisions encore ouvertes
 
@@ -164,10 +171,10 @@ artefact de job disparaît au bout de trente jours.
 GitLab Pages sert deux documents, écrits dans `docs/` et déployés à chaque
 poussée sur `main` :
 
-- <https://wicaonith.gitlab.io/petbou/> — la notice d'installation. **Son
+- <https://wicaonith.github.io/petbou/> — la notice d'installation. **Son
   adresse ne doit pas bouger** : elle est dans le README, dans le courriel de
   téléchargement et sur la notice imprimée elle-même.
-- <https://wicaonith.gitlab.io/petbou/architecture.html> — l'architecture et
+- <https://wicaonith.github.io/petbou/architecture.html> — l'architecture et
   l'arborescence, dont les chiffres sont comptés à la publication.
 
 Ces pages sont aussi faites pour être imprimées : la notice tient sur une seule

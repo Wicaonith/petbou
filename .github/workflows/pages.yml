@@ -1,0 +1,50 @@
+# Les deux documents publiés en ligne : la notice d'installation, et
+# l'architecture.
+#
+# La notice occupe la racine du site. Son adresse ne doit pas bouger : elle est
+# dans le README, dans le courriel de téléchargement, et imprimée sur la notice
+# elle-même.
+name: Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Un seul déploiement à la fois ; une poussée pendant un déploiement attend
+# plutôt que d'en lancer un second en parallèle.
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  construire:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Assembler le site
+        run: |
+          mkdir -p public
+          cp docs/installation.html public/index.html
+          node outils/architecture.mjs
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: public
+
+  deployer:
+    needs: construire
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deploiement.outputs.page_url }}
+    steps:
+      - id: deploiement
+        uses: actions/deploy-pages@v4

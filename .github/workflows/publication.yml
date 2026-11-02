@@ -1,0 +1,130 @@
+# Le bouton de publication : compile l'application Windows, puis crée la
+# version et y attache les trois fichiers.
+#
+# Déclenché à la main — Actions → Publier une version → Run workflow — et non
+# sur chaque poussée : publier est une décision, pas une conséquence.
+#
+# Le numéro vient de src-tauri/tauri.conf.json, la même source que celle qui
+# nomme les installeurs. Republier un numéro déjà publié est refusé AVANT de
+# compiler : la vérification coûte une seconde, la compilation dix minutes.
+name: Publier une version
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  publier:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      # Le runner Windows de GitHub fournit déjà Rust et les outils C++ de
+      # Visual Studio : il n'y a rien à installer, là où GitLab demandait un
+      # quart d'heure de chocolatey au premier passage.
+      - name: Vérifier la chaîne
+        run: |
+          rustc --version
+          cargo --version
+          node --version
+
+      - name: Lire le numéro de version
+        id: version
+        shell: pwsh
+        run: |
+          $v = (Get-Content src-tauri/tauri.conf.json -Raw | ConvertFrom-Json).version
+          "numero=$v" >> $env:GITHUB_OUTPUT
+          Write-Host "Version à publier : $v"
+
+      # Avant de compiler, pas après : découvrir le doublon au bout de dix
+      # minutes, c'est dix minutes perdues et un journal qu'il faut relire.
+      - name: Refuser une version déjà publiée
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          $v = "v${{ steps.version.outputs.numero }}"
+          gh release view $v 2>$null
+          if ($LASTEXITCODE -eq 0) {
+            throw "La version $v est deja publiee. Changez le numero dans src-tauri/tauri.conf.json, poussez, puis relancez."
+          }
+          Write-Host "$v est libre."
+
+      - name: Cache des caisses Rust
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            src-tauri/target
+          key: cargo-${{ runner.os }}-${{ hashFiles('src-tauri/Cargo.lock') }}
+          restore-keys: cargo-${{ runner.os }}-
+
+      - run: npm ci
+
+      # Le cache rapporte les installeurs des versions précédentes, et ils
+      # s'accumulent : le dossier repart vide pour qu'il n'y ait jamais
+      # d'ambiguïté sur ce qu'on publie. Le reste du cache est intact.
+      - name: Vider les installeurs de la compilation précédente
+        shell: pwsh
+        run: Remove-Item src-tauri/target/release/bundle -Recurse -Force -ErrorAction SilentlyContinue
+
+      - run: npm run app:build
+
+      # Le même script qu'en local : ce que produit le pipeline est exactement
+      # ce qu'obtient quelqu'un qui compile sur sa machine.
+      - name: Assembler la version portable
+        shell: pwsh
+        run: |
+          node outils/portable.mjs
+          Compress-Archive -Path "portable/Concours de petanque" -DestinationPath concours-petanque-portable.zip -Force
+
+      # Choisis sur leur numéro de version, jamais sur leur rang dans le
+      # dossier : prendre « le premier fichier » y choisissait le plus petit
+      # numéro, et la version 0.2.0 avait ainsi publié l'installeur de la 0.1.0.
+      - name: Rassembler les fichiers à publier
+        shell: pwsh
+        run: |
+          $v = "${{ steps.version.outputs.numero }}"
+          $setup = @(Get-ChildItem "src-tauri/target/release/bundle/nsis/*_${v}_*.exe")
+          $msi = @(Get-ChildItem "src-tauri/target/release/bundle/msi/*_${v}_*.msi")
+          if ($setup.Count -ne 1 -or $msi.Count -ne 1) {
+            throw "Attendu un installeur et un MSI en version $v, trouve $($setup.Count) et $($msi.Count)."
+          }
+          New-Item -ItemType Directory -Force -Path publication | Out-Null
+          Copy-Item concours-petanque-portable.zip publication/
+          Copy-Item $setup[0].FullName publication/concours-petanque-setup.exe
+          Copy-Item $msi[0].FullName publication/concours-petanque.msi
+          Get-ChildItem publication | Format-Table Name, Length
+
+      # Le texte de la page vit dans le dépôt, relu comme le reste du projet.
+      - name: Créer la version
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          $v = "${{ steps.version.outputs.numero }}"
+          gh release create "v$v" `
+            --title "Concours de petanque v$v" `
+            --notes-file docs/notes-de-version.md `
+            publication/concours-petanque-portable.zip `
+            publication/concours-petanque-setup.exe `
+            publication/concours-petanque.msi
+          Write-Host "Publie : https://github.com/${{ github.repository }}/releases/tag/v$v"
+
+      # Même si la publication échoue, la compilation reste récupérable : vingt
+      # minutes de runner ne doivent pas partir avec le job.
+      - name: Garder les fichiers compilés
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: concours-petanque-${{ github.sha }}
+          path: publication/
+          if-no-files-found: ignore
