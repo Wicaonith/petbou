@@ -116,5 +116,12 @@ export function dejaRencontrees(matchs: Match[]): Set<string> {
   return vus
 }
 
+/**
+ * Identifie une affiche indépendamment du sens.
+ *
+ * « A contre B » et « B contre A » sont la même rencontre : sans cet ordre
+ * imposé, le système suisse croirait pouvoir refaire une partie déjà jouée
+ * pour peu que les deux équipes aient changé de côté.
+ */
 export const clePaire = (a: string, b: string): string =>
   a < b ? `${a}|${b}` : `${b}|${a}`

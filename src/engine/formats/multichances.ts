@@ -6,10 +6,12 @@ import {
   type NouveauMatch,
   matchJoue,
   matchsDuGroupe,
+  parEquipeId,
   perdant,
 } from '../types'
 import { matchsTableau, vainqueur } from './seeding'
 
+/** Les trois tableaux, dans l'ordre de la cascade : on descend, jamais on ne remonte. */
 export const TABLEAUX = ['A', 'B', 'C'] as const
 export type Tableau = (typeof TABLEAUX)[number]
 
@@ -53,7 +55,7 @@ interface EtatTableau {
  */
 function tableauxActifs(etat: EtatPhase): EtatTableau[] {
   const graine = etat.config.graine ?? 1
-  const parId = new Map(etat.equipes.map((e) => [e.id, e]))
+  const parId = parEquipeId(etat.equipes)
   const matchsDe = (t: Tableau) => matchsDuGroupe(etat.matchs, t)
 
   const actifs: EtatTableau[] = [

@@ -2,13 +2,9 @@
 
 export type Formation = 'doublette' | 'triplette'
 
-export type Role = 'tireur' | 'pointeur' | 'milieu'
-
 export interface Joueur {
   id: string
   nom: string
-  role?: Role
-  enfant?: boolean
 }
 
 export interface Equipe {
@@ -84,6 +80,13 @@ export interface PhaseConfig {
   graine?: number
 }
 
+/**
+ * Tout ce qu'un format a le droit de voir pour décider du tour suivant.
+ *
+ * Délibérément plus étroit qu'un `Tournoi` : pas de nom, pas de date, pas de
+ * terrains. Un format répond à une seule question — qui joue contre qui — et ne
+ * peut donc pas se mettre à dépendre de ce qui ne la concerne pas.
+ */
 export interface EtatPhase {
   equipes: Equipe[]
   matchs: Match[]
@@ -110,7 +113,25 @@ export interface Driver {
   toursPrevus(nbEquipes: number, config: PhaseConfig): number
 }
 
+/**
+ * Le match a-t-il son résultat ?
+ *
+ * Les deux scores se saisissent ensemble : il n'existe pas de match à moitié
+ * rentré. Un exempt est joué dès sa création, puisque sa victoire est acquise
+ * d'office — sans quoi il bloquerait le tour en attendant un score.
+ */
 export const matchJoue = (m: Match): boolean => m.scoreA !== null && m.scoreB !== null
+
+/**
+ * Les équipes indexées par identifiant.
+ *
+ * Les matchs ne portent que des identifiants : les relier à des noms est le
+ * geste le plus fréquent du moteur comme de l'affichage, et il était refait
+ * dans huit fichiers — parfois en balayant la liste pour chaque équipe de
+ * chaque match.
+ */
+export const parEquipeId = (equipes: readonly Equipe[]): Map<string, Equipe> =>
+  new Map(equipes.map((e) => [e.id, e]))
 
 /**
  * Numéro du dernier tour créé, 0 si rien n'a encore été lancé.

@@ -3,7 +3,7 @@ import { TABLEAUX } from './formats/multichances'
 import { TABLEAUX_FINALS } from './formats/poules'
 import { vainqueur } from './formats/seeding'
 import type { Tournoi } from './tournoi'
-import { matchsDuGroupe, type Equipe } from './types'
+import { matchsDuGroupe, parEquipeId, type Equipe } from './types'
 
 /** Un classement et le titre sous lequel il se lit. */
 export interface Section {
@@ -47,7 +47,7 @@ export function classementParTableau(t: Tournoi): Section[] {
     ]
   }
 
-  const parId = new Map(t.equipes.map((e) => [e.id, e]))
+  const parId = parEquipeId(t.equipes)
   // Une équipe qui a basculé de A en B appartient au dernier tableau qu'elle a
   // joué : c'est là qu'elle a fini, et c'est ainsi qu'un club en parle.
   const dernier = new Map<string, string>()

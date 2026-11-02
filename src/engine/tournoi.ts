@@ -14,6 +14,13 @@ import {
   matchJoue,
 } from './types'
 
+/**
+ * Les quatre formats, derrière une interface unique.
+ *
+ * C'est la seule table à toucher pour en ajouter un : l'orchestrateur ne
+ * connaît que `Driver`, et rien d'autre dans le projet ne sait qu'il existe
+ * plusieurs formats.
+ */
 export const DRIVERS: Record<FormatId, Driver> = {
   poules,
   suisse,
@@ -21,6 +28,14 @@ export const DRIVERS: Record<FormatId, Driver> = {
   multichances,
 }
 
+/**
+ * Un concours entier, du nom jusqu'au dernier score.
+ *
+ * Immuable : aucune fonction de ce fichier ne le modifie, toutes en renvoient
+ * un nouveau. C'est ce qui rend un concours copiable, enregistrable et
+ * comparable à tout instant — et ce qui permet au tirage de se montrer sans
+ * rien engager.
+ */
 export interface Tournoi {
   id: string
   nom: string
@@ -97,6 +112,12 @@ export const driverDe = (t: Tournoi): Driver => DRIVERS[t.config.format]
 /** Le club numérote-t-il ses terrains ? Détermine tout l'affichage des terrains. */
 export const gereTerrains = (t: Tournoi): boolean => t.nbTerrains !== null
 
+/**
+ * Le concours est-il allé à son terme ?
+ *
+ * Un concours sans aucun match n'est pas terminé mais pas commencé : sans ce
+ * garde-fou, l'écran d'accueil annoncerait un classement final.
+ */
 export const termine = (t: Tournoi): boolean =>
   t.matchs.length > 0 && driverDe(t).terminee({ equipes: t.equipes, matchs: t.matchs, config: t.config })
 

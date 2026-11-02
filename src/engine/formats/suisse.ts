@@ -7,6 +7,12 @@ import { apparierAuMieux, choisirExempt } from './commun'
 export const toursRecommandes = (n: number): number =>
   n <= 1 ? 0 : Math.max(3, Math.ceil(Math.log2(n)))
 
+/**
+ * Tous les scores du tour sont-ils rentrés ?
+ *
+ * Un tour sans aucun match n'est pas complet mais vide : la distinction évite
+ * d'enchaîner sur le tour suivant avant que le premier ait été lancé.
+ */
 export const tourComplet = (etat: EtatPhase, tour: number): boolean => {
   const ms = etat.matchs.filter((m) => m.tour === tour)
   return ms.length > 0 && ms.every(matchJoue)

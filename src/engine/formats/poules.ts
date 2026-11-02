@@ -10,6 +10,7 @@ import {
   gagnant,
   matchJoue,
   matchsDuGroupe,
+  parEquipeId,
   perdant,
 } from '../types'
 import { taillesDePoules, tailleTableau } from './commun'
@@ -18,6 +19,7 @@ import { matchsTableau, vainqueur } from './seeding'
 /** Les deux tableaux qui suivent les poules : les 1res en A, les 2es en B. */
 export const TABLEAUX_FINALS = ['Tableau A', 'Tableau B'] as const
 
+/** Le nom affiché d'une poule. Comptées à partir de 1, comme on les annonce. */
 export const nomPoule = (i: number): string => `Poule ${i + 1}`
 
 /**
@@ -120,7 +122,7 @@ function tableauxFinals(etat: EtatPhase): {
   graine: number
 }[] {
   const graine = etat.config.graine ?? 1
-  const parId = new Map(etat.equipes.map((e) => [e.id, e]))
+  const parId = parEquipeId(etat.equipes)
   const parPoule = repartir(etat.equipes, graine).map((eqs, i) =>
     qualifiees(eqs, matchsDe(etat, nomPoule(i))),
   )

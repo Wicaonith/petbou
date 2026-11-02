@@ -14,6 +14,14 @@ export interface Etat {
   noms: string[]
 }
 
+/**
+ * Relit la sauvegarde, ou rien si elle est absente ou abîmée.
+ *
+ * Ne lève jamais : cette lecture a lieu au démarrage, et une entrée corrompue
+ * ne doit pas empêcher d'ouvrir l'application le matin du concours — mieux
+ * vaut un concours vide qu'un écran blanc. La présence de `config` sert de
+ * signature : elle écarte une entrée écrite par autre chose que nous.
+ */
 export function lire(): Etat | null {
   try {
     const brut = localStorage.getItem(CLE)
