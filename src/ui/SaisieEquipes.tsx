@@ -1,6 +1,7 @@
 import { useRef, useState } from 'react'
 import { melanger, rng, type Equipe, type Formation } from '../engine'
 import { Confirmation } from './Confirmation'
+import { accord } from './format'
 
 /** Découpe une liste plate de joueurs en équipes de la bonne taille. */
 export function equipesDepuisNoms(noms: string[], formation: Formation): Equipe[] {
@@ -139,12 +140,12 @@ export function SaisieEquipes({ formation, noms, onChange }: Props) {
       </div>
 
       <p className="compteur">
-        <strong>{equipes.length}</strong> équipe{equipes.length > 1 ? 's' : ''} complète
-        {equipes.length > 1 ? 's' : ''} · {joueursSaisis} joueur{joueursSaisis > 1 ? 's' : ''}
+        <strong>{equipes.length}</strong> équipe{accord(equipes.length)} complète
+        {accord(equipes.length)} · {joueursSaisis} joueur{accord(joueursSaisis)}
         {incomplets > 0 && (
           <span style={{ color: 'var(--alerte)' }}>
             {' '}
-            · {incomplets} joueur{incomplets > 1 ? 's' : ''} sans équipe complète
+            · {incomplets} joueur{accord(incomplets)} sans équipe complète
           </span>
         )}
       </p>

@@ -1,5 +1,12 @@
 import { useState } from 'react'
-import { type Equipe as EquipeT, gereTerrains, type Match, matchJoue, type Tournoi } from '../engine'
+import {
+  type Equipe as EquipeT,
+  gereTerrains,
+  type Match,
+  matchJoue,
+  parEquipeId,
+  type Tournoi,
+} from '../engine'
 import { NomEquipe as Equipe } from './Equipe'
 
 interface Props {
@@ -20,7 +27,7 @@ interface Props {
  * là qu'on revient quand un score est contesté une heure plus tard.
  */
 export function Matchs({ tournoi, onScore, onAnnuler }: Props) {
-  const parId = new Map(tournoi.equipes.map((e) => [e.id, e]))
+  const parId = parEquipeId(tournoi.equipes)
   const gere = gereTerrains(tournoi)
   const enAttente = tournoi.matchs.filter((m) => !matchJoue(m))
   const joues = tournoi.matchs.filter(matchJoue).reverse()

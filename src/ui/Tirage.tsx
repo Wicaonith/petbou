@@ -15,6 +15,7 @@ import {
 } from '../engine'
 import { Confirmation } from './Confirmation'
 import { NomEquipe } from './Equipe'
+import { accord } from './format'
 
 interface Props {
   tournoi: Tournoi
@@ -51,7 +52,7 @@ export function Tirage({ tournoi, onRetirer, onValider }: Props) {
           {termine(tournoi)
             ? 'Concours terminé : il n’y a plus rien à tirer.'
             : `Le tour en cours n’est pas fini. Il reste ${attente} score${
-                attente > 1 ? 's' : ''
+                accord(attente)
               } à saisir avant le prochain tirage.`}
         </p>
       </div>
@@ -125,7 +126,7 @@ export function Tirage({ tournoi, onRetirer, onValider }: Props) {
         >
           <p>
             <strong>
-              {parties} partie{parties > 1 ? 's' : ''}
+              {parties} partie{accord(parties)}
             </strong>{' '}
             {quoi}
             {gereTerrains(tournoi)
@@ -194,7 +195,7 @@ function Affiches({ tournoi, proposition }: { tournoi: Tournoi; proposition: Nou
     return (
       <NomEquipe
         equipe={parId.get(id)}
-        dessous={aJoue ? `${v} victoire${v > 1 ? 's' : ''}` : undefined}
+        dessous={aJoue ? `${v} victoire${accord(v)}` : undefined}
       />
     )
   }
@@ -205,7 +206,7 @@ function Affiches({ tournoi, proposition }: { tournoi: Tournoi; proposition: Nou
   return (
     <div className="carte">
       <h2>
-        {proposition.length} partie{proposition.length > 1 ? 's' : ''} à lancer
+        {proposition.length} partie{accord(proposition.length)} à lancer
       </h2>
       {groupes.map((g) => (
         <div key={g} style={{ marginBottom: 16 }}>

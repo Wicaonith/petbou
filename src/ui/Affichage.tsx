@@ -4,13 +4,17 @@ import {
   classementParTableau,
   dernierTour,
   enCours,
+  type Equipe,
   gereTerrains,
   type Match,
   matchJoue,
+  matchsDuGroupe,
+  parEquipeId,
   type Tournoi,
 } from '../engine'
 import { NomEquipe } from './Equipe'
 import { Tableau } from './Tableau'
+import { accord, goalAverage } from './format'
 
 /**
  * Écran public, à projeter ou à brancher sur une télé du club.
@@ -44,6 +48,7 @@ export function Affichage({ tournoi, onFermer }: { tournoi: Tournoi; onFermer?: 
   const joues = tournoi.matchs.filter(matchJoue).reverse()
   const lignes = classementDe(tournoi)
   const gere = gereTerrains(tournoi)
+  const parId = parEquipeId(tournoi.equipes)
   // Pendant les tableaux, l'arbre remplace le classement : il dit à la fois où
   // en est chacun et qui l'attend, ce que la liste des victoires ne dit pas.
   const tableaux = classementParTableau(tournoi).filter((s) => s.groupe !== undefined)
@@ -75,12 +80,12 @@ export function Affichage({ tournoi, onFermer }: { tournoi: Tournoi; onFermer?: 
           <div className="affichage-parties">
             <div className="affichage-section">
               {attente.length > 0
-                ? `${attente.length} partie${attente.length > 1 ? 's' : ''} en cours`
+                ? `${attente.length} partie${accord(attente.length)} en cours`
                 : 'Derniers résultats'}
             </div>
             <div className="affichage-grille">
               {affiches.map((m) => (
-                <Partie key={m.id} match={m} tournoi={tournoi} gere={gere} />
+                <Partie key={m.id} match={m} equipes={parId} gere={gere} />
               ))}
             </div>
           </div>
@@ -98,8 +103,8 @@ export function Affichage({ tournoi, onFermer }: { tournoi: Tournoi; onFermer?: 
                 {tableaux.length > 1 && ` — ${montre + 1} sur ${tableaux.length}`}
               </div>
               <Tableau
-                matchs={tournoi.matchs.filter((m) => m.groupe === tableaux[montre].groupe)}
-                equipes={new Map(tournoi.equipes.map((e) => [e.id, e]))}
+                matchs={matchsDuGroupe(tournoi.matchs, tableaux[montre].groupe!)}
+                equipes={parId}
               />
             </>
           ) : (
@@ -113,7 +118,7 @@ export function Affichage({ tournoi, onFermer }: { tournoi: Tournoi; onFermer?: 
                   <NomEquipe equipe={l} />
                 </span>
                 <span className="v">{l.victoires}</span>
-                <span className="diff">{l.diff > 0 ? `+${l.diff}` : l.diff}</span>
+                <span className="diff">{goalAverage(l.diff)}</span>
               </div>
             ))}
           </div>
@@ -124,7 +129,7 @@ export function Affichage({ tournoi, onFermer }: { tournoi: Tournoi; onFermer?: 
 
       <div className="affichage-pied">
         {attente.length > 0
-          ? `${attente.length} partie${attente.length > 1 ? 's' : ''} encore en jeu · le tour suivant démarrera dès le dernier score saisi`
+          ? `${attente.length} partie${accord(attente.length)} encore en jeu · le tour suivant démarrera dès le dernier score saisi`
           : 'Tirage du tour suivant en préparation à la table de marque'}
       </div>
     </div>
@@ -148,10 +153,16 @@ function useRotation(combien: number): number {
   return combien === 0 ? 0 : i % combien
 }
 
-function Partie({ match, tournoi, gere }: { match: Match; tournoi: Tournoi; gere: boolean }) {
-  const nom = (id: string) => (
-    <NomEquipe equipe={tournoi.equipes.find((e) => e.id === id)} />
-  )
+function Partie({
+  match,
+  equipes,
+  gere,
+}: {
+  match: Match
+  equipes: Map<string, Equipe>
+  gere: boolean
+}) {
+  const nom = (id: string) => <NomEquipe equipe={equipes.get(id)} />
   const joue = matchJoue(match)
   const aGagne = joue && match.scoreB !== null && match.scoreA! > match.scoreB
   const score = (v: number | null, gagnant: boolean) => (

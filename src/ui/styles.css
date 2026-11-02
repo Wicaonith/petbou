@@ -49,6 +49,8 @@ body {
 }
 .carte > h2 { margin: 0 0 16px; font-size: 17px; }
 .aide { color: var(--discret); font-size: 14px; margin: 0 0 16px; }
+/* Sous un bouton, l'explication se place après lui : la marge passe donc au-dessus. */
+.carte-aide { margin: 12px 0 0; }
 
 /* ---------- Formulaires ---------- */
 label { display: block; font-size: 13px; font-weight: 600; color: var(--discret); margin-bottom: 6px; }

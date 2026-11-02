@@ -1,6 +1,13 @@
-import { classementParTableau, type Section, type Tournoi } from '../engine'
+import {
+  classementParTableau,
+  matchsDuGroupe,
+  parEquipeId,
+  type Section,
+  type Tournoi,
+} from '../engine'
 import { NomEquipe } from './Equipe'
 import { Tableau } from './Tableau'
+import { accord, goalAverage } from './format'
 
 /**
  * Le classement, découpé par tableau quand le format en comporte plusieurs.
@@ -51,8 +58,8 @@ function SectionClassement({
 }) {
   if (section.lignes.length === 0) return null
   const gagnante = section.lignes.find((l) => l.equipeId === section.vainqueur)
-  const matchs = section.groupe ? tournoi.matchs.filter((m) => m.groupe === section.groupe) : []
-  const parId = new Map(tournoi.equipes.map((e) => [e.id, e]))
+  const matchs = section.groupe ? matchsDuGroupe(tournoi.matchs, section.groupe) : []
+  const parId = parEquipeId(tournoi.equipes)
 
   return (
     <div className="section-tableau">
@@ -96,7 +103,7 @@ function SectionClassement({
                 </div>
                 {l.exempts > 0 && (
                   <div className="equipe-joueurs">
-                    {l.exempts} exempt{l.exempts > 1 ? 's' : ''}
+                    {l.exempts} exempt{accord(l.exempts)}
                   </div>
                 )}
               </td>
@@ -107,7 +114,7 @@ function SectionClassement({
               <td>{l.defaites}</td>
               <td>{l.pointsPour}</td>
               <td>{l.pointsContre}</td>
-              <td>{l.diff > 0 ? `+${l.diff}` : l.diff}</td>
+              <td>{goalAverage(l.diff)}</td>
             </tr>
           ))}
         </tbody>

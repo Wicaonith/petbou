@@ -1,4 +1,4 @@
-import { type Equipe, type Match, matchJoue, type Tournoi } from '../engine'
+import { type Equipe, type Match, matchJoue, parEquipeId, type Tournoi } from '../engine'
 import { NomEquipe } from './Equipe'
 import { dateFr } from './format'
 
@@ -10,7 +10,7 @@ import { dateFr } from './format'
  * score contesté une heure plus tard.
  */
 export function Feuilles({ tournoi }: { tournoi: Tournoi }) {
-  const parId = new Map(tournoi.equipes.map((e) => [e.id, e]))
+  const parId = parEquipeId(tournoi.equipes)
   const aJouer = tournoi.matchs.filter((m) => !matchJoue(m) && m.equipeB !== null)
 
   return (

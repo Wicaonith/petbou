@@ -26,8 +26,8 @@ table `DRIVERS`.
 
 ```
 src/engine/       le moteur, TypeScript pur, zéro dépendance — 40 tests
-  types.ts          modèle de domaine, interface Driver, et deux lectures
-                    partagées : dernierTour() et matchsDuGroupe()
+  types.ts          modèle de domaine, interface Driver, et trois lectures
+                    partagées : dernierTour(), matchsDuGroupe(), parEquipeId()
   tournoi.ts        orchestration : créer, tirer, lancer, saisir, terrains
   classement.ts     départage FFPJP
   tableaux.ts       découpe le classement par tableau, quand le format en a plusieurs
@@ -36,7 +36,11 @@ src/engine/       le moteur, TypeScript pur, zéro dépendance — 40 tests
   formats/          poules, suisse, seeding, multichances, commun (appariement)
 src/ui/           React, aucune règle de tournoi
   Equipe.tsx        le dossard et les noms — partagé par tout l'affichage
-  format.ts         mises en forme partagées (dateFr)
+  CarteAction.tsx   un bouton et la phrase qui l'explique — jamais l'un sans l'autre
+  ProchaineEtape.tsx  le bandeau qui nomme la seule action suivante
+  Reglages.tsx      le premier écran : nom, formule, et ce qu'elle donnera
+  onglets.ts        le type Onglet, pour que trois écrans se renvoient l'un à l'autre
+  format.ts         mises en forme partagées : dateFr, accord, pluriel, goalAverage
 src/stockage.ts   localStorage — aussi le canal vers la fenêtre d'affichage public
 outils/           scripts hors application : captures, portable, PDF, architecture
 ```

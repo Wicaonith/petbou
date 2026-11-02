@@ -1,4 +1,5 @@
 import { apercu, type Tournoi } from '../engine'
+import { accord } from './format'
 
 /**
  * Comment le format choisi va se dérouler, et ce qu'il donne avec ces équipes-là.
@@ -102,16 +103,16 @@ function chiffres(tournoi: Tournoi): string[] {
 
   if (a.poules) out.push(listePoules(a.poules))
 
-  const parties = `${a.premieresParties} partie${a.premieresParties > 1 ? 's' : ''} au premier tour`
+  const parties = `${a.premieresParties} partie${accord(a.premieresParties)} au premier tour`
   const exempts =
     a.exempts > 0
-      ? `, et ${a.exempts} équipe${a.exempts > 1 ? 's' : ''} exempte${a.exempts > 1 ? 's' : ''}`
+      ? `, et ${a.exempts} équipe${accord(a.exempts)} exempte${accord(a.exempts)}`
       : ''
   out.push(parties + exempts)
 
   if (a.tours > 0) {
     out.push(
-      `${a.tours} tour${a.tours > 1 ? 's' : ''} en tout` +
+      `${a.tours} tour${accord(a.tours)} en tout` +
         (tournoi.config.format === 'suisse' ? ' pour chaque équipe' : ' au maximum'),
     )
   }
@@ -129,6 +130,6 @@ function listePoules(tailles: number[]): string {
   for (const t of tailles) compte.set(t, (compte.get(t) ?? 0) + 1)
   const morceaux = [...compte.entries()]
     .sort((a, b) => b[0] - a[0])
-    .map(([taille, combien]) => `${combien} poule${combien > 1 ? 's' : ''} de ${taille}`)
+    .map(([taille, combien]) => `${combien} poule${accord(combien)} de ${taille}`)
   return morceaux.join(' et ')
 }

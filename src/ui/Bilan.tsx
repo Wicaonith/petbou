@@ -1,6 +1,13 @@
-import { classementParTableau, dernierTour, matchJoue, type Ligne, type Tournoi } from '../engine'
+import {
+  classementParTableau,
+  dernierTour,
+  matchJoue,
+  parEquipeId,
+  type Ligne,
+  type Tournoi,
+} from '../engine'
 import { NomEquipe } from './Equipe'
-import { dateFr } from './format'
+import { accord, dateFr, goalAverage } from './format'
 
 /**
  * Bilan de fin de concours, une page A4 à imprimer ou à punaiser au club.
@@ -21,7 +28,7 @@ export function Bilan({ tournoi }: { tournoi: Tournoi }) {
   const podium = principale.lignes.slice(0, 3)
   const joues = tournoi.matchs.filter((m) => matchJoue(m) && m.equipeB !== null).length
   const tours = dernierTour(tournoi.matchs)
-  const parId = new Map(tournoi.equipes.map((e) => [e.id, e]))
+  const parId = parEquipeId(tournoi.equipes)
 
   const joueursDe = (id: string) => parId.get(id)?.joueurs.map((j) => j.nom) ?? []
 
@@ -59,8 +66,8 @@ export function Bilan({ tournoi }: { tournoi: Tournoi }) {
                   ))}
                 </div>
                 <div className="bilan-detail">
-                  {l.victoires} victoire{l.victoires > 1 ? 's' : ''} ·{' '}
-                  {l.diff > 0 ? `+${l.diff}` : l.diff}
+                  {l.victoires} victoire{accord(l.victoires)} ·{' '}
+                  {goalAverage(l.diff)}
                 </div>
               </div>
             )
@@ -84,8 +91,8 @@ export function Bilan({ tournoi }: { tournoi: Tournoi }) {
           puis points marqués, puis confrontation directe.
         </span>
         <span style={{ textAlign: 'right' }}>
-          {joues} partie{joues > 1 ? 's' : ''} jouée{joues > 1 ? 's' : ''} · {tours} tour
-          {tours > 1 ? 's' : ''}
+          {joues} partie{accord(joues)} jouée{accord(joues)} · {tours} tour
+          {accord(tours)}
           <br />
           Édité le {dateFr(new Date().toISOString().slice(0, 10))}
         </span>
@@ -121,7 +128,7 @@ function TableBilan({ lignes }: { lignes: Ligne[] }) {
             </td>
             <td>{l.pointsPour}</td>
             <td>{l.pointsContre}</td>
-            <td>{l.diff > 0 ? `+${l.diff}` : l.diff}</td>
+            <td>{goalAverage(l.diff)}</td>
           </tr>
         ))}
       </tbody>
