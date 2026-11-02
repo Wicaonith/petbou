@@ -1,9 +1,19 @@
 import react from '@vitejs/plugin-react'
-import { defineConfig } from 'vite'
+// defineConfig vient de vitest et non de vite : lui seul connaît la clé
+// « test », que la configuration de couverture ci-dessous utilise.
+import { defineConfig } from 'vitest/config'
 
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [react()],
+  test: {
+    coverage: {
+      // « json-summary » est le format que lit outils/badge-couverture.mjs ;
+      // « text » reste pour qu’un lancement en local affiche le tableau.
+      reporter: ["text", "json-summary"],
+      include: ["src/engine/**"],
+    },
+  },
   server: {
     watch: {
       // `npm run app:portable` dépose l'application dans `portable/`, et la

@@ -1,5 +1,11 @@
 ![Concours de pétanque](docs/identite/bandeau-readme.png)
 
+[![Tests](https://github.com/Wicaonith/petbou/actions/workflows/tests.yml/badge.svg)](https://github.com/Wicaonith/petbou/actions/workflows/tests.yml)
+[![Couverture](https://img.shields.io/endpoint?url=https%3A%2F%2Fwicaonith.github.io%2Fpetbou%2Fcouverture.json)](https://wicaonith.github.io/petbou/architecture.html)
+[![Node](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fraw.githubusercontent.com%2FWicaonith%2Fpetbou%2Fmain%2Fpackage.json&query=%24.engines.node&label=node&color=informational)](package.json)
+[![Dernière version](https://img.shields.io/github/v/release/Wicaonith/petbou?label=version&color=14532d)](https://github.com/Wicaonith/petbou/releases/latest)
+[![Dernier commit](https://img.shields.io/github/last-commit/Wicaonith/petbou?label=dernier%20commit)](https://github.com/Wicaonith/petbou/commits/main)
+
 # Concours de pétanque
 
 Application de gestion de concours de pétanque, écrite pour **la Bouillonne**,

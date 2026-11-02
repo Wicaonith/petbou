@@ -30,11 +30,17 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
+          cache: npm
+      - run: npm ci
       - name: Assembler le site
         run: |
           mkdir -p public
           cp docs/installation.html public/index.html
           node outils/architecture.mjs
+          # Le badge de couverture du README lit ce fichier. Il est recalculé
+          # ici, à chaque poussée, plutôt qu’écrit en dur quelque part où il
+          # dériverait sans que personne le voie.
+          npm run couverture
       - uses: actions/upload-pages-artifact@v3
         with:
           path: public

@@ -27,6 +27,8 @@ dist-ssr
 /portable
 
 # Page GitLab Pages, recopiée depuis docs/ par la CI
+coverage
+public/couverture.json
 public/index.html
 public/architecture.html
 

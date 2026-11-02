@@ -3,12 +3,17 @@
   "private": true,
   "version": "0.0.0",
   "type": "module",
+  "license": "UNLICENSED",
+  "engines": {
+    "node": ">=20"
+  },
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "oxlint",
     "preview": "vite preview",
     "test": "vitest run",
+    "couverture": "vitest run --coverage && node outils/badge-couverture.mjs",
     "tauri": "tauri",
     "app:dev": "tauri dev",
     "app:build": "tauri build",
