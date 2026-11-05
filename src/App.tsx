@@ -246,6 +246,10 @@ export default function App() {
           tournoi={tournoi}
           onScore={(id, a, b) => setTournoi((t) => saisirScore(t, id, a, b))}
           onAnnuler={(id) => setTournoi((t) => annulerScore(t, id))}
+          // Le même classement qu'à l'onglet 5, et non une version réduite :
+          // un classement qui montrerait autre chose selon l'écran se ferait
+          // contester le jour où quelqu'un compare les deux.
+          apresLesParties={<Classement tournoi={tournoi} />}
         />
       )}
 

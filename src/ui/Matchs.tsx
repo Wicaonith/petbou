@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { type ReactNode, useState } from 'react'
 import {
   type Equipe as EquipeT,
   gereTerrains,
@@ -13,6 +13,15 @@ interface Props {
   tournoi: Tournoi
   onScore: (matchId: string, a: number, b: number) => void
   onAnnuler: (matchId: string) => void
+  /**
+   * Inséré entre les parties à jouer et les résultats.
+   *
+   * Cette place précise est tout l'intérêt : en fin de page, le bloc serait
+   * sous les trente ou quarante résultats déjà saisis, donc invisible — et
+   * c'est justement de ne pas être vu qu'il s'agit de corriger. Au-dessus des
+   * parties à jouer, il repousserait la saisie, seule raison d'ouvrir l'écran.
+   */
+  apresLesParties?: ReactNode
 }
 
 /**
@@ -26,7 +35,7 @@ interface Props {
  * Les résultats restent affichés en dessous, et chacun reste corrigible : c'est
  * là qu'on revient quand un score est contesté une heure plus tard.
  */
-export function Matchs({ tournoi, onScore, onAnnuler }: Props) {
+export function Matchs({ tournoi, onScore, onAnnuler, apresLesParties }: Props) {
   const parId = parEquipeId(tournoi.equipes)
   const gere = gereTerrains(tournoi)
   const enAttente = tournoi.matchs.filter((m) => !matchJoue(m))
@@ -66,6 +75,8 @@ export function Matchs({ tournoi, onScore, onAnnuler }: Props) {
           </div>
         </div>
       )}
+
+      {apresLesParties}
 
       {joues.length > 0 && (
         <div className="carte">
