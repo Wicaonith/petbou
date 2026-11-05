@@ -3,6 +3,7 @@ import {
   type Equipe,
   type FormatId,
   type Formation,
+  JOUEURS_PAR_EQUIPE,
   creerTournoi,
   enCours,
   lancerProchainsMatchs,
@@ -12,7 +13,7 @@ import {
 } from '../index'
 
 export function equipes(n: number, formation: Formation = 'doublette'): Equipe[] {
-  const taille = formation === 'doublette' ? 2 : 3
+  const taille = JOUEURS_PAR_EQUIPE[formation]
   return Array.from({ length: n }, (_, i) => ({
     id: `e${i + 1}`,
     numero: i + 1,
@@ -32,11 +33,12 @@ export function tournoi(
     graine: number
     nbTours: number
     tableauFinal: boolean
+    formation: Formation
   }> = {},
 ): Tournoi {
   const t = creerTournoi({
     nom: 'Test',
-    formation: 'doublette',
+    formation: opts.formation ?? 'doublette',
     // `?? 8` avalerait le null, qui est justement le cas à tester.
     nbTerrains: opts.nbTerrains === undefined ? 8 : opts.nbTerrains,
     format,
@@ -44,7 +46,7 @@ export function tournoi(
     nbTours: opts.nbTours,
     tableauFinal: opts.tableauFinal,
   })
-  return { ...t, equipes: equipes(n) }
+  return { ...t, equipes: equipes(n, opts.formation) }
 }
 
 /**

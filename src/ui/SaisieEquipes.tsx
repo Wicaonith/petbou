@@ -1,11 +1,11 @@
 import { useRef, useState } from 'react'
-import { melanger, rng, type Equipe, type Formation } from '../engine'
+import { JOUEURS_PAR_EQUIPE, melanger, rng, type Equipe, type Formation } from '../engine'
 import { Confirmation } from './Confirmation'
 import { accord } from './format'
 
 /** Découpe une liste plate de joueurs en équipes de la bonne taille. */
 export function equipesDepuisNoms(noms: string[], formation: Formation): Equipe[] {
-  const taille = formation === 'doublette' ? 2 : 3
+  const taille = JOUEURS_PAR_EQUIPE[formation]
   const propres = noms.map((n) => n.trim())
   const equipes: Equipe[] = []
   for (let i = 0; i + taille <= propres.length; i += taille) {
@@ -36,7 +36,7 @@ interface Props {
  * seul dans les cases. Aucun bouton « ajouter une équipe » à cliquer.
  */
 export function SaisieEquipes({ formation, noms, onChange }: Props) {
-  const taille = formation === 'doublette' ? 2 : 3
+  const taille = JOUEURS_PAR_EQUIPE[formation]
   const refs = useRef<(HTMLInputElement | null)[]>([])
   // Les deux boutons défont un travail de frappe que rien ne permet de retrouver.
   const [aConfirmer, setAConfirmer] = useState<'melee' | 'effacer' | null>(null)

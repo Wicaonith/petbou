@@ -14,7 +14,7 @@ import {
 } from '../engine'
 import { NomEquipe } from './Equipe'
 import { Tableau } from './Tableau'
-import { accord, goalAverage } from './format'
+import { accord, goalAverage, LIBELLE_FORMATION } from './format'
 
 /**
  * Écran public, à projeter ou à brancher sur une télé du club.
@@ -65,7 +65,7 @@ export function Affichage({ tournoi, onFermer }: { tournoi: Tournoi; onFermer?: 
       <div className="affichage-tete">
         <span className="titre">{tournoi.nom || 'Concours'}</span>
         <span className="meta">
-          {tournoi.formation} · {tournoi.equipes.length} équipes
+          {LIBELLE_FORMATION[tournoi.formation].singulier} · {tournoi.equipes.length} équipes
         </span>
         <span className="tour">{tour > 0 ? `Tour ${tour}` : 'Avant le tirage'}</span>
         {onFermer && (

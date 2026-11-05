@@ -91,6 +91,7 @@ export function Reglages({
               disabled={lance}
               onChange={(e) => regler('formation', e.target.value as Formation)}
             >
+              <option value="tete-a-tete">Tête-à-tête (1 joueur)</option>
               <option value="doublette">Doublette (2 joueurs)</option>
               <option value="triplette">Triplette (3 joueurs)</option>
             </select>

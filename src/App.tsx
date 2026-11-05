@@ -28,7 +28,7 @@ import { CarteAction } from './ui/CarteAction'
 import type { Onglet } from './ui/onglets'
 import { ProchaineEtape } from './ui/ProchaineEtape'
 import { Reglages } from './ui/Reglages'
-import { accord } from './ui/format'
+import { accord, LIBELLE_FORMATION } from './ui/format'
 
 /**
  * L'écran principal : les cinq onglets, et l'état du concours.
@@ -100,7 +100,7 @@ export default function App() {
       <header className="entete">
         <h1>{tournoi.nom || 'Concours sans nom'}</h1>
         <span className="meta">
-          {tournoi.formation} · {DRIVERS[tournoi.config.format].nom} · {prets} équipe
+          {LIBELLE_FORMATION[tournoi.formation].singulier} · {DRIVERS[tournoi.config.format].nom} · {prets} équipe
           {accord(prets)}
           {tournoi.nbTerrains !== null && ` · ${tournoi.nbTerrains} terrains`}
         </span>

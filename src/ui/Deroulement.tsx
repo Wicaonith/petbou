@@ -1,5 +1,5 @@
 import { apercu, type Tournoi } from '../engine'
-import { accord } from './format'
+import { accord, LIBELLE_FORMATION } from './format'
 
 /**
  * Comment le format choisi va se dérouler, et ce qu'il donne avec ces équipes-là.
@@ -28,7 +28,7 @@ export function Deroulement({ tournoi }: { tournoi: Tournoi }) {
         <div className="deroulement-exemple">
           <div className="deroulement-titre">
             Avec vos {n} équipes
-            {tournoi.formation === 'triplette' ? ' (triplettes)' : ' (doublettes)'}
+            {` (${LIBELLE_FORMATION[tournoi.formation].pluriel})`}
           </div>
           <ul>
             {chiffres(tournoi).map((c) => (

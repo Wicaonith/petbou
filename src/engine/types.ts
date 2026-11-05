@@ -1,6 +1,22 @@
 /** Modèle de domaine partagé par tous les formats de tournoi. */
 
-export type Formation = 'doublette' | 'triplette'
+export type Formation = 'tete-a-tete' | 'doublette' | 'triplette'
+
+/**
+ * Combien de joueurs font une équipe, par formation.
+ *
+ * Seule chose que la formation détermine : aucune règle de tournoi ne dépend de
+ * la taille des équipes. Écrit en table plutôt qu'en test, parce que la taille
+ * se déduisait auparavant d'un `formation === 'doublette' ? 2 : 3` recopié à
+ * quatre endroits — une troisième formation y serait passée pour une triplette,
+ * partout où l'on aurait oublié de regarder, et sans que rien ne le signale.
+ * Ici, une formation sans taille déclarée ne compile pas.
+ */
+export const JOUEURS_PAR_EQUIPE: Record<Formation, number> = {
+  'tete-a-tete': 1,
+  doublette: 2,
+  triplette: 3,
+}
 
 export interface Joueur {
   id: string

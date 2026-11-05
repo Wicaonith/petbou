@@ -21,7 +21,7 @@ export function Guide({ nomConcours }: { nomConcours: string }) {
         <li>
           <strong>Réglages</strong>
           <p>
-            Donnez un nom au concours. Choisissez doublette ou triplette, et la formule (si vous
+            Donnez un nom au concours. Choisissez la formation — tête-à-tête, doublette ou triplette — et la formule (si vous
             hésitez, prenez <em>Poules</em>). Le nombre de terrains n’est pas obligatoire : laissez
             vide si vous ne les numérotez pas.
           </p>

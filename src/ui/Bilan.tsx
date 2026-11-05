@@ -7,7 +7,7 @@ import {
   type Tournoi,
 } from '../engine'
 import { NomEquipe } from './Equipe'
-import { accord, dateFr, goalAverage } from './format'
+import { accord, dateFr, goalAverage, LIBELLE_FORMATION } from './format'
 
 /**
  * Bilan de fin de concours, une page A4 à imprimer ou à punaiser au club.
@@ -37,7 +37,7 @@ export function Bilan({ tournoi }: { tournoi: Tournoi }) {
       <div className="bilan-tete">
         <div className="bilan-titre">{tournoi.nom || 'Concours'}</div>
         <div className="bilan-sous">
-          {tournoi.formation} · {tournoi.equipes.length} équipes
+          {LIBELLE_FORMATION[tournoi.formation].singulier} · {tournoi.equipes.length} équipes
           {tournoi.nbTerrains !== null && ` · ${tournoi.nbTerrains} terrains`} · parties en{' '}
           {tournoi.config.butScore} points · {dateFr(tournoi.date)}
         </div>

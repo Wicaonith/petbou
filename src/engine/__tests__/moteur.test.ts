@@ -6,6 +6,7 @@ import {
   classementParTableau,
   clePaire,
   dejaRencontrees,
+  JOUEURS_PAR_EQUIPE,
   lancerProchainsMatchs,
   matchJoue,
   nomPoule,
@@ -582,5 +583,26 @@ describe('classement', () => {
     expect(e1.victoires).toBe(1)
     expect(e1.joues).toBe(0)
     expect(e1.exempts).toBe(1)
+  })
+})
+
+describe('formations', () => {
+  const FORMATS: FormatId[] = ['poules', 'suisse', 'seeding', 'multichances']
+
+  // Aucune règle de tournoi ne dépend de la taille des équipes — c'est
+  // précisément ce qu'on vérifie ici, pour que ça le reste.
+  it.each(FORMATS)('joue un concours entier en tête-à-tête (%s)', (format) => {
+    const t = tournoi(16, format, { formation: 'tete-a-tete' })
+    expect(t.equipes.every((e) => e.joueurs.length === 1)).toBe(true)
+
+    const { final } = jouer(t)
+    expect(termine(final)).toBe(true)
+    for (const [, n] of matchsParEquipe(final)) expect(n).toBeGreaterThan(0)
+  })
+
+  it('donne à chaque formation sa taille d’équipe', () => {
+    expect(JOUEURS_PAR_EQUIPE['tete-a-tete']).toBe(1)
+    expect(JOUEURS_PAR_EQUIPE.doublette).toBe(2)
+    expect(JOUEURS_PAR_EQUIPE.triplette).toBe(3)
   })
 })

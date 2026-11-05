@@ -25,7 +25,7 @@ L'orchestrateur (`src/engine/tournoi.ts`) ne connaît que cette interface.
 table `DRIVERS`.
 
 ```
-src/engine/       le moteur, TypeScript pur, zéro dépendance — 40 tests
+src/engine/       le moteur, TypeScript pur, zéro dépendance — 45 tests
   types.ts          modèle de domaine, interface Driver, et trois lectures
                     partagées : dernierTour(), matchsDuGroupe(), parEquipeId()
   tournoi.ts        orchestration : créer, tirer, lancer, saisir, terrains
@@ -80,7 +80,7 @@ plus à comprendre le jour du concours.
 ## Commandes
 
 ```sh
-npm test              # 40 tests du moteur — le garde-fou principal
+npm test              # 45 tests du moteur — le garde-fou principal
 npm run dev           # interface seule, dans le navigateur
 npm run build         # tsc -b && vite build
 npm run lint          # oxlint
