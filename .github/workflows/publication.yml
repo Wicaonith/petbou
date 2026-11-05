@@ -43,6 +43,25 @@ jobs:
           "numero=$v" >> $env:GITHUB_OUTPUT
           Write-Host "Version à publier : $v"
 
+      # Les notes décrivent ce qui change dans LA version publiée, mais elles
+      # vivent dans un fichier réutilisé à chaque publication : sans ce
+      # contrôle, la 0.3.0 sortirait un jour en annonçant les nouveautés de la
+      # 0.2.4, et personne ne le verrait avant le club.
+      - name: Refuser des notes qui ne nomment pas la version
+        shell: pwsh
+        run: |
+          $v = "${{ steps.version.outputs.numero }}"
+          # ReadAllText et non Get-Content -Raw : celui-ci lit en ANSI, et les
+          # accents des notes en ressortaient abîmés. Chemin résolu d'abord,
+          # parce que [IO.File] suit le répertoire du processus et non
+          # l'emplacement PowerShell — les deux savent diverger.
+          $chemin = (Resolve-Path "docs/notes-de-version.md").Path
+          $notes = [IO.File]::ReadAllText($chemin)
+          if ($notes -notmatch [regex]::Escape($v)) {
+            throw "docs/notes-de-version.md ne nomme pas $v : les notes decrivent donc une autre version. Mettez-les a jour avant de publier."
+          }
+          Write-Host "Les notes nomment bien $v."
+
       # Avant de compiler, pas après : découvrir le doublon au bout de dix
       # minutes, c'est dix minutes perdues et un journal qu'il faut relire.
       - name: Refuser une version déjà publiée
