@@ -71,10 +71,12 @@ export function Guide({ nomConcours }: { nomConcours: string }) {
         sinon les feuilles de match porteront celle du jour où vous avez préparé.
       </p>
       <p className="guide-texte">
-        Pour préparer <strong>plusieurs</strong> concours, enregistrez chacun dans son fichier
-        avec le bouton <em>Enregistrer</em>, puis repartez d’un <em>Nouveau concours</em>. Le
-        jour venu, <em>Ouvrir</em> rouvre celui qu’il faut. Un concours qui n’a pas été
-        enregistré dans un fichier n’existe que dans le logiciel.
+        Vous pouvez en préparer <strong>plusieurs</strong>. Quand l’un est prêt, cliquez sur{' '}
+        <em>Nouveau concours</em> : celui que vous quittez se range, et vous repartez d’une page
+        blanche. Le bouton <em>Mes concours</em>, en haut, les montre tous avec leur date et leur
+        nombre d’équipes ; <em>Reprendre</em> rouvre celui du jour. Rien ne s’efface jamais tout
+        seul. Le bouton <em>Enregistrer</em>, lui, sert à autre chose : il crée un fichier à
+        copier sur une clé ou sur un autre ordinateur.
       </p>
 
       <div className="guide-titre-section">Si ça se passe mal</div>

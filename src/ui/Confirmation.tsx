@@ -17,7 +17,6 @@ export function Confirmation({
   retour,
   onValider,
   onAnnuler,
-  secours,
   children,
 }: {
   titre: string
@@ -27,15 +26,6 @@ export function Confirmation({
   retour: string
   onValider: () => void
   onAnnuler: () => void
-  /**
-   * Un troisième bouton, qui met à l'abri avant de détruire.
-   *
-   * Annuler laisse le problème entier : on voulait bien repartir de zéro, on
-   * ne voulait pas perdre ce qu'on avait tapé. Quand les deux sont vrais, la
-   * porte de sortie se présente ici plutôt que d'exiger qu'on referme, qu'on
-   * trouve le bon bouton ailleurs, puis qu'on revienne.
-   */
-  secours?: { libelle: string; onClick: () => void }
   children: ReactNode
 }) {
   const ref = useRef<HTMLDialogElement>(null)
@@ -51,11 +41,6 @@ export function Confirmation({
       <h2>{titre}</h2>
       {children}
       <div className="modale-pied">
-        {secours && (
-          <button className="secondaire" onClick={secours.onClick}>
-            {secours.libelle}
-          </button>
-        )}
         <button className="action" onClick={onValider} autoFocus>
           {action}
         </button>

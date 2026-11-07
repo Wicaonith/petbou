@@ -21,15 +21,24 @@ import { Affichage } from './ui/Affichage'
 import { Bilan } from './ui/Bilan'
 import { Guide } from './ui/Guide'
 import { ouvrirSecondEcran } from './ui/secondEcran'
-import { ecrire, lire } from './stockage'
-import { Confirmation } from './ui/Confirmation'
+import {
+  basculer,
+  concoursRanges,
+  ecrire,
+  lire,
+  oublier,
+  ranger,
+  remplacer,
+  vierge,
+} from './stockage'
+import { Concours } from './ui/Concours'
 import { Classement } from './ui/Classement'
 import { NomEquipe } from './ui/Equipe'
 import { CarteAction } from './ui/CarteAction'
 import type { Onglet } from './ui/onglets'
 import { ProchaineEtape } from './ui/ProchaineEtape'
 import { Reglages } from './ui/Reglages'
-import { accord, LIBELLE_FORMATION, pluriel } from './ui/format'
+import { accord, LIBELLE_FORMATION } from './ui/format'
 
 /**
  * L'écran principal : les cinq onglets, et l'état du concours.
@@ -49,7 +58,12 @@ export default function App() {
   const [noms, setNoms] = useState<string[]>(() => lire()?.noms ?? [])
   const [onglet, setOnglet] = useState<Onglet>('reglages')
   const [projection, setProjection] = useState(false)
-  const [effacerDemande, setEffacerDemande] = useState(false)
+  const [listeOuverte, setListeOuverte] = useState(false)
+  const [ranges, setRanges] = useState(concoursRanges)
+  // Le concours qui vient d'être rangé, pour dire où il est parti. Le dire une
+  // fois ne suffit pas : c'est au moment de ne plus le voir à l'écran qu'on
+  // croit l'avoir perdu.
+  const [vientDEtreRange, setVientDEtreRange] = useState<{ id: string; nom: string } | null>(null)
 
   const lance = tournoi.matchs.length > 0
 
@@ -82,31 +96,52 @@ export default function App() {
 
   const enregistrerConcours = () => enregistrer({ version: 1, tournoi, noms }, tournoi.nom)
 
-  const repartirDeZero = () => {
+  /**
+   * Range le concours ouvert, et en ouvre un vierge.
+   *
+   * Ce bouton effaçait, et demandait donc confirmation. Il ne détruit plus
+   * rien : le concours quitté va dans la liste, d'où on le reprend. Une
+   * fenêtre qui annoncerait une perte mentirait, et une confirmation pour un
+   * geste réversible apprend surtout à cliquer sans lire.
+   */
+  const nouveauConcours = () => {
+    ranger({ tournoi, noms })
+    setVientDEtreRange(vierge(tournoi) ? null : { id: tournoi.id, nom: tournoi.nom })
     setTournoi(nouveau())
     setNoms([])
     setOnglet('reglages')
-    setEffacerDemande(false)
+    setRanges(concoursRanges())
   }
 
-  /**
-   * Met le concours à l'abri, puis l'efface — et seulement s'il est à l'abri.
-   *
-   * Renoncer à la fenêtre d'enregistrement doit renoncer à tout : effacer
-   * quand même après un refus détruirait précisément ce que l'on venait de
-   * chercher à garder.
-   */
-  const enregistrerPuisEffacer = async () => {
-    if (await enregistrerConcours()) repartirDeZero()
+  /** Repose le concours ouvert dans la liste et en sort celui qu'on demande. */
+  const reprendre = (id: string) => {
+    const repris = basculer({ tournoi, noms }, id)
+    if (!repris) return
+    setTournoi(repris.tournoi)
+    setNoms(repris.noms)
+    setOnglet(repris.tournoi.matchs.length > 0 ? 'matchs' : 'equipes')
+    setVientDEtreRange(null)
+    setListeOuverte(false)
+    setRanges(concoursRanges())
+  }
+
+  const supprimer = (id: string) => {
+    oublier(id)
+    setRanges(concoursRanges())
   }
 
   const ouvrirFichier = async () => {
     try {
       const donnees = await ouvrir()
       if (!donnees) return
+      // Le concours en place part dans la liste plutôt que sous le fichier
+      // ouvert : ouvrir un fichier n'est pas une raison de perdre l'autre.
+      remplacer({ tournoi, noms }, { tournoi: donnees.tournoi, noms: donnees.noms ?? [] })
       setTournoi(donnees.tournoi)
       setNoms(donnees.noms ?? [])
       setOnglet(donnees.tournoi.matchs.length > 0 ? 'matchs' : 'equipes')
+      setListeOuverte(false)
+      setRanges(concoursRanges())
     } catch (e) {
       alert(e instanceof Error ? e.message : 'Fichier illisible.')
     }
@@ -116,14 +151,6 @@ export default function App() {
   const fini = termine(tournoi)
   const prets = tournoi.equipes.length
   const aTirer = propositionDe(tournoi).length
-
-  // Ce que l'effacement emporterait, dit en chiffres plutôt qu'en « ce concours » :
-  // on mesure ce qu'on perd quand on le voit compté.
-  const perduAEffacer = lance
-    ? `${pluriel(prets, 'équipe')} et ${pluriel(tournoi.matchs.length, 'partie')}`
-    : prets > 0
-      ? `${pluriel(prets, 'équipe')} saisie${accord(prets)}`
-      : null
 
   return (
     <div className="app">
@@ -155,8 +182,8 @@ export default function App() {
           >
             Second écran
           </button>
-          <button className="secondaire" onClick={ouvrirFichier}>
-            Ouvrir
+          <button className="secondaire" onClick={() => setListeOuverte(true)}>
+            Mes concours{ranges.length > 0 && ` (${ranges.length + 1})`}
           </button>
           <button className="secondaire" onClick={enregistrerConcours}>
             Enregistrer
@@ -164,7 +191,7 @@ export default function App() {
           <button className="secondaire" onClick={() => imprimer()}>
             Imprimer
           </button>
-          <button className="secondaire" onClick={() => setEffacerDemande(true)}>
+          <button className="secondaire" onClick={nouveauConcours}>
             Nouveau concours
           </button>
         </div>
@@ -192,6 +219,22 @@ export default function App() {
         aller={setOnglet}
         imprimerBilan={() => imprimer('bilan')}
       />
+
+      {/* Dit où est parti le concours qu'on vient de quitter, à l'endroit où
+          l'on arrive. La condition `vierge` lui sert de date de péremption :
+          dès que le nouveau concours a un nom ou une équipe, la phrase ne
+          répond plus à la question que l'on se posait, et s'en va seule. */}
+      {onglet === 'reglages' && vientDEtreRange && vierge(tournoi) && (
+        <div className="bandeau bandeau-range">
+          <span>
+            {vientDEtreRange.nom ? `« ${vientDEtreRange.nom} »` : 'Le concours précédent'} est rangé
+            dans <strong>Mes concours</strong>. Rien n’a été effacé.
+          </span>
+          <button className="secondaire" onClick={() => reprendre(vientDEtreRange.id)}>
+            Le reprendre
+          </button>
+        </div>
+      )}
 
       {onglet === 'reglages' && (
         <>
@@ -306,31 +349,15 @@ export default function App() {
       <Guide nomConcours={tournoi.nom} />
       {projection && <Affichage tournoi={tournoi} onFermer={() => setProjection(false)} />}
 
-      {/* Le geste le plus destructeur de l'application passait par la boîte du
-          navigateur, qui ne disait pas ce qu'elle emportait — alors que des
-          gestes bien moins graves avaient déjà cette fenêtre-ci. C'est pourtant
-          par là qu'on passe pour enchaîner la préparation de deux concours. */}
-      {effacerDemande && (
-        <Confirmation
-          titre={tournoi.nom ? `Effacer « ${tournoi.nom} » ?` : 'Effacer ce concours ?'}
-          action="Oui, effacer"
-          retour="Annuler"
-          secours={{ libelle: 'Enregistrer d’abord', onClick: enregistrerPuisEffacer }}
-          onValider={repartirDeZero}
-          onAnnuler={() => setEffacerDemande(false)}
-        >
-          {perduAEffacer ? (
-            <p>
-              Vous perdrez <strong>{perduAEffacer}</strong>.
-            </p>
-          ) : (
-            <p>Les réglages reviendront à leur valeur de départ.</p>
-          )}
-          <p>
-            Ce concours n’existe que dans le logiciel. Une fois effacé, rien ne permet de le
-            retrouver — sauf si vous l’enregistrez dans un fichier avant.
-          </p>
-        </Confirmation>
+      {listeOuverte && (
+        <Concours
+          ouvert={tournoi}
+          ranges={ranges}
+          onReprendre={reprendre}
+          onOublier={supprimer}
+          onOuvrirFichier={ouvrirFichier}
+          onFermer={() => setListeOuverte(false)}
+        />
       )}
     </div>
   )

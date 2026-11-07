@@ -81,6 +81,17 @@ button.secondaire {
 }
 button.secondaire:hover { background: #f0ece2; }
 
+/* Le seul bouton de l'application qui détruise sans retour. Il ne doit
+   ressembler ni à « Reprendre », dont il prend la place dans la ligne, ni à
+   son voisin « Non » : deux boutons identiques côte à côte se cliquent au
+   hasard. */
+button.danger {
+  padding: 10px 16px; font-size: 14px; font-weight: 600; font-family: inherit;
+  border: 1px solid var(--alerte); border-radius: 8px;
+  background: #fff; color: var(--alerte); cursor: pointer;
+}
+button.danger:hover { background: #fdeee6; }
+
 /* ---------- Saisie des équipes ---------- */
 .equipes { display: grid; gap: 8px; }
 .ligne-equipe { display: grid; grid-template-columns: 42px 1fr auto; gap: 10px; align-items: center; }
@@ -219,6 +230,39 @@ button.secondaire:hover { background: #f0ece2; }
 .modale p.attention { color: var(--alerte); }
 .modale-pied { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 20px; }
 .modale-pied button { flex: 1 1 auto; }
+
+/* ---------- Mes concours ---------- */
+/* Plus large que les fenêtres de confirmation : chaque ligne porte un nom de
+   concours, une date et deux boutons, et un nom qui passe à la ligne fait
+   perdre le balayage vertical par lequel on cherche le bon concours. */
+.modale.large { max-width: 44em; }
+
+.liste-concours { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
+.concours {
+  display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
+  border: 1px solid var(--trait); border-radius: 10px; padding: 12px 14px;
+}
+.concours > div:first-child { flex: 1 1 14em; }
+/* Le concours ouvert, posé en tête et sans bouton : il n'est pas une option de
+   la liste, il est le repère par rapport auquel on lit les autres. */
+.concours.ouvert { background: var(--accent-clair); border-color: #b6d9c3; }
+.concours-nom { font-size: 17px; font-weight: 600; }
+.concours-meta { color: var(--discret); font-size: 14px; margin-top: 3px; }
+.concours-boutons { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.concours-alerte { color: var(--alerte); font-size: 14px; font-weight: 600; }
+.etiquette {
+  font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em;
+  color: var(--accent); border: 1px solid #b6d9c3; border-radius: 6px;
+  padding: 1px 6px; background: #fff; vertical-align: 1px;
+}
+/* Plus spécifique que `.modale p`, dont la marge basse vaudrait ici une
+   respiration au mauvais bout du texte. */
+.modale p.concours-vide { color: var(--discret); font-size: 15px; margin: 14px 0 0; }
+
+/* Le bandeau qui dit où est parti le concours rangé : la phrase et le bouton
+   qui la défait sur la même ligne, pour que reprendre coûte un clic. */
+.bandeau-range { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+.bandeau-range span { flex: 1 1 20em; }
 
 /* ---------- Dossard ---------- */
 /* Le numéro se lit avant les noms sans leur voler la vedette : couleur discrète,

@@ -56,6 +56,7 @@ const ROLES = {
       'fichier.ts': 'enregistrer et rouvrir un concours en .petanque',
       'Feuilles.tsx': 'les feuilles de match à confier aux équipes',
       'Confirmation.tsx': 'la fenêtre qui précède un geste qu’on ne peut pas défaire',
+      'Concours.tsx': 'la liste des concours préparés, pour en reprendre un',
       'Reglages.tsx': 'le premier écran : le nom, la formule, et ce qu’elle donnera',
       'ProchaineEtape.tsx': 'le bandeau qui nomme la seule action suivante',
       'Equipe.tsx': 'le dossard et les noms — l’élément que tout l’affichage partage',

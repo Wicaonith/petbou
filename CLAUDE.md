@@ -41,7 +41,9 @@ src/ui/           React, aucune règle de tournoi
   Reglages.tsx      le premier écran : nom, formule, et ce qu'elle donnera
   onglets.ts        le type Onglet, pour que trois écrans se renvoient l'un à l'autre
   format.ts         mises en forme partagées : dateFr, accord, pluriel, goalAverage
-src/stockage.ts   localStorage — aussi le canal vers la fenêtre d'affichage public
+  Concours.tsx      la liste des concours préparés, pour en reprendre un
+src/stockage.ts   localStorage : le concours ouvert, les concours rangés, et le
+                  canal vers la fenêtre d'affichage public — testé, lui aussi
 outils/           scripts hors application : captures, portable, PDF, architecture
 ```
 
@@ -52,6 +54,11 @@ compte dans le dépôt et écrit la page publiée ; c'est la seule source à jou
 Le moteur est la partie dont une erreur se verrait publiquement le jour du
 concours : **garde-la testée et séparée de l'interface**. Aucune règle de
 tournoi dans `src/ui/`.
+
+`src/stockage.ts` est le seul autre fichier testé, et pour la même raison prise
+trois semaines plus tôt : c'est lui qui garantit qu'un concours préparé à
+l'avance se retrouve. Une erreur y coûterait la soirée de saisie, pas la
+journée — mais elle la coûterait pareil.
 
 ## Conventions
 
@@ -80,7 +87,7 @@ plus à comprendre le jour du concours.
 ## Commandes
 
 ```sh
-npm test              # 45 tests du moteur — le garde-fou principal
+npm test              # 57 tests : le moteur, et le rangement des concours
 npm run dev           # interface seule, dans le navigateur
 npm run build         # tsc -b && vite build
 npm run lint          # oxlint
