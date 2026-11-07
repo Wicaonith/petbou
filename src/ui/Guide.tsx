@@ -58,6 +58,25 @@ export function Guide({ nomConcours }: { nomConcours: string }) {
         </li>
       </ol>
 
+      {/* Deux personnes du club ont demandé si la préparation était possible,
+          et elle l'était déjà. Ce qui manquait n'était pas la fonction mais la
+          phrase qui la dit — et la feuille posée près du clavier est le seul
+          endroit que l'on lit vraiment. */}
+      <div className="guide-titre-section">Préparer à l’avance</div>
+      <p className="guide-texte">
+        Rien n’oblige à tout taper le jour du concours. Saisissez les noms quand vous voulez :
+        tout s’enregistre au fur et à mesure, et vous retrouverez la saisie en rouvrant le
+        logiciel. Si vous travaillez depuis la clé USB, la préparation reste sur la clé et vous
+        suit au club. <strong>Pensez à régler la date du concours</strong> dans les Réglages,
+        sinon les feuilles de match porteront celle du jour où vous avez préparé.
+      </p>
+      <p className="guide-texte">
+        Pour préparer <strong>plusieurs</strong> concours, enregistrez chacun dans son fichier
+        avec le bouton <em>Enregistrer</em>, puis repartez d’un <em>Nouveau concours</em>. Le
+        jour venu, <em>Ouvrir</em> rouvre celui qu’il faut. Un concours qui n’a pas été
+        enregistré dans un fichier n’existe que dans le logiciel.
+      </p>
+
       <div className="guide-titre-section">Si ça se passe mal</div>
       <table className="guide-pannes">
         <tbody>

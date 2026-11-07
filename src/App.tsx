@@ -22,13 +22,14 @@ import { Bilan } from './ui/Bilan'
 import { Guide } from './ui/Guide'
 import { ouvrirSecondEcran } from './ui/secondEcran'
 import { ecrire, lire } from './stockage'
+import { Confirmation } from './ui/Confirmation'
 import { Classement } from './ui/Classement'
 import { NomEquipe } from './ui/Equipe'
 import { CarteAction } from './ui/CarteAction'
 import type { Onglet } from './ui/onglets'
 import { ProchaineEtape } from './ui/ProchaineEtape'
 import { Reglages } from './ui/Reglages'
-import { accord, LIBELLE_FORMATION } from './ui/format'
+import { accord, LIBELLE_FORMATION, pluriel } from './ui/format'
 
 /**
  * L'écran principal : les cinq onglets, et l'état du concours.
@@ -48,6 +49,7 @@ export default function App() {
   const [noms, setNoms] = useState<string[]>(() => lire()?.noms ?? [])
   const [onglet, setOnglet] = useState<Onglet>('reglages')
   const [projection, setProjection] = useState(false)
+  const [effacerDemande, setEffacerDemande] = useState(false)
 
   const lance = tournoi.matchs.length > 0
 
@@ -78,6 +80,26 @@ export default function App() {
     delete document.body.dataset.impression
   }
 
+  const enregistrerConcours = () => enregistrer({ version: 1, tournoi, noms }, tournoi.nom)
+
+  const repartirDeZero = () => {
+    setTournoi(nouveau())
+    setNoms([])
+    setOnglet('reglages')
+    setEffacerDemande(false)
+  }
+
+  /**
+   * Met le concours à l'abri, puis l'efface — et seulement s'il est à l'abri.
+   *
+   * Renoncer à la fenêtre d'enregistrement doit renoncer à tout : effacer
+   * quand même après un refus détruirait précisément ce que l'on venait de
+   * chercher à garder.
+   */
+  const enregistrerPuisEffacer = async () => {
+    if (await enregistrerConcours()) repartirDeZero()
+  }
+
   const ouvrirFichier = async () => {
     try {
       const donnees = await ouvrir()
@@ -94,6 +116,14 @@ export default function App() {
   const fini = termine(tournoi)
   const prets = tournoi.equipes.length
   const aTirer = propositionDe(tournoi).length
+
+  // Ce que l'effacement emporterait, dit en chiffres plutôt qu'en « ce concours » :
+  // on mesure ce qu'on perd quand on le voit compté.
+  const perduAEffacer = lance
+    ? `${pluriel(prets, 'équipe')} et ${pluriel(tournoi.matchs.length, 'partie')}`
+    : prets > 0
+      ? `${pluriel(prets, 'équipe')} saisie${accord(prets)}`
+      : null
 
   return (
     <div className="app">
@@ -128,24 +158,13 @@ export default function App() {
           <button className="secondaire" onClick={ouvrirFichier}>
             Ouvrir
           </button>
-          <button
-            className="secondaire"
-            onClick={() => enregistrer({ version: 1, tournoi, noms }, tournoi.nom)}
-          >
+          <button className="secondaire" onClick={enregistrerConcours}>
             Enregistrer
           </button>
           <button className="secondaire" onClick={() => imprimer()}>
             Imprimer
           </button>
-          <button
-            className="secondaire"
-            onClick={() => {
-              if (!confirm('Effacer ce concours et repartir de zéro ?')) return
-              setTournoi(nouveau())
-              setNoms([])
-              setOnglet('reglages')
-            }}
-          >
+          <button className="secondaire" onClick={() => setEffacerDemande(true)}>
             Nouveau concours
           </button>
         </div>
@@ -286,6 +305,33 @@ export default function App() {
       <Bilan tournoi={tournoi} />
       <Guide nomConcours={tournoi.nom} />
       {projection && <Affichage tournoi={tournoi} onFermer={() => setProjection(false)} />}
+
+      {/* Le geste le plus destructeur de l'application passait par la boîte du
+          navigateur, qui ne disait pas ce qu'elle emportait — alors que des
+          gestes bien moins graves avaient déjà cette fenêtre-ci. C'est pourtant
+          par là qu'on passe pour enchaîner la préparation de deux concours. */}
+      {effacerDemande && (
+        <Confirmation
+          titre={tournoi.nom ? `Effacer « ${tournoi.nom} » ?` : 'Effacer ce concours ?'}
+          action="Oui, effacer"
+          retour="Annuler"
+          secours={{ libelle: 'Enregistrer d’abord', onClick: enregistrerPuisEffacer }}
+          onValider={repartirDeZero}
+          onAnnuler={() => setEffacerDemande(false)}
+        >
+          {perduAEffacer ? (
+            <p>
+              Vous perdrez <strong>{perduAEffacer}</strong>.
+            </p>
+          ) : (
+            <p>Les réglages reviendront à leur valeur de départ.</p>
+          )}
+          <p>
+            Ce concours n’existe que dans le logiciel. Une fois effacé, rien ne permet de le
+            retrouver — sauf si vous l’enregistrez dans un fichier avant.
+          </p>
+        </Confirmation>
+      )}
     </div>
   )
 }

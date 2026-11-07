@@ -508,6 +508,12 @@ td .equipe-joueurs { color: var(--discret); font-size: 13px; }
     font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.07em;
     color: #555; margin-bottom: 7px;
   }
+  .guide-texte { margin: 0 0 8px; font-size: 12px; line-height: 1.5; color: #222; }
+  .guide-texte em { font-style: normal; font-weight: 700; }
+  /* Un intertitre qui suit du texte a besoin de respirer ; le premier, qui
+     suit la liste des étapes, a déjà la marge de celle-ci. */
+  .guide-texte + .guide-titre-section { margin-top: 14px; }
+
   .guide-pannes { width: 100%; border-collapse: collapse; }
   .guide-pannes td {
     font-size: 12px; padding: 8px 6px; border-bottom: 1px solid #ddd;
