@@ -1,9 +1,23 @@
-## Ce qui change en 0.2.4
+## Ce qui change en 0.2.5
 
-- **Le tête-à-tête** rejoint la doublette et la triplette, dans les réglages.
-- **Le classement s'affiche sur l'écran de saisie des scores**, entre les parties
-  en cours et les résultats. Il se met à jour à chaque score : plus besoin d'aller
-  le chercher pour voir où en sont les équipes.
+Tout tourne autour d'une question posée par le club : peut-on préparer les
+concours à l'avance ? On pouvait déjà, mais il fallait retrouver le bon fichier
+dans l'Explorateur de Windows le jour venu.
+
+- **Mes concours**, en haut de l'écran : la liste de vos concours, avec pour
+  chacun son nom, sa date et son nombre d'équipes. Vous reprenez celui que vous
+  voulez d'un clic, sans passer par les fichiers.
+- **« Nouveau concours » n'efface plus rien.** Le concours que vous quittez se
+  range dans cette liste, et une phrase vous dit où il est parti — avec le
+  bouton pour le ramener si vous vous êtes trompé.
+- Vous pouvez donc **préparer autant de concours que vous voulez**, des semaines
+  à l'avance. Pensez seulement à régler la **date de chacun** dans les Réglages,
+  sinon les feuilles de match porteront celle du jour où vous avez préparé.
+- Le **mode d'emploi imprimable** (onglet Réglages) explique tout cela.
+
+Vos concours déjà enregistrés dans un fichier ne risquent rien : rien n'a changé
+au format. Ouvrez-les une fois par **Mes concours → Ouvrir un fichier…** et ils
+rejoignent la liste, où ils resteront.
 
 Pour mettre à jour, remplacez seulement l'exécutable : le dossier `donnees` posé
 à côté de lui garde le concours en cours.
